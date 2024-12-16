@@ -1,4 +1,4 @@
-displayName = 东方小伙伴+ ~ Adventure with imbalance cute partners
+displayName = 东方小祖宗 ~ Ultimate pet force
 author = hezuo1hao
 version = 1.1.4.2
 includeSource = true
