@@ -12,5 +12,14 @@ namespace TouhouPetsEx
 	public class TouhouPetsEx : Mod
 	{
         public static Dictionary<int, BaseEnhance> GEnhanceInstances = [];
+        public static TouhouPetsEx Instance;
+        public override void Load()
+        {
+            Instance = this;
+        }
+        public override void Unload()
+        {
+            Instance = null;
+        }
     }
 }

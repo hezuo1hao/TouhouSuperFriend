@@ -13,8 +13,16 @@ namespace TouhouPetsEx
 {
 	public static class TouhouPetsExUtils
 	{
-        public static List<BaseEnhance> GEnhanceInstances = new List<BaseEnhance>();
         public static EnhancePlayers MP(this Player player) => player.GetModPlayer<EnhancePlayers>();
+        public static int GetTooltipsLastIndex(this List<TooltipLine> tooltips)
+        {
+            return tooltips
+                .Select((t, index) => new { t.Name, Index = index }) // 保留索引
+                .Where(x => x.Name.StartsWith("Tooltip") && int.TryParse(x.Name.Substring(7), out _)) // 筛选有效字符串
+                .OrderByDescending(x => int.Parse(x.Name.Substring(7))) // 按数字降序排序
+                .Select(x => x.Index) // 取索引
+                .FirstOrDefault(); // 获取第一个结果
+        }
         public static string GetText(string name) => Language.GetTextValue("Mods.TouhouPetsEx." + name);
         public static string GetText(string name, int arg0) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0);
         public static string GetText(string name, int arg0, int arg1) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0, arg1);

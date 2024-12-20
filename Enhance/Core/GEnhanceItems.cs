@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,51 @@ namespace TouhouPetsEx.Enhance.Core
         }
         private static void ProcessDemonismAction(Item item, Action<BaseEnhance> action)
         {
-            if (item.ModItem.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance))
+            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance))
             {
                 action(enhance);
             }
+        }
+        private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
+        {
+            foreach (int id in player.MP().ActiveEnhance)
+            {
+                action(TouhouPetsEx.GEnhanceInstances[id]);
+            }
+        }
+        private static bool? ProcessDemonismAction(Item item, Func<BaseEnhance, bool?> action)
+        {
+            bool? @return = null;
+            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance))
+            {
+                @return = action(enhance);
+            }
+            return @return;
+        }
+        private static bool? ProcessDemonismAction(Player player, Func<BaseEnhance, bool?> action)
+        {
+            bool? @return = null;
+            foreach (int id in player.MP().ActiveEnhance)
+            {
+                @return = action(TouhouPetsEx.GEnhanceInstances[id]);
+            }
+            return @return;
+        }
+        public override void SetDefaults(Item entity)
+        {
+            ProcessDemonismAction(entity, (enhance) => enhance.ItemSD(entity));
+        }
+        public override void HoldItem(Item item, Player player)
+        {
+            ProcessDemonismAction((enhance) => enhance.ItemHoldItem(item, player));
+        }
+        public override void UpdateInventory(Item item, Player player)
+        {
+            ProcessDemonismAction((enhance) => enhance.ItemUpdateInventory(item, player));
+        }
+        public override bool? UseItem(Item item, Player player)
+        {
+            return ProcessDemonismAction(player, (enhance) => enhance.ItemUseItem(item, player));
         }
         public override void SetStaticDefaults()
         {
@@ -52,16 +94,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
             if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh))
             {
-                // 找到目标 Tooltip 的索引
-                int targetIndex = tooltips
-                .Select((t, index) => new { t.Name, Index = index }) // 保留索引
-                .Where(x => x.Name.StartsWith("Tooltip") && int.TryParse(x.Name.Substring(7), out _)) // 筛选有效字符串
-                .OrderByDescending(x => int.Parse(x.Name.Substring(7))) // 按数字降序排序
-                .Select(x => x.Index) // 取索引
-                .FirstOrDefault(); // 获取第一个结果
-
-                tooltips.Insert(targetIndex + 1, new TooltipLine(Mod, "EnhanceTooltip", TouhouPetsExUtils.GetText("Common") + "\n" + enh.Text));
+                tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new TooltipLine(Mod, "EnhanceTooltip", TouhouPetsExUtils.GetText("Common") + "\n" + enh.Text));
             }
+
+            ProcessDemonismAction((enhance) => enhance.ItemModifyTooltips(item, tooltips));
         }
         public override bool AltFunctionUse(Item item, Player player)
         {
@@ -78,6 +114,7 @@ namespace TouhouPetsEx.Enhance.Core
                 if (player.MP().ActiveEnhance.Contains(item.type))
                 {
                     player.MP().ActiveEnhance.Remove(item.type);
+                    CombatText.NewText(player.getRect(), Color.Cyan, TouhouPetsExUtils.GetText("Disable"));
                 }
                 else
                 {
@@ -85,6 +122,7 @@ namespace TouhouPetsEx.Enhance.Core
                         player.MP().ActiveEnhance.RemoveAt(0);
 
                     player.MP().ActiveEnhance.Add(item.type);
+                    CombatText.NewText(player.getRect(), Color.Cyan, TouhouPetsExUtils.GetText("Enable"));
                 }
 
                 return false;

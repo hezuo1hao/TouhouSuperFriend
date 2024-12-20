@@ -1,6 +1,7 @@
 Rukoto: 会清理周边的各种植物。
 Shinki: 解锁/give指令的使用权限
-AliceOld: 携带大量的魔法书将给予你魔力上限
+AliceOld: 你可以从书里汲取魔力、扩充你的魔法书典藏将给予你强大的魔力
+AliceOld_1: 你已经汲取了{0}本书
 Rumia: 让被黑暗所笼罩的敌人无法找寻正确的道路
 Daiyousei: 每隔一段时间，可以触发一次决死效果
 Cirno: 制造冰，并可以作为武器使用
@@ -97,6 +98,8 @@ Momoyo_7: 暴击伤害+{0}%/20%
 Momoyo_8: 运气+{0}/0.2
 Momoyo_9: 百分比穿甲+{0}%/30%
 Common: 特殊能力：
+Enable: 已启用能力！
+Disable: 已禁用能力！
 
 Give: {
 	Usage:
