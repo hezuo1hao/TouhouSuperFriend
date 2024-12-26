@@ -21,7 +21,15 @@ namespace TouhouPetsEx.Enhance.Core
         /// 萝莉丝用
         /// </summary>
         public int EatBook = 0;
+        /// <summary>
+        /// 大妖精用
+        /// </summary>
         public int DaiyouseiCD = 0;
+        /// <summary>
+        /// 姬虫百百世用
+        /// <para>索引决定对应的加成：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7—运气、8—百分比穿甲</para>
+        /// </summary>
+        public float[] ExtraAddition = [];
         private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
         {
             foreach (int id in player.MP().ActiveEnhance)
@@ -36,10 +44,12 @@ namespace TouhouPetsEx.Enhance.Core
         public override void SaveData(TagCompound tag)
         {
             tag.Add("EatBook", EatBook);
+            tag.Add("ExtraAddition", ExtraAddition);
         }
         public override void LoadData(TagCompound tag)
         {
             EatBook = tag.GetInt("EatBook");
+            ExtraAddition = tag.Get<float[]>("ExtraAddition");
         }
         public override void PostUpdateEquips()
         {

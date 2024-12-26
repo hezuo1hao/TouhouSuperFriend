@@ -16,7 +16,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void ItemUpdateInventory(Item item, Player player)
         {
-            if (item.type is ItemID.Sapphire or ItemID.Ruby or ItemID.Emerald or ItemID.Topaz or ItemID.Amethyst or ItemID.Diamond or ItemID.Amber or ItemID.)
+            if (item.type is ItemID.Sapphire or ItemID.Ruby or ItemID.Emerald or ItemID.Topaz or ItemID.Amethyst or ItemID.Diamond or ItemID.Amber or ItemID.WhitePearl or ItemID.BlackPearl or ItemID.PinkPearl or ItemID.CrystalShard)
             {
                 if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()) && player.MP().EatBook < 100)
                 {
@@ -36,11 +36,21 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override bool? ItemUseItem(Item item, Player player)
         {
-            return base.ItemUseItem(item, player);
+            return null;
         }
         public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            base.ItemModifyTooltips(item, tooltips);
+            TooltipLine tooltipLine = new(TouhouPetsEx.Instance, "EatBookTooltip", TouhouPetsExUtils.GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
+
+            if (item.type == ItemID.Book && Main.LocalPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()))
+            {
+                tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine);
+            }
+
+            if (item.type == ModContent.ItemType<AliceOldDoll>())
+            {
+                tooltips.Insert(tooltips.FindIndex(tooltip => tooltip.Name == "EnhanceTooltip") + 1, tooltipLine);
+            }
         }
     }
 }

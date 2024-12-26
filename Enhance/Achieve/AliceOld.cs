@@ -56,12 +56,13 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (item.type == ItemID.Book && player.MP().EatBook < 100)
             {
                 player.MP().EatBook += 1;
+                return true;
             }
-            return true;
+            return null;
         }
         public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            TooltipLine tooltipLine = new TooltipLine(TouhouPetsEx.Instance, "EatBookTooltip", TouhouPetsExUtils.GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
+            TooltipLine tooltipLine = new(TouhouPetsEx.Instance, "EatBookTooltip", TouhouPetsExUtils.GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
 
             if (item.type == ItemID.Book && Main.LocalPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()))
             {
