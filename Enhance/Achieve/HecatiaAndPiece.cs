@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -33,14 +34,16 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void NPCAI(NPC npc, Player player)
         {
-            int cycle = 60; // 周期
+            // 总体设置
+            int cycle = 60;  // 总的时间为 60 帧
+            int damage = 0;
             int Radius = 15;
-            int minTileX = (int)(npc.position.X / 16f - Radius);
-            int maxTileX = (int)(npc.position.X / 16f + Radius);
-            int minTileY = (int)(npc.position.Y / 16f - Radius);
-            int maxTileY = (int)(npc.position.Y / 16f + Radius);
+            int minTileX = (int)(npc.Center.X / 16f - Radius);
+            int maxTileX = (int)(npc.Center.X / 16f + Radius);
+            int minTileY = (int)(npc.Center.Y / 16f - Radius);
+            int maxTileY = (int)(npc.Center.Y / 16f + Radius);
 
-            // 确保坐标范围在有效范围内
+            // 确保坐标在有效范围内
             if (minTileX < 0)
             {
                 minTileX = 0;
@@ -58,39 +61,45 @@ namespace TouhouPetsEx.Enhance.Achieve
                 maxTileY = Main.maxTilesY;
             }
 
-            // 当前周期中的步骤
-            int totalTiles = (maxTileX - minTileX + 1) * (maxTileY - minTileY + 1);
-            int stepCount = totalTiles / cycle;  // 每次更新时处理多少砖块
+            // 计算应该在这一帧执行的任务数量
+            int tilesPerFrame = ((maxTileX - minTileX + 1) * (maxTileY - minTileY + 1)) / cycle;
+            int currentStep = (int)(Main.time % cycle);
 
-            if (stepCount == 0) stepCount = 1;  // 防止除以0，确保至少处理一个砖块
+            // 逐步执行循环
+            int startTileIndex = currentStep * tilesPerFrame;
+            int endTileIndex = (currentStep + 1) * tilesPerFrame - 1;
 
-            int stepIndex = (int)(Main.time % cycle); // 当前时间所处的周期步骤
-
-            // 计算当前步骤要处理的砖块
-            int startTile = minTileX + (stepIndex * stepCount); // 从哪个砖块开始
-            int endTile = startTile + stepCount - 1;  // 到哪个砖块结束
-
-            // 限制结束位置不超出范围
-            if (endTile > maxTileX) endTile = maxTileX;
-
-            // 逐步执行每个砖块的操作
-            for (int i = startTile; i <= endTile; i++)
+            // 遍历指定区域的所有瓷砖
+            int tileIndex = 0;
+            for (int i = minTileX; i <= maxTileX; i++)
             {
                 for (int j = minTileY; j <= maxTileY; j++)
                 {
-                    float diffX = Math.Abs(i - npc.position.X / 16f);
-                    float diffY = Math.Abs(j - npc.position.Y / 16f);
-                    double distanceToTile = Math.Sqrt((double)(diffX * diffX + diffY * diffY));
-
-                    // 如果距离小于设定的半径，并且该位置是火炬类型的砖块
-                    if (distanceToTile < Radius && TileID.Sets.Torch[Framing.GetTileSafely(i, j).TileType])
+                    if (tileIndex >= startTileIndex && tileIndex <= endTileIndex)
                     {
-                        npc.SimpleStrikeNPC(1, 0); // 对 NPC 造成伤害
-                    }
+                        // 计算到 NPC 的距离
+                        float diffX = Math.Abs(i - npc.position.X / 16f);
+                        float diffY = Math.Abs(j - npc.position.Y / 16f);
+                        double distanceToTile = Math.Sqrt(diffX * diffX + diffY * diffY);
 
-                    // 生成火炬的粉尘效果
-                    Dust.NewDustDirect(new Microsoft.Xna.Framework.Vector2(i * 16, j * 16), 1, 1, DustID.Torch).noGravity = true;
+                        // 判断是否在范围内且是火把类型的砖块
+                        if (distanceToTile < Radius && TileID.Sets.Torch[Framing.GetTileSafely(i, j).TileType])
+                        {
+                            damage++;
+                        }
+                    }
+                    tileIndex++;
                 }
+            }
+
+            if (damage != 0)
+                npc.SimpleStrikeNPC(damage, 0); // 处理 NPC 受伤
+        }
+        public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
+        {
+            if (item.type == ModContent.ItemType<HecatiaPlanet>())
+            {
+                tooltips.Insert(tooltips.FindIndex(tooltip => tooltip.Name == "EnhanceTooltip") + 1, new TooltipLine(TouhouPetsEx.Instance, "EnhanceTooltip_1", TouhouPetsExUtils.GetText("HecatiaAndPiece_1")));
             }
         }
     }
