@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -9,47 +10,210 @@ namespace TouhouPetsEx.Enhance.Achieve
 {
     public class Momoyo : BaseEnhance
     {
+        static private int[] Edible = [ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber, ItemID.WhitePearl, ItemID.BlackPearl, ItemID.PinkPearl, ItemID.CrystalShard];
         public override string Text => TouhouPetsExUtils.GetText("Momoyo");
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<MomoyoPickaxe>());
         }
+        public override void PlayerPostUpdateEquips(Player player)
+        {
+            EnhancePlayers plr = player.MP();
+
+            player.moveSpeed += plr.ExtraAddition[0] / 500f;
+            player.runSlowdown += plr.ExtraAddition[0] / 500f / 5f;
+            player.pickSpeed -= plr.ExtraAddition[1] / 500f;
+            player.breathMax += plr.ExtraAddition[2];
+            player.statLifeMax2 += plr.ExtraAddition[3];
+            player.lavaMax += plr.ExtraAddition[4];
+            player.endurance += plr.ExtraAddition[5] / 1000f;
+        }
+        public override void PlayerModifyHitNPC(Player player, NPC target, ref NPC.HitModifiers modifiers)
+        {
+            modifiers.CritDamage += player.MP().ExtraAddition[6] / 1000f;
+            modifiers.ScalingArmorPenetration += player.MP().ExtraAddition[10] / 500f;
+
+            if (target.type >= 87 && target.type <= 92) modifiers.TargetDamageMultiplier *= 3;
+        }
+        public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (target.life <= 0 && target.type >= 87 && target.type <= 92 && player.statLife < player.statLifeMax2) player.Heal(150);
+        }
+        public override void PlayerModifyLuck(Player player, ref float luck)
+        {
+            EnhancePlayers plr = player.MP();
+
+            luck += plr.ExtraAddition[7] / 100f + plr.ExtraAddition[8] / 40f + plr.ExtraAddition[9] / 10f;
+        }
         public override void ItemUpdateInventory(Item item, Player player)
         {
-            if (item.type is ItemID.Sapphire or ItemID.Ruby or ItemID.Emerald or ItemID.Topaz or ItemID.Amethyst or ItemID.Diamond or ItemID.Amber or ItemID.WhitePearl or ItemID.BlackPearl or ItemID.PinkPearl or ItemID.CrystalShard)
+            if (Edible.Contains(item.type))
             {
-                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()) && player.MP().EatBook < 100)
+                for (int i = 0; i < Edible.Length; i++)
                 {
-                    item.useAnimation = item.useTime = 30;
-                    item.useStyle = ItemUseStyleID.DrinkOld;
-                    item.UseSound = SoundID.Item2;
-                    item.consumable = true;
-                }
-                else
-                {
-                    item.useAnimation = item.useTime = 0;
-                    item.useStyle = ItemUseStyleID.None;
-                    item.UseSound = null;
-                    item.consumable = false;
+                    if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<MomoyoPickaxe>()) && player.MP().ExtraAddition[i] < player.MP().ExtraAdditionMax[i])
+                    {
+                        item.useAnimation = item.useTime = 30;
+                        item.createTile = -1;
+                        item.useStyle = ItemUseStyleID.DrinkOld;
+                        item.UseSound = SoundID.Item2;
+                        item.consumable = true;
+                    }
+                    else
+                    {
+                        Item item1 = new(item.type);
+                        item.useAnimation = item1.useAnimation;
+                        item.useTime = item1.useTime;
+                        item.createTile = item1.createTile;
+                        item.useStyle = item1.useStyle;
+                        item.UseSound = item1.UseSound;
+                        item.consumable = item1.consumable;
+                    }
                 }
             }
         }
         public override bool? ItemUseItem(Item item, Player player)
         {
-            return null;
+            int buffType;
+
+            switch (item.type)
+            {
+                case ItemID.Amethyst:
+                    player.MP().ExtraAddition[0]++;
+                    buffType = BuffID.WellFed;
+                    break;
+
+                case ItemID.Topaz:
+                    player.MP().ExtraAddition[1]++;
+                    buffType = BuffID.WellFed;
+                    break;
+
+                case ItemID.Sapphire:
+                    player.MP().ExtraAddition[2]++;
+                    buffType = BuffID.WellFed2;
+                    break;
+
+                case ItemID.Emerald:
+                    player.MP().ExtraAddition[3]++;
+                    buffType = BuffID.WellFed2;
+                    break;
+
+                case ItemID.Ruby:
+                    player.MP().ExtraAddition[4]++;
+                    buffType = BuffID.WellFed2;
+                    break;
+
+                case ItemID.Diamond:
+                    player.MP().ExtraAddition[5]++;
+                    buffType = BuffID.WellFed3;
+                    break;
+
+                case ItemID.Amber:
+                    player.MP().ExtraAddition[6]++;
+                    buffType = BuffID.WellFed2;
+                    break;
+
+                case ItemID.WhitePearl:
+                    player.MP().ExtraAddition[7]++;
+                    buffType = BuffID.WellFed;
+                    break;
+
+                case ItemID.BlackPearl:
+                    player.MP().ExtraAddition[8]++;
+                    buffType = BuffID.WellFed2;
+                    break;
+
+                case ItemID.PinkPearl:
+                    player.MP().ExtraAddition[9]++;
+                    buffType = BuffID.WellFed3;
+                    break;
+
+                case ItemID.CrystalShard:
+                    player.MP().ExtraAddition[10]++;
+                    buffType = BuffID.WellFed2;
+                    break;
+
+                default:
+                    return null;
+            }
+
+            player.AddBuff(buffType, 28800);
+
+            return true;
         }
         public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            TooltipLine tooltipLine = new(TouhouPetsEx.Instance, "EatBookTooltip", TouhouPetsExUtils.GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
+            EnhancePlayers plr = Main.LocalPlayer.MP();
 
-            if (item.type == ItemID.Book && Main.LocalPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()))
+            TooltipLine[] tooltipLine = [
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_1", TouhouPetsExUtils.GetText("Momoyo_1", plr.ExtraAddition[0] / 5f)),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_2", TouhouPetsExUtils.GetText("Momoyo_2", plr.ExtraAddition[1] / 5f)),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_3", TouhouPetsExUtils.GetText("Momoyo_3", plr.ExtraAddition[2])),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_4", TouhouPetsExUtils.GetText("Momoyo_4", plr.ExtraAddition[3])),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_5", TouhouPetsExUtils.GetText("Momoyo_5", plr.ExtraAddition[4])),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_6", TouhouPetsExUtils.GetText("Momoyo_6", plr.ExtraAddition[5] / 10f)),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_7", TouhouPetsExUtils.GetText("Momoyo_7", plr.ExtraAddition[6] / 10f)),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_8", TouhouPetsExUtils.GetText("Momoyo_8", plr.ExtraAddition[7] / 100f + plr.ExtraAddition[8] / 40f + plr.ExtraAddition[9] / 10f)),
+                new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_9", TouhouPetsExUtils.GetText("Momoyo_9", plr.ExtraAddition[10] / 5f))
+                ];
+
+            if (plr.ActiveEnhance.Contains(ModContent.ItemType<MomoyoPickaxe>()))
             {
-                tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine);
+                switch (item.type)
+                {
+                    case ItemID.Amethyst:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[0]);
+                        return;
+
+                    case ItemID.Topaz:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[1]);
+                        return;
+
+                    case ItemID.Sapphire:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[2]);
+                        return;
+
+                    case ItemID.Emerald:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[3]);
+                        return;
+
+                    case ItemID.Ruby:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[4]);
+                        return;
+
+                    case ItemID.Diamond:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[5]);
+                        return;
+
+                    case ItemID.Amber:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[6]);
+                        return;
+
+                    case ItemID.WhitePearl:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_8", TouhouPetsExUtils.GetText("Momoyo_10", plr.ExtraAddition[7] / 100f)));
+                        return;
+
+                    case ItemID.BlackPearl:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_8", TouhouPetsExUtils.GetText("Momoyo_10", plr.ExtraAddition[8] / 40f)));
+                        return;
+
+                    case ItemID.PinkPearl:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_8", TouhouPetsExUtils.GetText("Momoyo_10", plr.ExtraAddition[9] / 10f)));
+                        return;
+
+                    case ItemID.CrystalShard:
+                        tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine[8]);
+                        return;
+                }
             }
 
-            if (item.type == ModContent.ItemType<AliceOldDoll>())
+            if (item.type == ModContent.ItemType<MomoyoPickaxe>())
             {
-                tooltips.Insert(tooltips.FindIndex(tooltip => tooltip.Name == "EnhanceTooltip") + 1, tooltipLine);
+                int index = tooltips.FindIndex(tooltip => tooltip.Name == "EnhanceTooltip");
+                for (int i = 0; i < tooltipLine.Length; i++)
+                {
+                    tooltips.Insert(index + i + 1, tooltipLine[i]);
+                }
             }
         }
     }

@@ -52,6 +52,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
             return null;
         }
+        public virtual void PlayerPreUpdate(Player player)
+        {
+
+        }
         public virtual void PlayerPostUpdate(Player player)
         {
 
@@ -65,6 +69,22 @@ namespace TouhouPetsEx.Enhance.Core
 
         }
         public virtual void PlayerModifyHurt(Player player, ref Player.HurtModifiers modifiers)
+        {
+
+        }
+        public virtual void PlayerModifyHitNPC(Player player, NPC target, ref NPC.HitModifiers modifiers)
+        {
+
+        }
+        public virtual void PlayerModifyLuck(Player player, ref float luck)
+        {
+
+        }
+        public virtual void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+
+        }
+        public virtual void NPCAI(NPC npc, Player player)
         {
 
         }

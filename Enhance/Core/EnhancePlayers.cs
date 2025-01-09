@@ -10,6 +10,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.WorldBuilding;
 
 namespace TouhouPetsEx.Enhance.Core
 {
@@ -27,9 +28,14 @@ namespace TouhouPetsEx.Enhance.Core
         public int DaiyouseiCD = 0;
         /// <summary>
         /// 姬虫百百世用
-        /// <para>索引决定对应的加成：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7—运气、8—百分比穿甲</para>
+        /// <para>索引决定对应的加成：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲</para>
         /// </summary>
-        public float[] ExtraAddition = [];
+        public int[] ExtraAddition = new int[11];
+        /// <summary>
+        /// 姬虫百百世用
+        /// <para>索引决定对应的加成上限：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲</para>
+        /// </summary>
+        public int[] ExtraAdditionMax = [50, 50, int.MaxValue, 100, int.MaxValue, 50, 200, 10, 4, 1, 150];
         private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
         {
             foreach (int id in player.MP().ActiveEnhance)
@@ -49,7 +55,17 @@ namespace TouhouPetsEx.Enhance.Core
         public override void LoadData(TagCompound tag)
         {
             EatBook = tag.GetInt("EatBook");
-            ExtraAddition = tag.Get<float[]>("ExtraAddition");
+            if (tag.GetIntArray("ExtraAddition").Length != 0) ExtraAddition = tag.GetIntArray("ExtraAddition");
+        }
+        public override void ModifyLuck(ref float luck)
+        {
+            float luck2 = luck;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyLuck(Player, ref luck2));
+            luck = luck2;
+        }
+        public override void PreUpdate()
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerPreUpdate(Player));
         }
         public override void PostUpdateEquips()
         {
@@ -70,14 +86,24 @@ namespace TouhouPetsEx.Enhance.Core
             r = r2;
             g = g2;
             b = b2;
-            a2 = a;
-            fullBright2 = fullBright;
+            a = a2;
+            fullBright = fullBright2;
         }
         public override void ModifyHurt(ref Player.HurtModifiers modifiers)
         {
             Player.HurtModifiers modifiers2 = modifiers;
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHurt(Player, ref modifiers2));
-            modifiers2 = modifiers;
+            modifiers = modifiers2;
+        }
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            NPC.HitModifiers modifiers2 = modifiers;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPC(Player, target, ref modifiers2));
+            modifiers = modifiers2;
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerOnHitNPC(Player, target, hit, damageDone));
         }
     }
 }

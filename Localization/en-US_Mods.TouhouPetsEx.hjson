@@ -77,7 +77,7 @@ Sekibanki: 可以右键把头飞出去玩
 Raiko: 会让在雷雨天装的敌怪遭受制裁
 Doremy: 睡觉有概率美梦成真
 Junko: 不残不会玩
-Hecatia+Piece:
+HecatiaAndPiece:
 	'''
 	当你成功证明自身的强大时，增加能力携带上限
 	火把会使敌人疯狂自残
@@ -95,8 +95,9 @@ Momoyo_4: 最大生命值+{0}/100
 Momoyo_5: 岩浆免疫时间+{0}
 Momoyo_6: 伤害减免+{0}%/5%
 Momoyo_7: 暴击伤害+{0}%/20%
-Momoyo_8: 运气+{0}/0.2
+Momoyo_8: 运气+{0}/0.3
 Momoyo_9: 百分比穿甲+{0}%/30%
+Momoyo_10: 运气+{0}/0.1
 Common: 特殊能力：
 Enable: 已启用能力！
 Disable: 已禁用能力！

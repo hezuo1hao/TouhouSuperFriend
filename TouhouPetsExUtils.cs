@@ -24,9 +24,9 @@ namespace TouhouPetsEx
                 .FirstOrDefault(); // 获取第一个结果
         }
         public static string GetText(string name) => Language.GetTextValue("Mods.TouhouPetsEx." + name);
-        public static string GetText(string name, int arg0) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0);
-        public static string GetText(string name, int arg0, int arg1) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0, arg1);
-        public static string GetText(string name, int arg0, int arg1, int arg2) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0, arg1, arg2);
-        public static string GetText(string name, params int[] args) => Language.GetTextValue("Mods.TouhouPetsEx." + name, args);
+        public static string GetText(string name, object arg0) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0);
+        public static string GetText(string name, object arg0, object arg1) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0, arg1);
+        public static string GetText(string name, object arg0, object arg1, object arg2) => Language.GetTextValue("Mods.TouhouPetsEx." + name, arg0, arg1, arg2);
+        public static string GetText(string name, params object[] args) => Language.GetTextValue("Mods.TouhouPetsEx." + name, args);
     }
 }
