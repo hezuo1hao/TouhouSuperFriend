@@ -17,9 +17,24 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public virtual string Text => "";
         /// <summary>
+        /// 实验性玩法描述
+        /// </summary>
+        public virtual string ExperimentalText => "";
+        /// <summary>
         /// 是否启用右键，默认启用
         /// </summary>
         public virtual bool EnableRightClick => true;
+        /// <summary>
+        /// 是否为被动能力（携带在背包或宠物/照明宠物栏即生效），默认为否
+        /// </summary>
+        public virtual bool Passive => false;
+        /// <summary>
+        /// 是否启用了对应能力的实验性玩法
+        /// </summary>
+        public virtual bool Experimental
+        {
+            get { return false; }
+        }
         /// <summary>
         /// 添加本增强与对应物品之间的联系
         /// </summary>
@@ -52,6 +67,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
             return null;
         }
+        public virtual void PlayerResetEffects(Player player)
+        {
+
+        }
         public virtual void PlayerPreUpdate(Player player)
         {
 
@@ -67,6 +86,10 @@ namespace TouhouPetsEx.Enhance.Core
         public virtual void PlayerDrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
 
+        }
+        public virtual bool? PlayerFreeDodge(Player player, Player.HurtInfo info)
+        {
+            return null;
         }
         public virtual void PlayerModifyHurt(Player player, ref Player.HurtModifiers modifiers)
         {
@@ -84,7 +107,15 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
-        public virtual void NPCAI(NPC npc, Player player)
+        public virtual bool? PlayerPreKill(Player player, double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
+        {
+            return null;
+        }
+        public virtual void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+        {
+            
+        }
+        public virtual void NPCAI(NPC npc)
         {
 
         }

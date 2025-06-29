@@ -18,11 +18,24 @@ namespace TouhouPetsEx.Enhance.Core
             if (BuffLoader.GetBuff(type)?.Mod.Name == "TouhouPets")
             {
                 if (Main.LocalPlayer.MP().ActiveEnhance.Count > 0)
-                    tip += "\n" + TouhouPetsExUtils.GetText("Common");
+                    tip += "\n" + GetText("Common");
 
                 foreach (int id in Main.LocalPlayer.MP().ActiveEnhance)
                 {
                     tip += "\n" + TouhouPetsEx.GEnhanceInstances[id].Text;
+                    if (TouhouPetsEx.GEnhanceInstances[id].Experimental)
+                    {
+                        tip += "\n" + TouhouPetsEx.GEnhanceInstances[id].ExperimentalText;
+                    }
+                }
+
+                foreach (int id in Main.LocalPlayer.MP().ActivePassiveEnhance)
+                {
+                    tip += "\n" + TouhouPetsEx.GEnhanceInstances[id].Text;
+                    if (TouhouPetsEx.GEnhanceInstances[id].Experimental)
+                    {
+                        tip += "\n" + TouhouPetsEx.GEnhanceInstances[id].ExperimentalText;
+                    }
                 }
             }
         }

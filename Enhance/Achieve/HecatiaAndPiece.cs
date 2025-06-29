@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -10,21 +11,16 @@ namespace TouhouPetsEx.Enhance.Achieve
 {
     public class HecatiaAndPiece : BaseEnhance
     {
-        public override string Text => TouhouPetsExUtils.GetText("HecatiaAndPiece");
+        public override string Text => GetText("HecatiaAndPiece");
+        public override string ExperimentalText => GetText("HecatiaAndPiece_1");
+        public override bool Experimental { get => Config.Hecatia; }
         public override bool EnableRightClick => false;
+        public override bool Passive => true;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<HecatiaPlanet>());
         }
-        public override void ItemUpdateInventory(Item item, Player player)
-        {
-            if (item.type == ModContent.ItemType<HecatiaPlanet>() && !player.MP().ActiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()))
-            {
-                player.MP().ActiveEnhanceCount++;
-                player.MP().ActiveEnhance.Add(ModContent.ItemType<HecatiaPlanet>());
-            }
-        }
-        public override void PlayerPreUpdate(Player player)
+        public override void PlayerResetEffects(Player player)
         {
             if (Main.hardMode)
                 player.MP().ActiveEnhanceCount++;
@@ -32,8 +28,21 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (NPC.downedMoonlord)
                 player.MP().ActiveEnhanceCount++;
         }
-        public override void NPCAI(NPC npc, Player player)
+        public override void NPCAI(NPC npc)
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient || npc.dontTakeDamage || npc.friendly || NPCID.Sets.CountsAsCritter[npc.type])
+                return;
+
+            int magnification = 0;
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (player.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && player.HasTouhouPetsBuff())
+                    magnification++;
+            }
+
+            if (magnification == 0)
+                return;
+
             // 总体设置
             int cycle = 60;  // 总的时间为 60 帧
             int damage = 0;
@@ -63,7 +72,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 
             // 计算应该在这一帧执行的任务数量
             int tilesPerFrame = ((maxTileX - minTileX + 1) * (maxTileY - minTileY + 1)) / cycle;
-            int currentStep = (int)(Main.time % cycle);
+            int currentStep = (int)(Main.GameUpdateCount % cycle);
 
             // 逐步执行循环
             int startTileIndex = currentStep * tilesPerFrame;
@@ -93,13 +102,12 @@ namespace TouhouPetsEx.Enhance.Achieve
             }
 
             if (damage != 0)
-                npc.SimpleStrikeNPC(damage, 0); // 处理 NPC 受伤
-        }
-        public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
-        {
-            if (item.type == ModContent.ItemType<HecatiaPlanet>())
+                npc.GetGlobalNPC<GEnhanceNPCs>().TorchDamage += (int)Math.Ceiling(damage / 10f) * magnification;
+
+            if (Main.GameUpdateCount % 30 == 17 && npc.GetGlobalNPC<GEnhanceNPCs>().TorchDamage > 0)
             {
-                tooltips.Insert(tooltips.FindIndex(tooltip => tooltip.Name == "EnhanceTooltip") + 1, new TooltipLine(TouhouPetsEx.Instance, "EnhanceTooltip_1", TouhouPetsExUtils.GetText("HecatiaAndPiece_1")));
+                npc.SimpleStrikeNPC(npc.GetGlobalNPC<GEnhanceNPCs>().TorchDamage, 0);
+                npc.GetGlobalNPC<GEnhanceNPCs>().TorchDamage = 0;
             }
         }
     }

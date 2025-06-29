@@ -17,7 +17,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 {
     public class Rukoto : BaseEnhance
     {
-        public override string Text => TouhouPetsExUtils.GetText("Rukoto");
+        public override string Text => GetText("Rukoto");
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<RukotoRemote>());

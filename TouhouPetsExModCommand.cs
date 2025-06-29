@@ -21,19 +21,19 @@ namespace TouhouPetsEx
         public override string Command
             => "give";
 
-        public override string Usage => TouhouPetsExUtils.GetText("Give.Usage");
+        public override string Usage => GetText("Give.Usage");
 
-        public override string Description => TouhouPetsExUtils.GetText("Give.Description");
+        public override string Description => GetText("Give.Description");
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             // 不开能力就想用指令，报错！
-            if (!caller.Player.MP().ActiveEnhance.Contains(ModContent.ItemType<ShinkiHeart>()))
-                throw new UsageException(TouhouPetsExUtils.GetText("Give.Error_1"));
+            if (!caller.Player.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<ShinkiHeart>()))
+                throw new UsageException(GetText("Give.Error_1"));
 
             // 一个参数都没有，报错！
             if (args.Length == 0)
-                throw new UsageException(TouhouPetsExUtils.GetText("Give.Error_2"));
+                throw new UsageException(GetText("Give.Error_2"));
 
             // 尝试获取指令输入里有没有数字，没有意味着填写的是名称或是瞎几把填的
             if (!int.TryParse(args[0], out int type))
@@ -54,12 +54,16 @@ namespace TouhouPetsEx
 
             // 找不到对应的物品，报错！
             if (type <= 0 || type >= ItemLoader.ItemCount)
-                throw new UsageException(TouhouPetsExUtils.GetText("Give.Error_3", ItemLoader.ItemCount));
+                throw new UsageException(GetText("Give.Error_3", ItemLoader.ItemCount));
 
-            // 试图给予怪东西，报错！
+            // 试图在月前给不在表里的东西，报错！
+            if (!NPC.downedMoonlord && !TouhouPetsEx.WhitelistBlock.Contains(type))
+                throw new UsageException(GetText("Give.Error_4"));
+
+            // 试图给予怪东西，报错！(月后）
             Item item = new(type);
-            if (item.rare != ItemRarityID.White || item.value > 0 || item.createTile == -1 || !Main.tileSolid[item.createTile] || item.type is 424 or 1103 or 3347)
-                throw new UsageException(TouhouPetsExUtils.GetText("Give.Error_4"));
+            if (item.createTile == -1 || !Main.tileSolid[item.createTile])
+                throw new UsageException(GetText("Give.Error_5"));
 
             // 如果填了物品数量就获取，没填则默认为1
             int stack = 1;
@@ -67,7 +71,7 @@ namespace TouhouPetsEx
             {
                 // 参数瞎几把填，报错！
                 if (!int.TryParse(args[1], out stack))
-                    throw new UsageException(TouhouPetsExUtils.GetText("Give.Error_5") + args[1]);
+                    throw new UsageException(GetText("Give.Error_6") + args[1]);
             }
 
             // 在输入命令的玩家身上生成物品

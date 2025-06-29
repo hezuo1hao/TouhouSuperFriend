@@ -6,7 +6,9 @@ namespace TouhouPetsEx.Enhance.Achieve
 {
     public class Shinki : BaseEnhance
     {
-        public override string Text => TouhouPetsExUtils.GetText("Shinki");
+        public override string Text => GetText("Shinki");
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<ShinkiHeart>());

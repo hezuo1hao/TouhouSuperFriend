@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -9,7 +10,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 {
     public class AliceOld : BaseEnhance
     {
-        public override string Text => TouhouPetsExUtils.GetText("AliceOld");
+        public override string Text => GetText("AliceOld");
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<AliceOldDoll>());
@@ -34,35 +35,63 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             if (item.type == ItemID.Book)
             {
-                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()) && player.MP().EatBook < 100)
+                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()) && player.MP().EatBook < 100 && player.HasTouhouPetsBuff())
                 {
-                    item.useAnimation = item.useTime = 30;
+                    item.useAnimation = item.useTime = 15;
+                    item.createTile = -1;
                     item.useStyle = ItemUseStyleID.HoldUp;
                     item.UseSound = SoundID.Item4;
                     item.consumable = true;
                 }
                 else
                 {
-                    item.useAnimation = item.useTime = 0;
-                    item.useStyle = ItemUseStyleID.None;
-                    item.UseSound = null;
-                    item.consumable = false;
+                    Item item1 = new(item.type);
+                    item.useTime = item1.useTime;
+                    item.useAnimation = item1.useAnimation;
+                    item.createTile = item1.createTile;
+                    item.useStyle = item1.useStyle;
+                    item.UseSound = item1.UseSound;
+                    item.consumable = item1.consumable;
+                }
+            }
+        }
+        public override void ItemHoldItem(Item item, Player player)
+        {
+            if (item.type == ItemID.Book)
+            {
+                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()) && player.MP().EatBook < 100 && player.HasTouhouPetsBuff())
+                {
+                    item.useAnimation = item.useTime = 15;
+                    item.createTile = -1;
+                    item.useStyle = ItemUseStyleID.HoldUp;
+                    item.UseSound = SoundID.Item4;
+                    item.consumable = true;
+                }
+                else
+                {
+                    Item item1 = new(item.type);
+                    item.useTime = item1.useTime;
+                    item.useAnimation = item1.useAnimation;
+                    item.createTile = item1.createTile;
+                    item.useStyle = item1.useStyle;
+                    item.UseSound = item1.UseSound;
+                    item.consumable = item1.consumable;
                 }
             }
         }
         public override bool? ItemUseItem(Item item, Player player)
         {
-            Main.NewText(player.MP().EatBook);
-            if (item.type == ItemID.Book && player.MP().EatBook < 100)
+            if (item.type == ItemID.Book && player.MP().EatBook < 100 && player == Main.LocalPlayer)
             {
                 player.MP().EatBook += 1;
+                EnhancePlayers.AwardPlayerSync(TouhouPetsEx.Instance, -1, player.whoAmI);
                 return true;
             }
             return null;
         }
         public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            TooltipLine tooltipLine = new(TouhouPetsEx.Instance, "EatBookTooltip", TouhouPetsExUtils.GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
+            TooltipLine tooltipLine = new(TouhouPetsEx.Instance, "EatBookTooltip", GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
 
             if (item.type == ItemID.Book && Main.LocalPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()))
             {

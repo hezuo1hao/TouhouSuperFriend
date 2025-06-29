@@ -13,16 +13,34 @@ namespace TouhouPetsEx.Enhance.Core
 {
 	public class GEnhanceNPCs : GlobalNPC
     {
-        private static void ProcessDemonismAction(NPC npc, Player player, Action<BaseEnhance> action)
+        /// <summary>
+        /// 赫卡提亚+皮丝用
+        /// </summary>
+        public int TorchDamage;
+        /// <summary>
+        /// 土debuff，帕秋莉用
+        /// </summary>
+        public bool Earth;
+        public override bool InstancePerEntity => true;
+        private static void ProcessDemonismAction(NPC npc, Action<BaseEnhance> action)
         {
-            foreach (int id in player.MP().ActiveEnhance)
+            foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
             {
-                action(TouhouPetsEx.GEnhanceInstances[id]);
+                action(enhance);
             }
+        }
+        public override void ResetEffects(NPC npc)
+        {
+            Earth = false;
         }
         public override void AI(NPC npc)
         {
-            ProcessDemonismAction(npc, Main.LocalPlayer, (enhance) => enhance.NPCAI(npc, Main.LocalPlayer));
+            ProcessDemonismAction(npc, (enhance) => enhance.NPCAI(npc));
+        }
+        public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
+        {
+            if (Earth)
+                modifiers.ScalingArmorPenetration += 0.5f;
         }
     }
 }

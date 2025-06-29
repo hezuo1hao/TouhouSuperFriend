@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -14,16 +15,16 @@ namespace TouhouPetsEx.PlrDrawLayers
         public override Position GetDefaultPosition() => PlayerDrawLayers.AfterLastVanillaLayer;
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
         {
-            return !drawInfo.drawPlayer.dead && drawInfo.drawPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<RumiaRibbon>());
+            return !Main.gameMenu && !drawInfo.drawPlayer.dead && drawInfo.drawPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<RumiaRibbon>()) && drawInfo.drawPlayer.HasTouhouPetsBuff();
         }
+        public static Texture2D tex = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/NoBlackPointLight", AssetRequestMode.ImmediateLoad).Value;
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
             if (drawInfo.shadow == 0f)
             {
                 var position = drawInfo.Center.Floor() - Main.screenPosition;
-                var tex = TextureAssets.Projectile[540].Value;
                 drawInfo.DrawDataCache.Add(new DrawData(tex, position, null, Color.Black, 0f,
-                    tex.Size() * 0.5f, 3f, SpriteEffects.None, 0));
+                    tex.Size() * 0.5f, 2f, SpriteEffects.None, 0));
             }
         }
     }

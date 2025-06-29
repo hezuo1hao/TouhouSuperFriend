@@ -11,7 +11,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 {
     public class Rumia : BaseEnhance
     {
-        public override string Text => TouhouPetsExUtils.GetText("Rumia");
+        public override string Text => GetText("Rumia");
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<RumiaRibbon>());

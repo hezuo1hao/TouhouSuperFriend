@@ -29,7 +29,10 @@ namespace TouhouPetsEx.Enhance.Core
         }
         private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
         {
-            foreach (int id in player.MP().ActiveEnhance)
+            if (!player.HasTouhouPetsBuff())
+                return;
+
+            foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
             {
                 action(TouhouPetsEx.GEnhanceInstances[id]);
             }
@@ -43,14 +46,35 @@ namespace TouhouPetsEx.Enhance.Core
             }
             return @return;
         }
-        private static bool? ProcessDemonismAction(Player player, Func<BaseEnhance, bool?> action)
+        /// <param name="priority">填写需要优先返回的bool结果，如：执行三次，俩false一true，需求true，则返回true结果
+        /// <r>特别的，如果填null则会返回最后一个非null的结果</r>
+        /// </param>
+        private static bool? ProcessDemonismAction(Player player, bool? priority, Func<BaseEnhance, bool?> action)
         {
-            bool? @return = null;
-            foreach (int id in player.MP().ActiveEnhance)
+            if (!player.HasTouhouPetsBuff())
+                return null;
+
+            if (priority == null)
             {
-                @return = action(TouhouPetsEx.GEnhanceInstances[id]);
+                bool? @return = null;
+                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                {
+                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (a != null) @return = a;
+                }
+                return @return;
             }
-            return @return;
+            else
+            {
+                bool? @return = null;
+                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                {
+                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (a == priority) return a;
+                    else if (a != null) @return = a;
+                }
+                return @return;
+            }
         }
         public override void SetDefaults(Item entity)
         {
@@ -58,15 +82,21 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void HoldItem(Item item, Player player)
         {
+            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
+                player.MP().ActivePassiveEnhance.Add(item.type);
+
             ProcessDemonismAction((enhance) => enhance.ItemHoldItem(item, player));
         }
         public override void UpdateInventory(Item item, Player player)
         {
+            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
+                player.MP().ActivePassiveEnhance.Add(item.type);
+
             ProcessDemonismAction((enhance) => enhance.ItemUpdateInventory(item, player));
         }
         public override bool? UseItem(Item item, Player player)
         {
-            return ProcessDemonismAction(player, (enhance) => enhance.ItemUseItem(item, player));
+            return ProcessDemonismAction(player, false, (enhance) => enhance.ItemUseItem(item, player));
         }
         public override void SetStaticDefaults()
         {
@@ -94,7 +124,11 @@ namespace TouhouPetsEx.Enhance.Core
         {
             if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh))
             {
-                tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new TooltipLine(Mod, "EnhanceTooltip", TouhouPetsExUtils.GetText("Common") + "\n" + enh.Text));
+                int index = tooltips.GetTooltipsLastIndex();
+                tooltips.Insert(index + 1, new TooltipLine(Mod, "EnhanceTooltip", GetText("Common") + "\n" + (enh.Passive ? GetText("Passive") + "\n" : "") + enh.Text));
+
+                if (TouhouPetsEx.GEnhanceInstances[item.type].Experimental)
+                    tooltips.Insert(index + 2, new TooltipLine(Mod, "EnhanceTooltip_Experimental", GetText("Experimental") + "\n" + enh.ExperimentalText));
             }
 
             ProcessDemonismAction((enhance) => enhance.ItemModifyTooltips(item, tooltips));
@@ -114,16 +148,22 @@ namespace TouhouPetsEx.Enhance.Core
                 if (player.MP().ActiveEnhance.Contains(item.type))
                 {
                     player.MP().ActiveEnhance.Remove(item.type);
-                    CombatText.NewText(player.getRect(), Color.Cyan, TouhouPetsExUtils.GetText("Disable"));
+                    CombatText.NewText(player.getRect(), Color.Cyan, GetText("Disable"));
                 }
                 else
                 {
-                    if (player.MP().ActiveEnhance.Count == player.MP().ActiveEnhanceCount)
+                    if (player.MP().ActiveEnhance.Count >= player.MP().ActiveEnhanceCount)
+                    {
                         player.MP().ActiveEnhance.RemoveAt(0);
+                        player.MP().ActiveEnhance.Add(item.type);
+                    }
+                    else
+                        player.MP().ActiveEnhance.Add(item.type);
 
-                    player.MP().ActiveEnhance.Add(item.type);
-                    CombatText.NewText(player.getRect(), Color.Cyan, TouhouPetsExUtils.GetText("Enable"));
+                    CombatText.NewText(player.getRect(), Color.Cyan, GetText("Enable"));
                 }
+
+                EnhancePlayers.AwardPlayerSync(Mod, -1, player.whoAmI);
 
                 return false;
             }
