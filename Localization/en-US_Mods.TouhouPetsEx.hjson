@@ -174,3 +174,15 @@ Projectiles: {
 	DaiyouseiBoom.DisplayName: 炸弹
 	CirnoIce.DisplayName: 纯纯的冰
 }
+
+Buffs: {
+	Earth: {
+		DisplayName: Earth
+		Description: Mods.TouhouPetsEx.Buffs.Earth.Description
+	}
+
+	MoonMist: {
+		DisplayName: Moon Mist
+		Description: Mods.TouhouPetsEx.Buffs.MoonMist.Description
+	}
+}

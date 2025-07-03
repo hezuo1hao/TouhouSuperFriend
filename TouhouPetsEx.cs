@@ -9,6 +9,8 @@ using Terraria.ID;
 using Terraria;
 using Terraria.ModLoader;
 using TouhouPetsEx.Enhance.Core;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 
 namespace TouhouPetsEx
 {
@@ -17,15 +19,28 @@ namespace TouhouPetsEx
         public static int[] WhitelistBlock = [ 2, 3, 3086, 3081, 169, 3271, 3272, 133, 176, 172, 593, 664, 9, 620, 619, 911, 2503, 2504, 1727, 4564, 586, 591, 1872];
         public static Dictionary<int, BaseEnhance> GEnhanceInstances = [];
         public static TouhouPetsEx Instance;
+        public static Effect RingShader;
+        public static BlendState InverseColor;
         public override void Load()
         {
             Instance = this;
+            RingShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Ring", AssetRequestMode.ImmediateLoad).Value;
+            InverseColor = new BlendState()
+            {
+                Name = "BlendState.InverseColor",
+                ColorDestinationBlend = Blend.InverseSourceColor,
+                ColorSourceBlend = Blend.InverseDestinationColor,
+                AlphaDestinationBlend = Blend.One,
+                AlphaSourceBlend = Blend.Zero
+            };
         }
         public override void Unload()
         {
             Instance = null;
             Config = null;
             WhitelistBlock = null;
+            RingShader = null;
+            InverseColor.Dispose();
         }
         internal enum MessageType : byte
         {
