@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -11,9 +12,16 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class AliceOld : BaseEnhance
     {
         public override string Text => GetText("AliceOld");
+        public override string[] ExperimentalText => [GetText("AliceOld_2")];
+        public override bool[] Experimental => [Config.AliceOld];
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<AliceOldDoll>());
+        }
+        public override void PlayerResetEffects(Player player)
+        {
+            if (player.MP().EatBook >= 100)
+                player.MP().ActiveEnhanceCount += 2;
         }
         public override void PlayerPostUpdateEquips(Player player)
         {
@@ -29,13 +37,18 @@ namespace TouhouPetsEx.Enhance.Achieve
                     player.statManaMax2 += item.stack / 100;
             }
 
-            player.statManaMax2 += player.MP().EatBook;
+            player.statManaMax2 += Math.Clamp(player.MP().EatBook, 0, 100);
+        }
+        public override void PlayerPostUpdate(Player player)
+        {
+            if (Config.AliceOld)
+                player.GetDamage(DamageClass.Magic) += player.statManaMax2 / 1000f;
         }
         public override void ItemUpdateInventory(Item item, Player player)
         {
             if (item.type == ItemID.Book)
             {
-                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()) && player.MP().EatBook < 100 && player.HasTouhouPetsBuff())
+                if (player.MP().EatBook < 100 && player.EnableEnhance<AliceOldDoll>())
                 {
                     item.useAnimation = item.useTime = 15;
                     item.createTile = -1;
@@ -45,7 +58,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
                 else
                 {
-                    Item item1 = new(item.type);
+                    Item item1 = ContentSamples.ItemsByType[item.type];
                     item.useTime = item1.useTime;
                     item.useAnimation = item1.useAnimation;
                     item.createTile = item1.createTile;
@@ -59,7 +72,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             if (item.type == ItemID.Book)
             {
-                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()) && player.MP().EatBook < 100 && player.HasTouhouPetsBuff())
+                if (player.MP().EatBook < 100 && player.EnableEnhance<AliceOldDoll>())
                 {
                     item.useAnimation = item.useTime = 15;
                     item.createTile = -1;
@@ -69,7 +82,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
                 else
                 {
-                    Item item1 = new(item.type);
+                    Item item1 = ContentSamples.ItemsByType[item.type];
                     item.useTime = item1.useTime;
                     item.useAnimation = item1.useAnimation;
                     item.createTile = item1.createTile;
@@ -93,7 +106,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             TooltipLine tooltipLine = new(TouhouPetsEx.Instance, "EatBookTooltip", GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
 
-            if (item.type == ItemID.Book && Main.LocalPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<AliceOldDoll>()))
+            if (item.type == ItemID.Book && Main.LocalPlayer.HasEnhance<AliceOldDoll>())
             {
                 tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine);
             }

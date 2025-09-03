@@ -17,7 +17,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             AddEnhance(ModContent.ItemType<DaiyouseiBomb>());
         }
-        public override void PlayerPostUpdateEquips(Player player)
+        public override void PlayerResetEffects(Player player)
         {
             if (player.MP().DaiyouseiCD > 0)
                 player.MP().DaiyouseiCD--;
@@ -36,7 +36,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                     player.hurtCooldowns[i] += 180;
                 }
                 player.MP().DaiyouseiCD = 10800;
-                Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<DaiyouseiBoom>(), info.Damage, 5, player.whoAmI);
+                Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<DaiyouseiBoom>(), (info.Damage + 10) * 10, 5, player.whoAmI);
                 return true;
             }
 

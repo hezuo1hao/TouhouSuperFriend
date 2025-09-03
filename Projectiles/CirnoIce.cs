@@ -19,28 +19,32 @@ namespace TouhouPetsEx.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.DamageType = DamageClass.Ranged;
+            Projectile.coldDamage = true;
         }
         public override void AI()
         {
             Projectile.ai[1] = -1;
 
-            foreach (Projectile proj in Main.ActiveProjectiles)
-            {
-                if (proj.type == Type && proj.whoAmI != Projectile.whoAmI && Projectile.ai[1] != proj.whoAmI && Collision.CheckAABBvAABBCollision(proj.Center, proj.Size, Projectile.Center, Projectile.Size))
+            if (Projectile.ai[2] <= 0)
+                foreach (Projectile proj in Main.ActiveProjectiles)
                 {
-                    float speed = (proj.velocity.Length() + Projectile.velocity.Length()) / 2f;
-                    if (Config.Cirno) speed *= 1.1f;
-                    proj.velocity = Vector2.Normalize(proj.Center - Projectile.Center) * speed;
-                    Projectile.velocity = Vector2.Normalize(Projectile.Center - proj.Center) * speed;
-                    Projectile.ai[1] = proj.whoAmI;
+                    if (proj.type == Type && proj.whoAmI != Projectile.whoAmI && Projectile.ai[1] != proj.whoAmI && proj.Center != Projectile.Center && Collision.CheckAABBvAABBCollision(proj.Center, proj.Size, Projectile.Center, Projectile.Size))
+                    {
+                        float speed = (proj.velocity.Length() + Projectile.velocity.Length()) / 2f;
+                        if (Config.Cirno) speed *= 1.1f;
+                        proj.velocity = Vector2.Normalize(proj.Center - Projectile.Center) * speed;
+                        Projectile.velocity = Vector2.Normalize(Projectile.Center - proj.Center) * speed;
+                        Projectile.ai[1] = proj.whoAmI;
+                    }
                 }
-            }
 
-            if (Projectile.velocity.Length() < 0.1f || Collision.SolidCollision(Projectile.position, Projectile.width, Projectile.height))
+            Projectile.ai[2]--;
+
+            if (Projectile.lavaWet || Projectile.velocity.Length() < 0.1f || Collision.SolidCollision(Projectile.position, Projectile.width, Projectile.height))
                 Projectile.Kill();
 
             Projectile.velocity.X *= (Projectile.ai[0] == 1) ? 0.995f : 0.99f;
-            Projectile.velocity.Y += 0.12f;
+            Projectile.velocity.Y += (!Projectile.wet) ? 0.12f : -0.2f;
 
             if (Projectile.ai[0] == 0)
                 Projectile.rotation += Projectile.velocity.X * 0.2f;

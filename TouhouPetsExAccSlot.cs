@@ -17,33 +17,33 @@ namespace TouhouPetsEx
 	{
         public override bool IsHidden()
         {
-            return !(Config.Hecatia && Main.LocalPlayer.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && Main.LocalPlayer.HasTouhouPetsBuff());
+            return !(Config.Hecatia && Player.EnableEnhance<HecatiaPlanet>());
         }
         public override bool CanAcceptItem(Item checkItem, AccessorySlotType context)
         {
-            return base.CanAcceptItem(checkItem, context) && Config.Hecatia && Main.LocalPlayer.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && Main.LocalPlayer.HasTouhouPetsBuff();
+            return base.CanAcceptItem(checkItem, context) && Config.Hecatia && Player.EnableEnhance<HecatiaPlanet>();
         }
     }
     public class HecatiaAccSlot_2 : ModAccessorySlot
     {
         public override bool IsHidden()
         {
-            return !(Config.Hecatia && Main.hardMode && Main.LocalPlayer.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && Main.LocalPlayer.HasTouhouPetsBuff());
+            return !(Config.Hecatia && Main.hardMode && Player.EnableEnhance<HecatiaPlanet>());
         }
         public override bool CanAcceptItem(Item checkItem, AccessorySlotType context)
         {
-            return base.CanAcceptItem(checkItem, context) && Config.Hecatia && Main.hardMode && Main.LocalPlayer.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && Main.LocalPlayer.HasTouhouPetsBuff();
+            return base.CanAcceptItem(checkItem, context) && Config.Hecatia && Main.hardMode && Player.EnableEnhance<HecatiaPlanet>();
         }
     }
     public class HecatiaAccSlot_3 : ModAccessorySlot
     {
         public override bool IsHidden()
         {
-            return !(Config.Hecatia && NPC.downedMoonlord && Main.LocalPlayer.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && Main.LocalPlayer.HasTouhouPetsBuff());
+            return !(Config.Hecatia && NPC.downedMoonlord && Player.EnableEnhance<HecatiaPlanet>());
         }
         public override bool CanAcceptItem(Item checkItem, AccessorySlotType context)
         {
-            return base.CanAcceptItem(checkItem, context) && Config.Hecatia && NPC.downedMoonlord && Main.LocalPlayer.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && Main.LocalPlayer.HasTouhouPetsBuff();
+            return base.CanAcceptItem(checkItem, context) && Config.Hecatia && NPC.downedMoonlord && Player.EnableEnhance<HecatiaPlanet>();
         }
     }
 }

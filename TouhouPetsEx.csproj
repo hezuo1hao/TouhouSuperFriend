@@ -8,8 +8,17 @@
 		
 	</PropertyGroup>
 	<ItemGroup>
+	  <PackageReference Include="Krafs.Publicizer" Version="2.3.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+    <Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Reference Include="TouhouPets">
-	    <HintPath>..\ModAssemblies\TouhouPets.dll</HintPath>
+	    <HintPath>..\TouhouPets\bin\Debug\net8.0\TouhouPets.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

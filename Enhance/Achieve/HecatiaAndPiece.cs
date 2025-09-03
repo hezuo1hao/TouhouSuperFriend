@@ -12,8 +12,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class HecatiaAndPiece : BaseEnhance
     {
         public override string Text => GetText("HecatiaAndPiece");
-        public override string ExperimentalText => GetText("HecatiaAndPiece_1");
-        public override bool Experimental { get => Config.Hecatia; }
+        public override string[] ExperimentalText => [GetText("HecatiaAndPiece_1")];
+        public override bool[] Experimental  => [Config.Hecatia];
         public override bool EnableRightClick => false;
         public override bool Passive => true;
         public override void ItemSSD()

@@ -14,9 +14,12 @@ namespace TouhouPetsEx.Buffs
         public override void Update(NPC npc, ref int buffIndex)
         {
             npc.GetGlobalNPC<GEnhanceNPCs>().Earth = true;
-            Dust dust = Dust.NewDustDirect(npc.Center, 2, 2, DustID.Dirt, 10, 10);
-            dust.velocity = new Vector2(Main.rand.NextFloat(-1.00f, 1.00f), Main.rand.NextFloat(-1.00f, 1.00f));
-            dust.scale = Main.rand.NextFloat(2.00f, 3.00f);
+            if (Main.rand.NextBool(5))
+            {
+                Dust dust = Dust.NewDustDirect(npc.position, npc.width, npc.height, DustID.Dirt, 10, 10);
+                dust.velocity = Vector2.Zero;
+                dust.scale = Main.rand.NextFloat(1.00f, 1.50f);
+            }
         }
     }
 }

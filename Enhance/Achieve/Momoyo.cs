@@ -51,7 +51,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (Edible.Contains(item.type))
             {
                 int i = Array.IndexOf(Edible, item.type);
-                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<MomoyoPickaxe>()) && player.MP().ExtraAddition[i] < EnhancePlayers.ExtraAdditionMax[i] && player.HasTouhouPetsBuff())
+                if (player.MP().ExtraAddition[i] < EnhancePlayers.ExtraAdditionMax[i] && player.EnableEnhance<MomoyoPickaxe>())
                 {
                     item.useAnimation = item.useTime = 15;
                     item.createTile = -1;
@@ -61,7 +61,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
                 else
                 {
-                    Item item1 = new(item.type);
+                    Item item1 = ContentSamples.ItemsByType[item.type];
                     item.useAnimation = item1.useAnimation;
                     item.useTime = item1.useTime;
                     item.createTile = item1.createTile;
@@ -76,7 +76,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (Edible.Contains(item.type))
             {
                 int i = Array.IndexOf(Edible, item.type);
-                if (player.MP().ActiveEnhance.Contains(ModContent.ItemType<MomoyoPickaxe>()) && player.MP().ExtraAddition[i] < EnhancePlayers.ExtraAdditionMax[i] && player.HasTouhouPetsBuff())
+                if (player.MP().ExtraAddition[i] < EnhancePlayers.ExtraAdditionMax[i] && player.EnableEnhance<MomoyoPickaxe>())
                 {
                     item.useAnimation = item.useTime = 15;
                     item.createTile = -1;
@@ -86,7 +86,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
                 else
                 {
-                    Item item1 = new(item.type);
+                    Item item1 = ContentSamples.ItemsByType[item.type];
                     item.useAnimation = item1.useAnimation;
                     item.useTime = item1.useTime;
                     item.createTile = item1.createTile;
@@ -189,7 +189,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_9", GetText("Momoyo_9", plr.ExtraAddition[10] / 5f))
                 ];
 
-            if (plr.ActiveEnhance.Contains(ModContent.ItemType<MomoyoPickaxe>()))
+            if (Main.LocalPlayer.HasEnhance<MomoyoPickaxe>())
             {
                 switch (item.type)
                 {

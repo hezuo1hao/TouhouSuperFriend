@@ -18,6 +18,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Rukoto : BaseEnhance
     {
         public override string Text => GetText("Rukoto");
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<RukotoRemote>());
@@ -30,7 +32,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 
                 if (player.ownedProjectileCounts[ModContent.ProjectileType<Pets.Rukoto>()] > 0)
                 {
-                    foreach(Projectile proj in Main.projectile)
+                    foreach(Projectile proj in Main.ActiveProjectiles)
                     {
                         if (proj.type == ModContent.ProjectileType<Pets.Rukoto>())
                         {

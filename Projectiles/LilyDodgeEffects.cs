@@ -1,9 +1,10 @@
-using Terraria;
-using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
-using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace TouhouPetsEx.Projectiles
 {
@@ -21,6 +22,13 @@ namespace TouhouPetsEx.Projectiles
         {
             Player player = Main.player[Projectile.owner];
             Projectile.Center = player.MountedCenter.Floor() + new Vector2(0, player.gfxOffY);
+
+            foreach (int buffType in player.buffType)
+            {
+                if (Main.debuff[buffType] && !BuffID.Sets.NurseCannotRemoveDebuff[buffType])
+                    player.ClearBuff(buffType);
+            }
+            player.breath = player.breathMax;
 
             if (Projectile.ai[0]  == 0)
                 SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_border"), Projectile.Center);

@@ -3,20 +3,27 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.Drawing;
+using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
-using Terraria.ID;
+using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Buffs;
+using TouhouPetsEx.Projectiles;
 
 namespace TouhouPetsEx.Enhance.Core
 {
-	public class EnhancePlayers : ModPlayer
+    public class EnhancePlayers : ModPlayer
     {
         public List<int> ActiveEnhance = [];
         public List<int> ActivePassiveEnhance = [];
@@ -33,6 +40,62 @@ namespace TouhouPetsEx.Enhance.Core
         /// 莉莉白用
         /// </summary>
         public int LilyCD = 0;
+        /// <summary>
+        /// 幽香四溢Buff用（风见幽香能力相关）
+        /// </summary>
+        public bool FragrantAromaFillsTheAir = false;
+        /// <summary>
+        /// 风见幽香用
+        /// </summary>
+        public int FragrantAromaFillsTheAirCD = 0;
+        /// <summary>
+        /// 蕾蒂用
+        /// </summary>
+        public int LettyCD = 0;
+        /// <summary>
+        /// 莉莉卡用
+        /// </summary>
+        public int LyricaCD = 0;
+        /// <summary>
+        /// 八云紫用
+        /// </summary>
+        public int YukariCD = 0;
+        /// <summary>
+        /// 莉格露用
+        /// </summary>
+        public int WriggleCD = 0;
+        /// <summary>
+        /// 米斯蒂娅用
+        /// </summary>
+        public int MystiaCD = 0;
+        /// <summary>
+        /// 上白泽慧音用，索引1记录的是上一个buff的type
+        /// </summary>
+        public int[] KeineCD = [0, -1];
+        /// <summary>
+        /// 蓬莱山辉夜用
+        /// </summary>
+        public int[] OldBuff;
+        /// <summary>
+        /// 河城荷取用，记录原版合成站
+        /// </summary>
+        public bool[] adjTileVanilla;
+        /// <summary>
+        /// 河城荷取用，记录模组合成站
+        /// </summary>
+        public List<string> adjTileMod;
+        /// <summary>
+        /// 河城荷取用，记录全部合成站
+        /// </summary>
+        public bool[] adjTile;
+        /// <summary>
+        /// 河城荷取用，记录水、蜂蜜、岩浆、微光、炼药桌
+        /// </summary>
+        public bool[] adjOther;
+        /// <summary>
+        /// 东风谷早苗用
+        /// </summary>
+        public int SanaeCD;
         /// <summary>
         /// 姬虫百百世用
         /// <para>索引决定对应的加成：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲</para>
@@ -53,8 +116,18 @@ namespace TouhouPetsEx.Enhance.Core
                 action(TouhouPetsEx.GEnhanceInstances[id]);
             }
         }
+        private static void ProcessDemonismAction(Action<BaseEnhance> action)
+        {
+            foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
+            {
+                action(enhance);
+            }
+        }
         private static bool? ProcessDemonismAction(Player player, bool? priority, Func<BaseEnhance, bool?> action)
         {
+            if (!player.HasTouhouPetsBuff())
+                return null;
+
             if (priority == null)
             {
                 bool? @return = null;
@@ -77,13 +150,40 @@ namespace TouhouPetsEx.Enhance.Core
                 return @return;
             }
         }
+        private static float ProcessDemonismAction(Player player, Func<BaseEnhance, float?> action)
+        {
+            float multiplier = 1f;
+
+            if (!player.HasTouhouPetsBuff())
+                return multiplier;
+
+            foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+            {
+                multiplier *= action(TouhouPetsEx.GEnhanceInstances[id]) ?? 1f;
+            }
+
+            return multiplier;
+        }
+        public override void Initialize()
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerInitialize(Player));
+        }
         public override void ResetEffects()
         {
             ActiveEnhanceCount = 1;
 
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerResetEffects(Player));
+            ProcessDemonismAction((enhance) => enhance.PlayerResetEffectsAlways(Player));
 
             ActivePassiveEnhance = [];
+
+            FragrantAromaFillsTheAir = false;
+
+            foreach (Item item in Player.miscEquips)
+            {
+                if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
+                    ActivePassiveEnhance.Add(item.type);
+            }
         }
         public override void SaveData(TagCompound tag)
         {
@@ -94,6 +194,9 @@ namespace TouhouPetsEx.Enhance.Core
             }
             tag.Add("ActiveEnhanceName", strings);
             tag.Add("EatBook", EatBook);
+            tag.Add("adjTileVanilla", adjTileVanilla);
+            tag.Add("adjTileMod", adjTileMod);
+            tag.Add("adjOther", adjOther);
             tag.Add("ExtraAddition", ExtraAddition);
         }
         public override void LoadData(TagCompound tag)
@@ -106,7 +209,33 @@ namespace TouhouPetsEx.Enhance.Core
             }
             ActiveEnhance = ints;
             EatBook = tag.GetInt("EatBook");
+            if (tag.TryGet<bool[]>("adjTileVanilla", out var adjtileVanilla))
+                adjTileVanilla = adjtileVanilla;
+            else
+                adjTileVanilla = new bool[TileID.Count];
+            if (tag.TryGet<List<string>>("adjTileMod", out var adjtileMod))
+                adjTileMod = adjtileMod;
+            else
+                adjTileMod = [];
+            if (tag.TryGet<bool[]>("adjOther", out var adjother))
+                adjOther = adjother;
+            else
+            adjOther = new bool[5];
             if (tag.GetIntArray("ExtraAddition").Length != 0) ExtraAddition = tag.GetIntArray("ExtraAddition");
+
+            adjTile = (bool[])Player.adjTile.Clone();
+
+            for (int i = 0; i < adjTileVanilla.Length; i++)
+            {
+                adjTile[i] = adjTileVanilla[i];
+            }
+
+            foreach (string fullName in adjTileMod)
+            {
+                string[] parts = fullName.Split('/');
+                if (parts.Length == 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]) && ModLoader.TryGetMod(parts[0], out Mod mod) && mod.TryFind(parts[1], out ModTile tile))
+                    adjTile[tile.Type] = true;
+            }
         }
         public override void ModifyLuck(ref float luck)
         {
@@ -114,15 +243,34 @@ namespace TouhouPetsEx.Enhance.Core
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyLuck(Player, ref luck2));
             luck = luck2;
         }
+        public override void UpdateLifeRegen()
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerUpdateLifeRegen(Player));
+        }
+        public override void GetHealLife(Item item, bool quickHeal, ref int healValue)
+        {
+            int healValue2 = healValue;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerGetHealLife(Player, item, quickHeal, ref healValue2));
+            healValue = healValue2;
+        }
+        public override void GetHealMana(Item item, bool quickHeal, ref int healValue)
+        {
+            int healValue2 = healValue;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerGetHealMana(Player, item, quickHeal, ref healValue2));
+            healValue = healValue2;
+        }
         public override void PreUpdate()
         {
-            foreach (Item item in Player.miscEquips)
-            {
-                if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
-                    ActivePassiveEnhance.Add(item.type);
-            }
-
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerPreUpdate(Player));
+        }
+        public override void PreUpdateBuffs()
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerPreUpdateBuffs(Player));
+            ProcessDemonismAction((enhance) => enhance.PlayerPreUpdateBuffsAlways(Player));
+        }
+        public override void PostUpdateBuffs()
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostUpdateBuffs(Player));
         }
         public override void PostUpdateEquips()
         {
@@ -130,10 +278,23 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void PostUpdate()
         {
+            if (FragrantAromaFillsTheAir && TouhouPetsExModSystem.SynchronousTime % 60 == 37)
+                Player.statLife += Math.Clamp(Player.statLifeMax2 / 100, 0, Player.statLifeMax2 - Player.statLife);
+
             if (Main.GameUpdateCount % 18000 == 12000 && Player == Main.LocalPlayer)
                 AwardPlayerSync(Mod, -1, Main.myPlayer);
 
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostUpdate(Player));
+        }
+        public override void ModifyItemScale(Item item, ref float scale)
+        {
+            float scale2 = scale;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyItemScale(Player, item, ref scale2));
+            scale = scale2;
+        }
+        public override float UseTimeMultiplier(Item item)
+        {
+            return ProcessDemonismAction(Player, (enhance) => enhance.PlayerUseTimeMultiplier(Player, item));
         }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
@@ -151,6 +312,29 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override bool FreeDodge(Player.HurtInfo info)
         {
+            if (info.DamageSource.SourceNPCIndex > -1)
+            {
+                NPC npc = Main.npc[info.DamageSource.SourceNPCIndex];
+                if (npc.GetGlobalNPC<GEnhanceNPCs>().MoonMist && Main.rand.NextBool(10))
+                {
+                    ParticleOrchestrator.RequestParticleSpawn(clientOnly: true, ParticleOrchestraType.TownSlimeTransform, new ParticleOrchestraSettings
+                    {
+                        UniqueInfoPiece = 1,
+                        PositionInWorld = Player.Center + (npc.Center - Player.Center) / 4f,
+                        MovementVector = Vector2.Zero
+                    });
+
+                    Player.immune = true;
+                    Player.immuneTime += Player.longInvince ? 60 : 20;
+                    for (int i = 0; i < Player.hurtCooldowns.Length; i++)
+                    {
+                        Player.hurtCooldowns[i] += Player.longInvince ? 60 : 20;
+                    }
+
+                    return true;
+                }
+            }
+
             bool? reesult = ProcessDemonismAction(Player, true, (enhance) => enhance.PlayerFreeDodge(Player, info));
 
             return reesult ?? base.FreeDodge(info);
@@ -159,6 +343,18 @@ namespace TouhouPetsEx.Enhance.Core
         {
             Player.HurtModifiers modifiers2 = modifiers;
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHurt(Player, ref modifiers2));
+            modifiers = modifiers2;
+        }
+        public override void ModifyHitNPCWithItem(Item item, NPC target, ref NPC.HitModifiers modifiers)
+        {
+            NPC.HitModifiers modifiers2 = modifiers;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPCWithItem(Player, item, target, ref modifiers2));
+            modifiers = modifiers2;
+        }
+        public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
+        {
+            NPC.HitModifiers modifiers2 = modifiers;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPCWithProjectile(Player, proj, target, ref modifiers2));
             modifiers = modifiers2;
         }
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -189,8 +385,39 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void OnEnterWorld()
         {
-            if (Player == Main.LocalPlayer)
+            if (Player == Main.LocalPlayer && Main.netMode == NetmodeID.MultiplayerClient)
+            {
                 AwardPlayerSync(Mod, -1, Main.myPlayer, true);
+            }
+        }
+        public override void ProcessTriggers(TriggersSet triggersSet)
+        {
+            if (TouhouPetsExModSystem.ReisenKeyBind.JustPressed && Config.Reisen && Main.LocalPlayer.EnableEnhance<ReisenGun>())
+            {
+                List<int> blackList = [];
+                foreach (string fullName in Config.Letty_2_1 ?? [])
+                {
+                    string[] parts = fullName.Split('/');
+                    if (parts.Length == 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]) && ModLoader.TryGetMod(parts[0], out Mod mod) && mod.TryFind(parts[1], out ModProjectile proj))
+                        blackList.Add(proj.Type);
+                }
+
+                foreach (Projectile proj in Main.ActiveProjectiles)
+                {
+                    if (proj.owner != Main.LocalPlayer.whoAmI || proj.type == ProjectileID.ChlorophyteBullet || (proj.type >= ProjectileID.Count && blackList.Contains(proj.type)) || !proj.GetGlobalProjectile<GEnhanceProjectile>().Bullet)
+                        continue;
+
+                    int target = proj.FindTargetWithLineOfSight();
+
+                    if (target == -1)
+                        continue;
+
+                    proj.velocity = proj.DirectionTo(Main.npc[target].Center).SafeNormalize(-Vector2.UnitY) * proj.velocity.Length();
+                    proj.GetGlobalProjectile<GEnhanceProjectile>().Bullet = false;
+                }
+
+                Projectile.NewProjectile(Main.LocalPlayer.GetSource_FromThis(), Main.LocalPlayer.Center, Vector2.Zero, ModContent.ProjectileType<ReisenEffect>(), 0, 0, Main.LocalPlayer.whoAmI, ai1: 1);
+            }
         }
 
         public static void AwardPlayerSync(Mod mod, int toWho, int fromWho, bool rebate = false)
@@ -228,13 +455,13 @@ namespace TouhouPetsEx.Enhance.Core
 
             int activeEnhanceCount = reader.ReadInt32();
             List<int> activeEnhance = [];
-            for (int i = 0;i < activeEnhanceCount;i++)
+            for (int i = 0; i < activeEnhanceCount; i++)
                 activeEnhance.Add(reader.ReadInt32());
             player.ActiveEnhance = activeEnhance;
 
             int extraAdditionLength = reader.ReadInt32();
             int[] extraAddition = new int[extraAdditionLength];
-            for (int i = 0;i < extraAdditionLength;i++)
+            for (int i = 0; i < extraAdditionLength; i++)
                 extraAddition[i] = reader.ReadInt32();
             player.ExtraAddition = extraAddition;
 
@@ -242,6 +469,59 @@ namespace TouhouPetsEx.Enhance.Core
                 AwardPlayerSync(TouhouPetsEx.Instance, whoAmI, Main.myPlayer);
 
             //Main.NewText("收");
+        }
+        public static void YukariTp(Player player, Vector2 newPos)
+        {
+            player.RemoveAllGrapplingHooks();
+            player.StopVanityActions();
+
+            if (player.shimmering || player.shimmerWet)
+            {
+                player.shimmering = false;
+                player.shimmerWet = false;
+                player.wet = false;
+                player.ClearBuff(353);
+            }
+
+            SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_warpl") with { MaxInstances = 114514 }, player.Center);
+            for (int i = player.width * player.height / 5; i >= 0; i--)
+            {
+                Dust dust = Dust.NewDustDirect(player.position, player.width, player.height, DustID.TeleportationPotion);
+                dust.scale = Main.rand.Next(20, 70) * 0.01f;
+
+                if (i < 10)
+                    dust.scale += 0.25f;
+
+                if (i < 5)
+                    dust.scale += 0.25f;
+            }
+
+            PressurePlateHelper.UpdatePlayerPosition(player);
+            player.position = newPos;
+            player.fallStart = (int)player.position.Y / 16;
+            PressurePlateHelper.UpdatePlayerPosition(player);
+            player.ResetAdvancedShadows();
+            for (int i = 0; i < 3; i++)
+            {
+                player.UpdateSocialShadow();
+            }
+
+            player.oldPosition = player.position + player.BlehOldPositionFixer;
+
+            player.MP().YukariCD = 60;
+
+            SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_warpl") with { MaxInstances = 114514 }, player == Main.LocalPlayer ? null : player.Center);
+            for (int i = player.width * player.height / 5; i >= 0; i--)
+            {
+                Dust dust = Dust.NewDustDirect(player.position, player.width, player.height, DustID.TeleportationPotion);
+                dust.scale = Main.rand.Next(20, 70) * 0.01f;
+
+                if (i < 10)
+                    dust.scale += 0.25f;
+
+                if (i < 5)
+                    dust.scale += 0.25f;
+            }
         }
     }
 }

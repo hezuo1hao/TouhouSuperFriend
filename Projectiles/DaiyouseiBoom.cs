@@ -62,6 +62,10 @@ namespace TouhouPetsEx.Projectiles
             // 4. ≈–∂œ «∑Òœ‡Ωª
             return distanceSquared < (circleRadius * circleRadius);
         }
+        public override bool? CanCutTiles()
+        {
+            return false;
+        }
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
             modifiers.HitDirectionOverride = target.Center.X > Projectile.Center.X ? 1 : -1;
@@ -76,15 +80,14 @@ namespace TouhouPetsEx.Projectiles
             var spriteBatch = Main.spriteBatch;
 
             spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, TouhouPetsEx.InverseColor);
+            spriteBatch.Begin(SpriteSortMode.Immediate, TouhouPetsEx.InverseColor, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
             TouhouPetsEx.RingShader.Parameters["width"].SetValue(Math.Max(0f, 0.5f - (50f / Projectile.width)));
             TouhouPetsEx.RingShader.CurrentTechnique.Passes[0].Apply();
             spriteBatch.Draw(TextureAssets.MagicPixel.Value, Projectile.Center - Main.screenPosition, null, Color.White * ((255 - Projectile.alpha) / 255f), 0, TextureAssets.MagicPixel.Size() /2f, new Vector2(Projectile.width, Projectile.width * 0.001f), SpriteEffects.None, 0);
 
             spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            Main.NewText(300 / (3 * Projectile.width));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             return false;
         }
     }

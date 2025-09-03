@@ -28,7 +28,7 @@ namespace TouhouPetsEx
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             // 不开能力就想用指令，报错！
-            if (!caller.Player.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<ShinkiHeart>()))
+            if (!caller.Player.HasEnhance<ShinkiHeart>())
                 throw new UsageException(GetText("Give.Error_1"));
 
             // 一个参数都没有，报错！
@@ -61,7 +61,7 @@ namespace TouhouPetsEx
                 throw new UsageException(GetText("Give.Error_4"));
 
             // 试图给予怪东西，报错！(月后）
-            Item item = new(type);
+            Item item = ContentSamples.ItemsByType[type];
             if (item.createTile == -1 || !Main.tileSolid[item.createTile])
                 throw new UsageException(GetText("Give.Error_5"));
 

@@ -15,7 +15,7 @@ namespace TouhouPetsEx.PlrDrawLayers
         public override Position GetDefaultPosition() => PlayerDrawLayers.AfterLastVanillaLayer;
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
         {
-            return !Main.gameMenu && !drawInfo.drawPlayer.dead && drawInfo.drawPlayer.MP().ActiveEnhance.Contains(ModContent.ItemType<RumiaRibbon>()) && drawInfo.drawPlayer.HasTouhouPetsBuff();
+            return !Main.gameMenu && LocalConfig.Rumia && !drawInfo.drawPlayer.dead && drawInfo.drawPlayer.EnableEnhance<RumiaRibbon>();
         }
         public static Texture2D tex = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/NoBlackPointLight", AssetRequestMode.ImmediateLoad).Value;
         protected override void Draw(ref PlayerDrawSet drawInfo)

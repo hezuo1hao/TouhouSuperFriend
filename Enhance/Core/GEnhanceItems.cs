@@ -80,6 +80,11 @@ namespace TouhouPetsEx.Enhance.Core
         {
             ProcessDemonismAction(entity, (enhance) => enhance.ItemSD(entity));
         }
+        public override void GrabRange(Item item, Player player, ref int grabRange)
+        {
+            if (player.MBP().Throw)
+                grabRange += 1600;
+        }
         public override void HoldItem(Item item, Player player)
         {
             if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
@@ -125,10 +130,23 @@ namespace TouhouPetsEx.Enhance.Core
             if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh))
             {
                 int index = tooltips.GetTooltipsLastIndex();
+                int experimentalTooltip = 0;
                 tooltips.Insert(index + 1, new TooltipLine(Mod, "EnhanceTooltip", GetText("Common") + "\n" + (enh.Passive ? GetText("Passive") + "\n" : "") + enh.Text));
 
-                if (TouhouPetsEx.GEnhanceInstances[item.type].Experimental)
-                    tooltips.Insert(index + 2, new TooltipLine(Mod, "EnhanceTooltip_Experimental", GetText("Experimental") + "\n" + enh.ExperimentalText));
+                for (int i = 0; i < enh.Experimental.Length; i++)
+                {
+                    if (enh.Experimental[i])
+                    {
+                        if (experimentalTooltip == 0)
+                        {
+                            tooltips.Insert(index + 2, new TooltipLine(Mod, "EnhanceTooltip_Experimental", GetText("Experimental")));
+                            experimentalTooltip++;
+                        }
+
+                        tooltips.Insert(index + 2 + experimentalTooltip, new TooltipLine(Mod, "EnhanceTooltip_Experimental", enh.ExperimentalText[i]));
+                        experimentalTooltip++;
+                    }
+                }
             }
 
             ProcessDemonismAction((enhance) => enhance.ItemModifyTooltips(item, tooltips));
@@ -142,7 +160,13 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override bool CanUseItem(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets" && player.altFunctionUse == 2
+            bool def = true;
+            bool? reesult = ProcessDemonismAction(player, false, (enhance) => enhance.ItemCanUseItem(item, player, ref def));
+
+            if (reesult.HasValue)
+                return reesult.Value;
+
+            if (def && item.ModItem?.Mod.Name == "TouhouPets" && player.altFunctionUse == 2
                 && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh) && enh.EnableRightClick)
             {
                 if (player.MP().ActiveEnhance.Contains(item.type))
