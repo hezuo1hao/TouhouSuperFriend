@@ -100,15 +100,11 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void SystemPostUpdateEverything()
         {
-            foreach (Player player in Main.ActivePlayers)
+            if (WorldEnableEnhance<SanaeCoin>())
             {
-                if (player.EnableEnhance<SanaeCoin>())
-                {
-                    Main.sundialCooldown = 0;
-                    Main.moondialCooldown = 0;
-                    break;
-                }
-            }    
+                Main.sundialCooldown = 0;
+                Main.moondialCooldown = 0;
+            }
         }
     }
 }

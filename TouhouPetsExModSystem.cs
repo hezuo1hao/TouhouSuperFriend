@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,11 +18,13 @@ namespace TouhouPetsEx
         public override void Load()
         {
             ReisenKeyBind = KeybindLoader.RegisterKeybind(Mod, "ReisenKeyBind", "V");
+            EnhanceCount = [];
         }
 
         public override void Unload()
         {
             ReisenKeyBind = null;
+            EnhanceCount = null;
         }
         public override void PreUpdateTime()
         {
@@ -45,6 +49,18 @@ namespace TouhouPetsEx
                     text.scale -= 0.1f;
                     text.color = new Color(133, 0, 133);
                     continue;
+                }
+            }
+        }
+        public override void PreUpdatePlayers()
+        {
+            EnhanceCount.Keys.ToList().ForEach(key => EnhanceCount[key] = 0);
+
+            foreach (Player player in Main.ActivePlayers)
+            {
+                foreach (int type in player.MP().ActiveEnhance.Concat(player.MP()?.ActivePassiveEnhance))
+                {
+                    EnhanceCount[type] = EnhanceCount.GetValueOrDefault(type) + 1;
                 }
             }
         }

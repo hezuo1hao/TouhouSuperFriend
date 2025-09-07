@@ -129,12 +129,9 @@ namespace TouhouPetsEx.Enhance.Achieve
                         Rectangle rectangle = new(num10 * 16, num11 * 16, 16, 16);
                         foreach (Player player1 in Main.ActivePlayers)
                         {
-                            if (player1.active)
-                            {
-                                Rectangle rectangle2 = new((int)(player1.position.X + player1.width / 2 - NPC.sWidth / 2 - NPC.safeRangeX), (int)(player1.position.Y + player1.height / 2 - NPC.sHeight / 2 - NPC.safeRangeY), NPC.sWidth + NPC.safeRangeX * 2, NPC.sHeight + NPC.safeRangeY * 2);
-                                if (rectangle.Intersects(rectangle2))
-                                    flag = false;
-                            }
+                            Rectangle rectangle2 = new((int)(player1.position.X + player1.width / 2 - NPC.sWidth / 2 - NPC.safeRangeX), (int)(player1.position.Y + player1.height / 2 - NPC.sHeight / 2 - NPC.safeRangeY), NPC.sWidth + NPC.safeRangeX * 2, NPC.sHeight + NPC.safeRangeY * 2);
+                            if (rectangle.Intersects(rectangle2))
+                                flag = false;
                         }
                     }
 

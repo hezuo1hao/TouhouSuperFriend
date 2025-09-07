@@ -28,5 +28,9 @@ namespace TouhouPetsEx.Enhance.Core
             ProcessDemonismAction((enhance) => enhance.TileDrawEffects(i, j, type, spriteBatch, ref drawData2));
             drawData = drawData2;
         }
+        public override void RandomUpdate(int i, int j, int type)
+        {
+            ProcessDemonismAction((enhance) => enhance.TileRandomUpdate(i, j, type));
+        }
     }
 }

@@ -174,6 +174,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void TileRandomUpdate(int i, int j, int type)
+        {
+
+        }
         public virtual void ModifyBuffText(Player player, int type, ref string buffName, ref string tip, ref int rare)
         {
 

@@ -10,9 +10,11 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent;
+using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.Net;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPets.Content.Projectiles.Pets;
 using TouhouPetsEx.Projectiles;
@@ -40,6 +42,11 @@ namespace TouhouPetsEx.Enhance.Core
             On_Main.DamageVar_float_int_float += LuckUp;
             On_WorldGen.ShakeTree += On_WorldGen_ShakeTree;
             On_Player.AdjTiles += On_Player_AdjTiles;
+            On_BirthdayParty.NaturalAttempt += On_BirthdayParty_NaturalAttempt;
+            On_Main.UpdateTime_StartNight += On_Main_UpdateTime_StartNight;
+            On_WorldGen.UpdateWorld_GrassGrowth += On_WorldGen_UpdateWorld_GrassGrowth;
+            On_ShopHelper.LimitAndRoundMultiplier += On_ShopHelper_LimitAndRoundMultiplier;
+            On_ShopHelper.ProcessMood += On_ShopHelper_ProcessMood;
 
             // 锤子敲背景墙有特殊处理，要用On才能应用工具速度提升
             On_Player.ItemCheck_UseMiningTools_TryHittingWall += (orig, player, item, x, y) =>
@@ -50,6 +57,70 @@ namespace TouhouPetsEx.Enhance.Core
                 if (player.itemTime == item.useTime / 2 && player.EnableEnhance<FlandrePudding>())
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
+        }
+
+        private void On_ShopHelper_ProcessMood(On_ShopHelper.orig_ProcessMood orig, ShopHelper self, Player player, NPC npc)
+        {
+            if (player.EnableEnhance<KokoroMask>())
+            {
+                bool a = Main.remixWorld;
+                Main.remixWorld = false;
+                orig(self, player, npc);
+                Main.remixWorld = a;
+            }
+            else orig(self, player, npc);
+        }
+
+        private float On_ShopHelper_LimitAndRoundMultiplier(On_ShopHelper.orig_LimitAndRoundMultiplier orig, ShopHelper self, float priceAdjustment)
+        {
+            if (Main.LocalPlayer.EnableEnhance<KokoroMask>())
+                return 0.75f;
+
+            return orig(self, priceAdjustment);
+        }
+
+        private void On_WorldGen_UpdateWorld_GrassGrowth(On_WorldGen.orig_UpdateWorld_GrassGrowth orig, int i, int j, int minI, int maxI, int minJ, int maxJ, bool underground)
+        {
+            orig(i, j, minI, maxI, minJ, maxJ, underground);
+
+            if (!underground || !WorldGen.InWorld(i, j, 10) || Main.tile[i, j].type != TileID.JungleGrass)
+                return;
+
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (!player.sleeping.isSleeping || !player.EnableEnhance<DoremyPillow>())
+                    return;
+
+                orig(i, j, minI, maxI, minJ, maxJ, underground);
+            }
+        }
+
+        private void On_Main_UpdateTime_StartNight(On_Main.orig_UpdateTime_StartNight orig, ref bool stopEvents)
+        {
+            orig(ref stopEvents);
+
+            if (Main.netMode == NetmodeID.MultiplayerClient || !NPC.downedBoss2)
+                return;
+
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (player.sleeping.isSleeping && player.EnableEnhance<DoremyPillow>() && Main.rand.NextBool(50))
+                    WorldGen.spawnMeteor = true;
+            }
+        }
+
+        private void On_BirthdayParty_NaturalAttempt(On_BirthdayParty.orig_NaturalAttempt orig)
+        {
+            orig();
+
+            if (Main.netMode == NetmodeID.MultiplayerClient || !NPC.AnyNPCs(208) || BirthdayParty.PartyDaysOnCooldown > 0)
+                return;
+
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (player.sleeping.isSleeping && player.EnableEnhance<DoremyPillow>())
+                    orig();
+            }
         }
 
         private void On_Player_AdjTiles(On_Player.orig_AdjTiles orig, Player self)
@@ -100,15 +171,7 @@ namespace TouhouPetsEx.Enhance.Core
 
         private void On_WorldGen_ShakeTree(On_WorldGen.orig_ShakeTree orig, int i, int j)
         {
-            bool b = false;
-            foreach (Player player in Main.ActivePlayers)
-                if (player.EnableEnhance<SizuhaBrush>())
-                {
-                    b = true;
-                    break;
-                }
-
-            if (!b)
+            if (!WorldEnableEnhance<SizuhaBrush>())
             {
                 orig(i, j);
                 return;
@@ -231,15 +294,7 @@ namespace TouhouPetsEx.Enhance.Core
         {
             orig(self);
 
-            bool b = false;
-            foreach (Player player in Main.ActivePlayers)
-                if (player.EnableEnhance<SuikaGourd>())
-                {
-                    b = true;
-                    break;
-                }
-
-            if (!b)
+            if (!WorldEnableEnhance<SuikaGourd>())
                 return;
 
             bool a = Main.tenthAnniversaryWorld;

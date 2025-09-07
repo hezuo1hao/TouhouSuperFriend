@@ -33,12 +33,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (Main.netMode == NetmodeID.MultiplayerClient || npc.dontTakeDamage || npc.friendly || NPCID.Sets.CountsAsCritter[npc.type])
                 return;
 
-            int magnification = 0;
-            foreach (Player player in Main.ActivePlayers)
-            {
-                if (player.MP().ActivePassiveEnhance.Contains(ModContent.ItemType<HecatiaPlanet>()) && player.HasTouhouPetsBuff())
-                    magnification++;
-            }
+            int magnification = EnhanceCount[ModContent.ItemType<HecatiaPlanet>()];
 
             if (magnification == 0)
                 return;

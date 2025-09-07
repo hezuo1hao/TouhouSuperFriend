@@ -141,6 +141,7 @@ Disable: 已禁用能力！
 Tp: 花费[i:73]右键传送
 Tipsy: 提高近战能力
 KoishiNo1: 泰拉瑞亚：恋恋世界第一！
+Ez: 591 {$Currency.Platinum} 60 {$Currency.Gold} 15 {$Currency.Silver} 3 {$Currency.Copper}
 
 Give: {
 	Usage:
