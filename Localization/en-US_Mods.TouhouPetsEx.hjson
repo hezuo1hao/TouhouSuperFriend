@@ -86,7 +86,8 @@ Sanae_0_3: 起风！
 Sanae_0_4: 风止！
 Sanae_1: 危机情况时，立刻治愈自身的创伤
 Iku: 暴击有概率产生闪电链，对其它敌人造成连锁打击，并施加雷蛰
-Tenshi: 增加耐打能力，可通过洞悉弱点来对敌人造成更致命的打击
+Tenshi: 增加耐打能力，可以洞悉敌人弱点
+Tenshi_1: 可通过洞悉弱点来对敌人造成更致命的打击
 Satori: 你面对的敌人可能会精神错乱，精神错乱的敌人会开始自残
 Rin: 让敌人的尸体拥有用武之地
 Utsuho: 让周围的敌人感受地底太阳般的温暖
@@ -290,6 +291,15 @@ Configs: {
 				'''
 		}
 
+		Tenshi: {
+			Label: 天子-破甲伤害也是伤害
+			Tooltip:
+				'''
+				无兼容性问题
+				根据溢出的盔甲穿透追加基础伤害
+				'''
+		}
+
 		Junko: {
 			Label: 纯狐-纯化加成
 			Tooltip:
@@ -360,6 +370,7 @@ Projectiles: {
 	Butterfly.DisplayName: "{$Mods.TouhouPetsEx.Configs.YuyukoEffectType.Butterfly.Label}"
 	ReisenEffect.DisplayName: 幻视调律
 	SanaeRegen.DisplayName: 奇迹「白昼的客星」
+	LightningStormProj.DisplayName: 雷符「Lightning Fish」
 }
 
 Buffs: {
@@ -435,6 +446,11 @@ Buffs: {
 			{$CommonItemTooltip.IncreasesDefenseBy}
 			{$CommonItemTooltip.IncreasesMaxLifeBy@1}
 			'''
+	}
+
+	LeiZhe: {
+		DisplayName: Lei Zhe
+		Description: Mods.TouhouPetsEx.Buffs.LeiZhe.Description
 	}
 }
 

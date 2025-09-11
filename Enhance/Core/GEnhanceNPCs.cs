@@ -10,6 +10,7 @@ using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using TouhouPetsEx.Buffs;
 
 namespace TouhouPetsEx.Enhance.Core
 {
@@ -65,6 +66,9 @@ namespace TouhouPetsEx.Enhance.Core
 
             if (Restless)
                 modifiers.FinalDamage *= 1.05f;
+
+            if (npc.HasBuff(ModContent.BuffType<LeiZhe>()))
+                modifiers.FinalDamage *= 1 + (float)Math.Ceiling(npc.buffTime[npc.FindBuffIndex(ModContent.BuffType<LeiZhe>())] / 60f) * 0.02f;
         }
         public override void ModifyHitNPC(NPC npc, NPC target, ref NPC.HitModifiers modifiers)
         {

@@ -1,3 +1,4 @@
+using Humanizer;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.Net;
+using Terraria.WorldBuilding;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPets.Content.Projectiles.Pets;
 using TouhouPetsEx.Projectiles;
@@ -338,6 +340,23 @@ namespace TouhouPetsEx.Enhance.Core
             if (!crit && self.DamageType?.CountsAsClass(DamageClass.Summon) == true && Main.LocalPlayer.EnableEnhance<YukarisItem>() && Main.rand.NextBool(100))
             {
                 self.SetCrit();
+            }
+
+            if (Main.LocalPlayer.EnableEnhance<TenshiKeyStone>())
+            {
+                self.ScalingArmorPenetration += baseDamage / 100f;
+
+                if (Config.Tenshi)
+                {
+                    float defense = self.Defense.ApplyTo(0);
+                    float effectiveScaling = Math.Max(self.ScalingArmorPenetration.Value, 0);
+                    float totalPenetration = effectiveScaling * defense + self.ArmorPenetration.Value;
+
+                    if (effectiveScaling > 1)
+                        totalPenetration = effectiveScaling * self.ArmorPenetration.Value;
+
+                    baseDamage += Math.Max(totalPenetration - defense, 0);
+                }
             }
             return orig(ref self, baseDamage, crit, damageVariation, luck);
         }

@@ -38,13 +38,16 @@ namespace TouhouPetsEx
         [DefaultValue(false)]
         public bool Reisen;
 
+        public List<string> Reisen_1;
+
         [DefaultValue(false)]
         public bool Eirin;
 
         [DefaultValue(false)]
         public bool Sanae;
 
-        public List<string> Reisen_1;
+        [DefaultValue(false)]
+        public bool Tenshi;
 
         [DefaultValue(false)]
         public bool Junko;
