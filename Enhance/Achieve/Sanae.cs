@@ -38,7 +38,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (player.MP().SanaeCD == 1)
                 SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/Power"), player.Center);
 
-            if (player.statLife < player.statLifeMax2 / 2 && player.MP().SanaeCD == 0)
+            if (!player.dead && player.statLife < player.statLifeMax2 / 2 && player.MP().SanaeCD == 0)
             {
                 player.MP().SanaeCD = 21600;
                 player.Heal(player.statLifeMax2 / 2);
@@ -52,10 +52,10 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override bool? ItemCanUseItem(Item item, Player player, ref bool def)
         {
-            def = false;
-
             if (player.altFunctionUse == 2 && item.type == ModContent.ItemType<SanaeCoin>())
             {
+                def = false;
+
                 if (Main.MouseWorld.Y < Main.screenPosition.Y + Main.screenHeight / 3f)
                 {
                     if (!Main.raining)

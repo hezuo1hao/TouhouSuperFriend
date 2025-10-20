@@ -18,7 +18,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Reference Include="TouhouPets">
-	    <HintPath>..\..\ModReader\TouhouPets\TouhouPets.dll</HintPath>
+		  <HintPath>..\TouhouPets\bin\Debug\net8.0\TouhouPets.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

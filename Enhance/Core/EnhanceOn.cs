@@ -1,5 +1,6 @@
 using Humanizer;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.Net;
 using Terraria.WorldBuilding;
+using TouhouPets.Content.Buffs.PetBuffs;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPets.Content.Projectiles.Pets;
 using TouhouPetsEx.Projectiles;
@@ -49,6 +51,8 @@ namespace TouhouPetsEx.Enhance.Core
             On_WorldGen.UpdateWorld_GrassGrowth += On_WorldGen_UpdateWorld_GrassGrowth;
             On_ShopHelper.LimitAndRoundMultiplier += On_ShopHelper_LimitAndRoundMultiplier;
             On_ShopHelper.ProcessMood += On_ShopHelper_ProcessMood;
+            On_Gore.NewGore_IEntitySource_Vector2_Vector2_int_float += On_Gore_NewGore_IEntitySource_Vector2_Vector2_int_float;
+            MonoModHooks.Add(typeof(Koishi).GetMethod("ShouldKillPlayer", BindingFlags.Instance | BindingFlags.NonPublic), On_ShouldKillPlayer);
 
             // 锤子敲背景墙有特殊处理，要用On才能应用工具速度提升
             On_Player.ItemCheck_UseMiningTools_TryHittingWall += (orig, player, item, x, y) =>
@@ -59,6 +63,38 @@ namespace TouhouPetsEx.Enhance.Core
                 if (player.itemTime == item.useTime / 2 && player.EnableEnhance<FlandrePudding>())
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
+        }
+
+        public delegate bool ShouldKillPlayerDelegate(Koishi koishi);
+        private bool On_ShouldKillPlayer(ShouldKillPlayerDelegate orig, Koishi koishi)
+        {
+            if (koishi.Owner.HasBuff(ModContent.BuffType<MarisaBuff>()))
+                return false;
+
+            return orig(koishi);
+        }
+
+        private int On_Gore_NewGore_IEntitySource_Vector2_Vector2_int_float(On_Gore.orig_NewGore_IEntitySource_Vector2_Vector2_int_float orig, IEntitySource source, Vector2 Position, Vector2 Velocity, int Type, float Scale)
+        {
+            int index = orig(source, Position, Velocity, Type, Scale);
+            if (index < 600 && Main.LocalPlayer.EnableEnhance<RinSkull>())
+            {
+                NPC targetNpc = source switch
+                {
+                    EntitySource_Parent { Entity: NPC npc } when npc.life <= 0 => npc,
+                    EntitySource_Death { Entity: NPC npc } => npc,
+                    _ => null
+                };
+
+                if (targetNpc != null)
+                {
+                    if (ChildSafety.Disabled)
+                        EnhanceSystem.GoreDamage[index] = targetNpc.damage / 4;
+                    else
+                        Projectile.NewProjectile(source, Position, Velocity, ProjectileID.SpiritHeal, 0, 0, Main.LocalPlayer.whoAmI, Main.LocalPlayer.whoAmI, 1);
+                }
+            }
+            return index;
         }
 
         private void On_ShopHelper_ProcessMood(On_ShopHelper.orig_ProcessMood orig, ShopHelper self, Player player, NPC npc)
@@ -275,7 +311,7 @@ namespace TouhouPetsEx.Enhance.Core
 
         private int SuperCrit(On_NPC.orig_StrikeNPC_HitInfo_bool_bool orig, NPC self, NPC.HitInfo hit, bool fromNet, bool noPlayerInteraction)
         {
-            if (self.GetGlobalNPC<GEnhanceNPCs>().SuperCrit)
+            if (self.TryGetGlobalNPC(out GEnhanceNPCs gnpc) && gnpc.SuperCrit)
             {
                 int index = NewText(new Rectangle((int)self.position.X, (int)self.position.Y, self.width, self.height), new Color(133, 0, 133), hit.Damage, true);
 

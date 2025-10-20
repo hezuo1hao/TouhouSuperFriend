@@ -22,7 +22,7 @@ namespace TouhouPetsEx.Projectiles
         }
         public override void AI()
         {
-            if (LocalConfig.Yuyuko == YuyukoEffectType.Disabled)
+            if (LocalConfig.Yuyuko == YuyukoEffect.Disabled)
                 return;
 
             if (Projectile.ai[0] > 30)
@@ -40,7 +40,7 @@ namespace TouhouPetsEx.Projectiles
         public static Texture2D tex2;
         public override bool PreDraw(ref Color lightColor)
         {
-            if (LocalConfig.Yuyuko == YuyukoEffectType.Disabled)
+            if (LocalConfig.Yuyuko == YuyukoEffect.Disabled)
                 return false;
 
             tex ??= TextureAssets.Projectile[Type].Value;

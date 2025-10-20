@@ -23,12 +23,22 @@ namespace TouhouPetsEx.Enhance.Core
         /// 总共有多少个城镇npc，剑、玉、镜、乡buff用（上白泽慧音能力相关）
         /// </summary>
         public static int TownNPCMax;
+        /// <summary>
+        /// 记录尸块伤害（火焰猫燐能力相关）
+        /// </summary>
+        public static int[] GoreDamage = new int[Main.maxGore];
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
             foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
             {
                 action(enhance);
             }
+        }
+        public override void ModifyLightingBrightness(ref float scale)
+        {
+            float scale2 = scale;
+            ProcessDemonismAction((enhance) => enhance.SystemModifyLightingBrightness(ref scale2));
+            scale = scale2;
         }
         public override void PostSetupContent()
         {
@@ -39,6 +49,14 @@ namespace TouhouPetsEx.Enhance.Core
         public override void PostAddRecipes()
         {
             ProcessDemonismAction((enhance) => enhance.SystemPostAddRecipes());
+        }
+        public override void PreUpdateGores()
+        {
+            for (int i = 0; i < Main.maxGore; i++)
+                if (!Main.gore[i].active)
+                    GoreDamage[i] = 0;
+
+            ProcessDemonismAction((enhance) => enhance.SystemPreUpdateGores());
         }
         public override void PostUpdateNPCs()
         {

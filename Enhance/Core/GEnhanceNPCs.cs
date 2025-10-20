@@ -10,7 +10,9 @@ using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Buffs;
+using static TouhouPetsEx.TouhouPetsEx;
 
 namespace TouhouPetsEx.Enhance.Core
 {
@@ -40,12 +42,43 @@ namespace TouhouPetsEx.Enhance.Core
         /// 超级暴击，饕餮Buff用（米斯蒂娅能力相关）
         /// </summary>
         public bool SuperCrit;
+        /// <summary>
+        /// 熔化debuff，灵乌路空用
+        /// </summary>
+        public bool Melt;
         public override bool InstancePerEntity => true;
-        private static void ProcessDemonismAction(NPC npc, Action<BaseEnhance> action)
+        private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
             foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
             {
                 action(enhance);
+            }
+        }
+        /// <param name="priority">填写需要优先返回的bool结果，如：执行三次，俩false一true，需求true，则返回true结果
+        /// <br>特别的，如果填null则会返回最后一个非null的结果</br>
+        /// </param>
+        private static bool? ProcessDemonismAction(bool? priority, Func<BaseEnhance, bool?> action)
+        {
+            if (priority == null)
+            {
+                bool? @return = null;
+                foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
+                {
+                    bool? a = action(enhance);
+                    if (a != null) @return = a;
+                }
+                return @return;
+            }
+            else
+            {
+                bool? @return = null;
+                foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
+                {
+                    bool? a = action(enhance);
+                    if (a == priority) return a;
+                    else if (a != null) @return = a;
+                }
+                return @return;
             }
         }
         public override void ResetEffects(NPC npc)
@@ -54,14 +87,41 @@ namespace TouhouPetsEx.Enhance.Core
             MoonMist = false;
             Depression = false;
             Restless = false;
+            Melt = false;
+        }
+        public override bool PreAI(NPC npc)
+        {
+            bool? reesult = ProcessDemonismAction(false, (enhance) => enhance.NPCPreAI(npc));
+
+            return reesult ?? base.PreAI(npc);
         }
         public override void AI(NPC npc)
         {
-            ProcessDemonismAction(npc, (enhance) => enhance.NPCAI(npc));
+            ProcessDemonismAction((enhance) => enhance.NPCAI(npc));
+        }
+        public override void UpdateLifeRegen(NPC npc, ref int damage)
+        {
+            if (npc.HasBuff(BuffID.Confused) && WorldEnableEnhance<SatoriSlippers>())
+            {
+                npc.lifeRegen -= 12;
+                if (damage < 5) damage = 5;
+            }
+
+            if (Melt && damage < 6)
+                damage = 6;
+        }
+        public override bool CanHitNPC(NPC npc, NPC target)
+        {
+            bool? reesult = ProcessDemonismAction(false, (enhance) => enhance.NPCCanHitNPC(npc, target));
+
+            return reesult ?? base.CanHitNPC(npc, target);
         }
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
             if (Earth)
+                modifiers.Defense /= 2f;
+
+            if (npc.HasBuff(BuffID.Confused) && WorldEnableEnhance<SatoriSlippers>())
                 modifiers.Defense /= 2f;
 
             if (Restless)

@@ -21,12 +21,12 @@ namespace TouhouPetsEx.Enhance.Achieve
 
             target.StrikeInstantKill();
             int rand = -1;
-            if (LocalConfig.Yuyuko == YuyukoEffectType.All)
+            if (LocalConfig.Yuyuko == YuyukoEffect.All)
                 rand = Main.rand.Next(2);
 
-            if (LocalConfig.Yuyuko == YuyukoEffectType.Die || rand == 0)
+            if (LocalConfig.Yuyuko == YuyukoEffect.Die || rand == 0)
                 Projectile.NewProjectile(target.GetSource_Death(), target.Center, Vector2.Zero, ModContent.ProjectileType<Die>(), 0, 0, player.whoAmI, ai1: Main.rand.NextFloat(3.140f));
-            else if (LocalConfig.Yuyuko == YuyukoEffectType.Butterfly || rand == 1)
+            else if (LocalConfig.Yuyuko == YuyukoEffect.Butterfly || rand == 1)
                 Projectile.NewProjectile(target.GetSource_Death(), target.Center, Vector2.Zero, ModContent.ProjectileType<Butterfly>(), 0, 0, player.whoAmI, Main.rand.Next(2));
 
         }

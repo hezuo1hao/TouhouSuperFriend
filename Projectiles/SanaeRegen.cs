@@ -51,7 +51,7 @@ namespace TouhouPetsEx.Projectiles
                 for (int i = 0; i < 3; i++)
                     p[i] = new Vector2(Main.rand.NextFloat(-player.width, player.width) * Main.rand.NextFloat(2.50f, 4.00f), Main.rand.NextFloat(-player.height * .5f, player.height * 2));
                 for (int i = 3; i < p.Length; i++)
-                    p[i] = new Vector2(Main.rand.NextFloat(-player.width, player.width) * Main.rand.NextFloat(2.50f, 4.00f) + Main.rand.Next([-100, 100]), Main.rand.NextFloat(player.height * 2f, player.height * 4f));
+                    p[i] = new Vector2(Main.rand.NextFloat(-player.width, player.width) * Main.rand.NextFloat(2.50f, 4.00f) + Main.rand.Next([-75, 75]), Main.rand.NextFloat(player.height * 2f, player.height * 4f));
             }
 
             if (Projectile.ai[0] > 45)

@@ -27,7 +27,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 
             foreach (Player player in Main.ActivePlayers)
             {
-                if (!player.HasEnhance<WriggleInAJar>())
+                if (!player.EnableEnhance<WriggleInAJar>())
                     continue;
 
                 NPC.goldCritterChance = 200;

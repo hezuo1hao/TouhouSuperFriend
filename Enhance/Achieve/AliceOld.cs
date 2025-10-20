@@ -106,7 +106,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             TooltipLine tooltipLine = new(TouhouPetsEx.Instance, "EatBookTooltip", GetText("AliceOld_1", Main.LocalPlayer.MP().EatBook));
 
-            if (item.type == ItemID.Book && Main.LocalPlayer.HasEnhance<AliceOldDoll>())
+            if (item.type == ItemID.Book && Main.LocalPlayer.EnableEnhance<AliceOldDoll>())
             {
                 tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, tooltipLine);
             }

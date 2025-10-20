@@ -189,7 +189,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 new TooltipLine(TouhouPetsEx.Instance, "ExtraAdditionTooltip_9", GetText("Momoyo_9", plr.ExtraAddition[10] / 5f))
                 ];
 
-            if (Main.LocalPlayer.HasEnhance<MomoyoPickaxe>())
+            if (Main.LocalPlayer.EnableEnhance<MomoyoPickaxe>())
             {
                 switch (item.type)
                 {

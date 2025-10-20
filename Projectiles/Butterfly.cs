@@ -26,7 +26,7 @@ namespace TouhouPetsEx.Projectiles
         bool a;
         public override void AI()
         {
-            if (a || LocalConfig.Yuyuko == YuyukoEffectType.Disabled)
+            if (a || LocalConfig.Yuyuko == YuyukoEffect.Disabled)
                 return;
 
             if (Projectile.ai[0] == 0)

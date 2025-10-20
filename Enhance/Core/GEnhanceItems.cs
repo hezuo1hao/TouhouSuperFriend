@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace TouhouPetsEx.Enhance.Core
             return @return;
         }
         /// <param name="priority">填写需要优先返回的bool结果，如：执行三次，俩false一true，需求true，则返回true结果
-        /// <r>特别的，如果填null则会返回最后一个非null的结果</r>
+        /// <br>特别的，如果填null则会返回最后一个非null的结果</br>
         /// </param>
         private static bool? ProcessDemonismAction(Player player, bool? priority, Func<BaseEnhance, bool?> action)
         {
@@ -76,6 +77,33 @@ namespace TouhouPetsEx.Enhance.Core
                 return @return;
             }
         }
+        /// <param name="priority">填写需要优先返回的bool结果，如：执行三次，俩false一true，需求true，则返回true结果
+        /// <br>特别的，如果填null则会返回最后一个非null的结果</br>
+        /// </param>
+        private static bool? ProcessDemonismAction(bool? priority, Func<BaseEnhance, bool?> action)
+        {
+            if (priority == null)
+            {
+                bool? @return = null;
+                foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+                {
+                    bool? a = action(enhance.Value);
+                    if (a != null) @return = a;
+                }
+                return @return;
+            }
+            else
+            {
+                bool? @return = null;
+                foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+                {
+                    bool? a = action(enhance.Value);
+                    if (a == priority) return a;
+                    else if (a != null) @return = a;
+                }
+                return @return;
+            }
+        }
         public override void SetDefaults(Item entity)
         {
             ProcessDemonismAction(entity, (enhance) => enhance.ItemSD(entity));
@@ -87,14 +115,14 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void HoldItem(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
+            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !player.EnableEnhance(item.type))
                 player.MP().ActivePassiveEnhance.Add(item.type);
 
             ProcessDemonismAction((enhance) => enhance.ItemHoldItem(item, player));
         }
         public override void UpdateInventory(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
+            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !player.EnableEnhance(item.type))
                 player.MP().ActivePassiveEnhance.Add(item.type);
 
             ProcessDemonismAction((enhance) => enhance.ItemUpdateInventory(item, player));
@@ -193,6 +221,16 @@ namespace TouhouPetsEx.Enhance.Core
             }
 
             return true;
+        }
+        public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            bool? reesult = ProcessDemonismAction(Main.LocalPlayer, false, (enhance) => enhance.ItemPreDrawInInventory(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale));
+
+            return reesult ?? base.PreDrawInInventory(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale);
+        }
+        public override void PostDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            ProcessDemonismAction((enhance) => enhance.ItemPostDrawInInventory(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale));
         }
     }
 }

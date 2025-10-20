@@ -28,7 +28,7 @@ namespace TouhouPetsEx
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             // 不开能力就想用指令，报错！
-            if (!caller.Player.HasEnhance<ShinkiHeart>())
+            if (!caller.Player.EnableEnhance<ShinkiHeart>())
                 throw new UsageException(GetText("Give.Error_1"));
 
             // 一个参数都没有，报错！

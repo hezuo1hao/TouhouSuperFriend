@@ -22,10 +22,13 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             foreach (NPC npc in Main.ActiveNPCs)
             {
-                if (!npc.friendly && npc.Center.Distance(player.Center) < 120)
+                if (npc.dontTakeDamage || npc.friendly || (npc.aiStyle == 112 && !(npc.ai[2] <= 1f)) || !player.CanNPCBeHitByPlayerOrPlayerProjectile(npc))
+                    continue;
+
+                if (npc.Center.Distance(player.Center) < 120)
                     npc.AddBuff(BuffID.Confused, 60);
 
-                if (!npc.friendly && Config.Rumia && !Main.dayTime && Main.rand.NextBool(60))
+                if (Config.Rumia && !Main.dayTime && Main.rand.NextBool(60))
                     npc.AddBuff(BuffID.Confused, Main.rand.Next(15, 90));
             }
         }

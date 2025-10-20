@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
@@ -23,6 +24,14 @@ namespace TouhouPetsEx.Enhance.Achieve
                 player.statManaMax2 += 100;
                 player.manaRegenDelay = 0;
             }
+        }
+        public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
+        {
+            if (item.type != ModContent.ItemType<MarisaHakkero>())
+                return;
+
+            int index = tooltips.GetTooltipsLastIndex();
+            tooltips.Insert(index + 1, new TooltipLine(TouhouPetsEx.Instance, "SpecialTooltip", GetText("Marisa_0")));
         }
     }
 }

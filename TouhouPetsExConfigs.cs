@@ -50,6 +50,36 @@ namespace TouhouPetsEx
         public bool Tenshi;
 
         [DefaultValue(false)]
+        public bool Satori;
+
+        [DefaultValue(false)]
+        public bool Satori_2;
+
+        [DefaultValue(false)]
+        public bool Rin;
+
+        [DefaultValue(false)]
+        public bool Rin_2;
+
+        [DefaultValue(false)]
+        public bool Utsuho;
+
+        [DefaultValue(false)]
+        public bool Utsuho_2;
+
+        [DefaultValue(false)]
+        public bool Koishi;
+
+        [DefaultValue(false)]
+        public bool Koishi_2;
+
+        [DefaultValue(false)]
+        public bool Wakasagihime;
+
+        [DefaultValue(false)]
+        public bool Wakasagihime_2;
+
+        [DefaultValue(false)]
         public bool Junko;
 
         [DefaultValue(false)]
@@ -61,13 +91,22 @@ namespace TouhouPetsEx
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
         [DefaultValue(true)]
+        public bool Tooltip_1;
+
+        [DefaultValue(true)]
+        public bool Tooltip_2;
+
+        [DefaultValue(true)]
+        public bool Tooltip_3;
+
+        [DefaultValue(true)]
         public bool Rumia;
 
-        [DefaultValue(YuyukoEffectType.All)]
+        [DefaultValue(YuyukoEffect.All)]
         [DrawTicks]
-        public YuyukoEffectType Yuyuko;
+        public YuyukoEffect Yuyuko;
     }
-    public enum YuyukoEffectType
+    public enum YuyukoEffect
     {
         Disabled,
         Butterfly,

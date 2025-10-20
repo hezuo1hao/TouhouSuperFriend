@@ -21,5 +21,24 @@ namespace TouhouPetsEx.Enhance.Achieve
 
             luck += 0.001f;
         }
+        public override void ItemUpdateInventory(Item item, Player player)
+        {
+            if (!player.EnableEnhance<HinaDoll>())
+                return;
+
+            int i = 0;
+            while (PrefixID.Sets.ReducedNaturalChance[item.prefix])
+            {
+                if (i >= 100)
+                {
+                    item.prefix = 0;
+                    return;
+                }
+
+                item.ResetPrefix();
+                item.Prefix(-2);
+                i++;
+            }
+        }
     }
 }

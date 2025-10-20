@@ -9,6 +9,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Sizuha : BaseEnhance
     {
         public override string Text => GetText("Sizuha");
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SizuhaBrush>());

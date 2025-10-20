@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public virtual string Text => "";
         /// <summary>
-        /// 实验性玩法描述，需确保长度与 Experimental 一致
+        /// 实验性玩法描述，需确保长度与 <see cref="Experimental"/> 一致
         /// <br>如果某一索引为""则当对应实验性玩法启动时并不会显示新描述</br>
         /// </summary>
         public virtual string[] ExperimentalText => [];
@@ -31,9 +32,13 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public virtual bool Passive => false;
         /// <summary>
-        /// 是否启用了对应能力的实验性玩法，需确保长度与 ExperimentalText 一致
+        /// 是否启用了对应能力的实验性玩法，需确保长度与 <see cref="ExperimentalText"/> 一致
         /// </summary>
         public virtual bool[] Experimental => [];
+        /// <summary>
+        /// 关闭所给物品的增益能力描述
+        /// </summary>
+        public HashSet<int> BanTootips = [];
         /// <summary>
         /// 添加本增强与对应物品之间的联系
         /// </summary>
@@ -41,6 +46,10 @@ namespace TouhouPetsEx.Enhance.Core
         public void AddEnhance(int type)
         {
             TouhouPetsEx.GEnhanceInstances[type] = this;
+        }
+        public void AddBanTootips(HashSet<int> ints)
+        {
+            BanTootips = ints;
         }
         public virtual void ItemSSD()
         {
@@ -70,6 +79,14 @@ namespace TouhouPetsEx.Enhance.Core
         {
             return null;
         }
+        public virtual bool? ItemPreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            return null;
+        }
+        public virtual void ItemPostDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+
+        }
         public virtual void PlayerInitialize(Player player)
         {
 
@@ -79,6 +96,10 @@ namespace TouhouPetsEx.Enhance.Core
 
         }
         public virtual void PlayerResetEffectsAlways(Player player)
+        {
+
+        }
+        public virtual void PlayerPostResetEffects(Player player)
         {
 
         }
@@ -126,6 +147,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void PlayerPostHurt(Player player, Player.HurtInfo info)
+        {
+
+        }
         public virtual void PlayerModifyHitNPCWithItem(Player player, Item item, NPC target, ref NPC.HitModifiers modifiers)
         {
 
@@ -166,9 +191,17 @@ namespace TouhouPetsEx.Enhance.Core
         {
             
         }
+        public virtual bool? NPCPreAI(NPC npc)
+        {
+            return null;
+        }
         public virtual void NPCAI(NPC npc)
         {
 
+        }
+        public virtual bool? NPCCanHitNPC(NPC npc, NPC target)
+        {
+            return null;
         }
         public virtual void TileDrawEffects(int i, int j, int type, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
@@ -186,7 +219,15 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void SystemModifyLightingBrightness(ref float scale)
+        {
+
+        }
         public virtual void SystemPostSetupContent()
+        {
+
+        }
+        public virtual void SystemPreUpdateGores()
         {
 
         }

@@ -34,7 +34,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
 
                 Projectile.NewProjectile(player.GetSource_Misc("Dodge"), player.Center, Vector2.Zero, ModContent.ProjectileType<ReisenEffect>(), 0, 0, player.whoAmI);
-                return false;
+                return true;
             }
 
             return null;

@@ -24,7 +24,9 @@ namespace TouhouPetsEx
         public static EnhanceBuffPlayers MBP(this Player player) => player.TryGetModPlayer<EnhanceBuffPlayers>(out var mbp) ? mbp : null;
         public static bool HasTouhouPetsBuff(this Player player) => player.buffType.Any(type => (Main.vanityPet[type] || Main.lightPet[type]) && BuffLoader.GetBuff(type)?.FullName.StartsWith("TouhouPets/") == true);
         public static bool HasEnhance<T>(this Player player) where T : ModItem => player.MP()?.ActiveEnhance.Concat(player.MP()?.ActivePassiveEnhance).Contains(ModContent.ItemType<T>()) == true;
+        public static bool HasEnhance(this Player player, int type) => player.MP()?.ActiveEnhance.Concat(player.MP()?.ActivePassiveEnhance).Contains(type) == true;
         public static bool EnableEnhance<T>(this Player player) where T : ModItem => player.HasEnhance<T>() && player.HasTouhouPetsBuff();
+        public static bool EnableEnhance(this Player player, int type) => player.HasEnhance(type) && player.HasTouhouPetsBuff();
         public static bool WorldEnableEnhance<T>() where T : ModItem => EnhanceCount.TryGetValue(ModContent.ItemType<T>(), out int value) && value > 0;
         public static int GetTooltipsLastIndex(this List<TooltipLine> tooltips)
         {

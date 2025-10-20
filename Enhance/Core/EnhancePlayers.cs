@@ -19,12 +19,15 @@ using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Buffs;
+using TouhouPetsEx.Items;
 using TouhouPetsEx.Projectiles;
 
 namespace TouhouPetsEx.Enhance.Core
 {
     public class EnhancePlayers : ModPlayer
     {
+        public bool NewlyMadeDoll;
+        public bool ABurntDoll;
         public List<int> ActiveEnhance = [];
         public List<int> ActivePassiveEnhance = [];
         public int ActiveEnhanceCount = 11037;
@@ -96,6 +99,14 @@ namespace TouhouPetsEx.Enhance.Core
         /// 东风谷早苗用
         /// </summary>
         public int SanaeCD;
+        /// <summary>
+        /// 火焰猫燐用
+        /// </summary>
+        public int RinCD;
+        /// <summary>
+        /// 古明地恋用，人气值
+        /// </summary>
+        public float Popularity;
         /// <summary>
         /// 姬虫百百世用
         /// <para>索引决定对应的加成：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲</para>
@@ -172,6 +183,12 @@ namespace TouhouPetsEx.Enhance.Core
         {
             ActiveEnhanceCount = 1;
 
+            if (NewlyMadeDoll)
+                ActiveEnhanceCount++;
+
+            if (ABurntDoll)
+                ActiveEnhanceCount++;
+
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerResetEffects(Player));
             ProcessDemonismAction((enhance) => enhance.PlayerResetEffectsAlways(Player));
 
@@ -181,9 +198,11 @@ namespace TouhouPetsEx.Enhance.Core
 
             foreach (Item item in Player.miscEquips)
             {
-                if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive)
+                if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !Player.EnableEnhance(item.type))
                     ActivePassiveEnhance.Add(item.type);
             }
+
+            ProcessDemonismAction((enhance) => enhance.PlayerPostResetEffects(Player));
         }
         public override void SaveData(TagCompound tag)
         {
@@ -198,6 +217,8 @@ namespace TouhouPetsEx.Enhance.Core
             tag.Add("adjTileMod", adjTileMod);
             tag.Add("adjOther", adjOther);
             tag.Add("ExtraAddition", ExtraAddition);
+            tag.Add("NewlyMadeDoll", NewlyMadeDoll);
+            tag.Add("ABurntDoll", ABurntDoll);
         }
         public override void LoadData(TagCompound tag)
         {
@@ -209,6 +230,8 @@ namespace TouhouPetsEx.Enhance.Core
             }
             ActiveEnhance = ints;
             EatBook = tag.GetInt("EatBook");
+            NewlyMadeDoll = tag.GetBool("NewlyMadeDoll");
+            ABurntDoll = tag.GetBool("ABurntDoll");
             if (tag.TryGet<bool[]>("adjTileVanilla", out var adjtileVanilla))
                 adjTileVanilla = adjtileVanilla;
             else
@@ -236,6 +259,10 @@ namespace TouhouPetsEx.Enhance.Core
                 if (parts.Length == 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]) && ModLoader.TryGetMod(parts[0], out Mod mod) && mod.TryFind(parts[1], out ModTile tile))
                     adjTile[tile.Type] = true;
             }
+        }
+        public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
+        {
+            return [new Item(ModContent.ItemType<MysteriousSlip>())];
         }
         public override void ModifyLuck(ref float luck)
         {
@@ -345,6 +372,10 @@ namespace TouhouPetsEx.Enhance.Core
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHurt(Player, ref modifiers2));
             modifiers = modifiers2;
         }
+        public override void PostHurt(Player.HurtInfo info)
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostHurt(Player, info));
+        }
         public override void ModifyHitNPCWithItem(Item item, NPC target, ref NPC.HitModifiers modifiers)
         {
             NPC.HitModifiers modifiers2 = modifiers;
@@ -413,10 +444,22 @@ namespace TouhouPetsEx.Enhance.Core
                         continue;
 
                     proj.velocity = proj.DirectionTo(Main.npc[target].Center).SafeNormalize(-Vector2.UnitY) * proj.velocity.Length();
+                    proj.netUpdate = true;
                     proj.GetGlobalProjectile<GEnhanceProjectile>().Bullet = false;
                 }
 
                 Projectile.NewProjectile(Main.LocalPlayer.GetSource_FromThis(), Main.LocalPlayer.Center, Vector2.Zero, ModContent.ProjectileType<ReisenEffect>(), 0, 0, Main.LocalPlayer.whoAmI, ai1: 1);
+            }
+
+            if (TouhouPetsExModSystem.KoishiKeyBind.JustPressed && Config.Koishi && Main.LocalPlayer.EnableEnhance<KoishiTelephone>())
+            {
+                if (Main.LocalPlayer.HasBuff(ModContent.BuffType<PopularityExplosion>()))
+                    Main.LocalPlayer.ClearBuff(ModContent.BuffType<PopularityExplosion>());
+                else
+                {
+                    Main.LocalPlayer.AddBuff(ModContent.BuffType<PopularityExplosion>(), 900);
+                    Projectile.NewProjectile(Main.LocalPlayer.GetSource_FromThis(), Main.LocalPlayer.Center, Vector2.Zero, ModContent.ProjectileType<PopularityExplosionEffect>(), 0, 0, Main.myPlayer);
+                }
             }
         }
 
@@ -432,6 +475,8 @@ namespace TouhouPetsEx.Enhance.Core
             packet.Write((byte)TouhouPetsEx.MessageType.StatIncreasePlayerSync);
             packet.Write((byte)plr.whoAmI);
             packet.Write(rebate);
+            packet.Write(player.NewlyMadeDoll);
+            packet.Write(player.ABurntDoll);
             packet.Write(player.EatBook);
             packet.Write(player.ActiveEnhance.Count);
             for (int i = 0; i < player.ActiveEnhance.Count; i++)
@@ -445,25 +490,31 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public static void ReceivePlayerSync(BinaryReader reader, int whoAmI, bool award)
         {
-            if (whoAmI == Main.myPlayer)
-                return;
-
             Player plr = Main.player[whoAmI];
             EnhancePlayers player = plr.MP();
 
-            player.EatBook = reader.ReadInt32();
+            bool newlyMadeDoll = reader.ReadBoolean();
+            bool aBurntDoll = reader.ReadBoolean();
+            int eatBook = reader.ReadInt32();
 
             int activeEnhanceCount = reader.ReadInt32();
             List<int> activeEnhance = [];
             for (int i = 0; i < activeEnhanceCount; i++)
                 activeEnhance.Add(reader.ReadInt32());
-            player.ActiveEnhance = activeEnhance;
 
             int extraAdditionLength = reader.ReadInt32();
             int[] extraAddition = new int[extraAdditionLength];
             for (int i = 0; i < extraAdditionLength; i++)
                 extraAddition[i] = reader.ReadInt32();
-            player.ExtraAddition = extraAddition;
+
+            if (whoAmI != Main.myPlayer)
+            {
+                player.NewlyMadeDoll = newlyMadeDoll;
+                player.ABurntDoll = aBurntDoll;
+                player.EatBook = eatBook;
+                player.ExtraAddition = extraAddition;
+                player.ActiveEnhance = activeEnhance;
+            }
 
             if (award)
                 AwardPlayerSync(TouhouPetsEx.Instance, whoAmI, Main.myPlayer);

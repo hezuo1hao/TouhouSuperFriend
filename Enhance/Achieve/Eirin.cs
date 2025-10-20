@@ -21,7 +21,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             Recipe.IngredientQuantityCallback callback = new(delegate (Recipe recipe, int type, ref int amount, bool isDecrafting)
             {
-                if (isDecrafting || !Main.LocalPlayer.EnableEnhance<EirinBow>())
+                if (isDecrafting || !recipe.HasTile(TileID.Bottles) || !Main.LocalPlayer.EnableEnhance<EirinBow>())
                         return;
 
                 for (int i = amount; i > 0; i--)

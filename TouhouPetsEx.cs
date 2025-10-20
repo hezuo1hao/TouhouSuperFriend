@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Net;
@@ -22,16 +23,19 @@ namespace TouhouPetsEx
         public static List<int> ColdProjAll = [];
         public static int[] VanillaBug = [355, 356, 357, 358, 359, 360, 377, 484, 485, 486, 487, 595, 596, 597, 598, 599, 600, 604, 606, 612, 653, 654, 655, 669];
         public static int[] VanillaGoldBug = [444, 446, 448, 601, 605, 613];
+        public static HashSet<int> OceanEnemy = [];
         public static Dictionary<int, BaseEnhance> GEnhanceInstances = [];
         public static TouhouPetsEx Instance;
         public static Effect RingShader;
         public static Effect DistortShader;
+        public static Effect TransformShader;
         public static BlendState InverseColor;
         public override void Load()
         {
             Instance = this;
             RingShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Ring", AssetRequestMode.ImmediateLoad).Value;
             DistortShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Distort", AssetRequestMode.ImmediateLoad).Value;
+            TransformShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Transform", AssetRequestMode.ImmediateLoad).Value;
             InverseColor = new BlendState()
             {
                 Name = "BlendState.InverseColor",
@@ -46,6 +50,15 @@ namespace TouhouPetsEx
             ColdProjAll.AddRange(ColdProjVanilla);
             ColdProjAll.AddRange(ContentSamples.ProjectilesByType.Where(kv => kv.Value.coldDamage && !kv.Value.hostile && kv.Value.friendly && kv.Key >= ProjectileID.Count).Select(kv => kv.Key));
 
+            foreach (var kvp in ContentSamples.NpcsByNetId)
+            {
+                var entry = BestiaryDatabaseNPCsPopulator.FindEntryByNPCID(kvp.Key);
+                if (kvp.Key >= 0 && !kvp.Value.boss && !kvp.Value.friendly && entry?.Info?.Contains(BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Ocean) == true)
+                {
+                    OceanEnemy.Add(kvp.Key);
+                }
+            }
+
             if (Main.netMode != NetmodeID.Server && Main.rand.NextBool(25))
                 Main.instance.Window.Title = GetText("KoishiNo1");
         }
@@ -59,7 +72,9 @@ namespace TouhouPetsEx
             VanillaBug = null;
             VanillaGoldBug = null;
             RingShader = null;
-            InverseColor.Dispose();
+            DistortShader = null;
+            TransformShader = null;
+            InverseColor?.Dispose();
         }
         internal enum MessageType : byte
         {

@@ -14,16 +14,19 @@ namespace TouhouPetsEx
     {
         public static int SynchronousTime;
         public static ModKeybind ReisenKeyBind { get; private set; }
+        public static ModKeybind KoishiKeyBind { get; private set; }
 
         public override void Load()
         {
             ReisenKeyBind = KeybindLoader.RegisterKeybind(Mod, "ReisenKeyBind", "V");
+            KoishiKeyBind = KeybindLoader.RegisterKeybind(Mod, "KoishiKeyBind", "C");
             EnhanceCount = [];
         }
 
         public override void Unload()
         {
             ReisenKeyBind = null;
+            KoishiKeyBind = null;
             EnhanceCount = null;
         }
         public override void PreUpdateTime()

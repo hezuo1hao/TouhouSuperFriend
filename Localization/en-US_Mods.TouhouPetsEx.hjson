@@ -55,6 +55,7 @@ Reimu:
 	当你成功证明自身的强大时，天空将无极限
 	'''
 Marisa: 给予魔法就是火力程度的增强
+Marisa_0: "[c/3BDA55:东方小祖宗：][c/FFF014:抑制无意识的活动]"
 Marisa_1: 魔力充盈 【极】
 Tewi: 增加运气，同时你能承受更多的运气
 Reisen: 有概率让敌人无法琢磨透你真身所在
@@ -72,7 +73,7 @@ Aya:
 Yuka: 接触向日葵会为你带来增益
 Sizuha: 你摇起树来更加得心应手
 Minoriko: 食物更好吃
-Hina: 减小伤害浮动的负面效果
+Hina: 减小伤害浮动的负面效果，并净化负面前缀
 Nitori: 可以随身制作各种物品
 Sanae:
 	'''
@@ -88,22 +89,42 @@ Sanae_1: 危机情况时，立刻治愈自身的创伤
 Iku: 暴击有概率产生闪电链，对其它敌人造成连锁打击，并施加雷蛰
 Tenshi: 增加耐打能力，可以洞悉敌人弱点
 Tenshi_1: 可通过洞悉弱点来对敌人造成更致命的打击
-Satori: 你面对的敌人可能会精神错乱，精神错乱的敌人会开始自残
+Satori: 你面对的敌人会精神错乱，精神错乱的敌人会开始自残
+Satori_1: “全体家人，回应于我！”
+Satori_2: 不管是从正面看还是从后面看，都会精神错乱
 Rin: 让敌人的尸体拥有用武之地
-Utsuho: 让周围的敌人感受地底太阳般的温暖
+Rin_1: 怨灵们将为你而战
+Rin_2: 会上演一场盛大的烟火表口
+Utsuho:
+	'''
+	让周围的敌人感受地底太阳般的温暖
+	亲临地狱的险恶并在一场艰苦卓绝的战斗中生还将会使得太阳更加耀眼
+	'''
+Utsuho_1: 终为白日
+Utsuho_2: 自身的温暖会使得太阳更加温暖
 Koishi:
 	'''
 	隐匿自身
 	偶尔会不再隐匿自身，而是向全世界告知自己的存在
 	伴随着而来的是，会有强大的自信充满自己的全身
 	'''
+Koishi_1: 获得从某个世界，又或者是不可探测的将来中，所拥有的能力
+Koishi_2: 给帽子附魔保护IV和前缀
 Kogasa: 学会锻造（手持可锻造物品右键长按砧即可）
-Murasa: 对水里或带有水的敌人造成惨痛打击
+Murasa: 对水里或带有水的敌人造成惨痛打击，且更会玩水
 Sunny: 让光更亮
 Luna: 敌怪将会听不到小动物和友善npc所发出的动静，进而无视
 Star: 可以感知周围敌怪的存在
+SAYYA:
+	'''
+	{$Mods.TouhouPetsEx.Sunny}
+	{$Mods.TouhouPetsEx.Luna}
+	{$Mods.TouhouPetsEx.Star}
+	'''
 Kokoro: 会让所有人都高兴起来
-Wakasagihime: 在水里更强，且移动更加轻松
+Wakasagihime: 在水里更强，可以化身海栖种
+Wakasagihime_1: 进化出了在极地生存的能力
+Wakasagihime_2: ⚡水精之力充满全身⚡
 Sekibanki: 可以右键把头飞出去玩
 Raiko: 会让在雷雨天装的敌怪遭受制裁
 Doremy: 睡觉有概率美梦成真
@@ -143,6 +164,7 @@ Tp: 花费[i:73]右键传送
 Tipsy: 提高近战能力
 KoishiNo1: 泰拉瑞亚：恋恋世界第一！
 Ez: 591 {$Currency.Platinum} 60 {$Currency.Gold} 15 {$Currency.Silver} 3 {$Currency.Copper}
+Protect: 保护IV
 
 Give: {
 	Usage:
@@ -268,7 +290,7 @@ Configs: {
 				需要填写对应弹幕的内部名称（模组内部名/弹幕内部名）
 				填写原版弹幕会被无视
 				特别的，{$ItemName.ChlorophyteBullet}本身就已经在黑名单内，且你无法取消
-				加入到该名单的弹幕将不会在触发铃仙实验性玩法效果时，被该效果所影响
+				加入到该名单的弹幕将不会在触发铃仙-子弹偏转时，被该效果所影响
 				'''
 		}
 
@@ -300,6 +322,98 @@ Configs: {
 				'''
 		}
 
+		Satori: {
+			Label: 地灵殿的君主 古明地觉
+			Tooltip:
+				'''
+				无兼容性问题
+				火焰猫燐、灵乌路空、古明地恋的能力会转为被动能力
+				'''
+		}
+
+		Satori_2: {
+			Label: 小五-反方向的廉价把戏
+			Tooltip:
+				'''
+				无兼容性问题
+				背对着的敌人也会精神错乱
+				'''
+		}
+
+		Rin: {
+			Label: 灼热地狱的怨灵们-魁首 火焰猫燐
+			Tooltip:
+				'''
+				无兼容性问题
+				周围随机出现怨灵并空投尸体
+				'''
+		}
+
+		Rin_2: {
+			Label: 阿燐-尸爆术
+			Tooltip:
+				'''
+				无兼容性问题
+				尸块触碰到敌人时改为爆炸，同时造成中毒减益
+				'''
+		}
+
+		Utsuho: {
+			Label: 地灵殿 核反应炉主理人 灵乌路空
+			Tooltip:
+				'''
+				无兼容性问题
+				熔化速度永远为最大
+				'''
+		}
+
+		Utsuho_2: {
+			Label: 阿空-温度叠加
+			Tooltip:
+				'''
+				无兼容性问题
+				保暖增益会增加熔化减益的伤害
+				'''
+		}
+
+		Koishi: {
+			Label: 绽放E.G.O::重新睁开的恋之瞳 古明地恋
+			Tooltip:
+				'''
+				无兼容性问题
+				可自由切换人气爆发状态，先前的人气值仍然存在但改为对人气爆发状态的额外加成
+				在按下对应快捷键后，会切换人气爆发状态
+				请设置快捷键：设置 → 控件 → 下滑找到 “东方小祖宗：{$Mods.TouhouPetsEx.Keybinds.KoishiKeyBind.DisplayName}”
+				'''
+		}
+
+		Koishi_2: {
+			Label: 恋恋-钢制帽子先生
+			Tooltip:
+				'''
+				无兼容性问题
+				头盔额外追加5+1+4点防御，同时追加等同于保护IV的减伤（16%）
+				'''
+		}
+
+		Wakasagihime: {
+			Label: 若鹭姬-冰点之下
+			Tooltip:
+				'''
+				无兼容性问题
+				获得全套北极探险装备的效果
+				'''
+		}
+
+		Wakasagihime_2: {
+			Label: 若鹭姬-水精共振
+			Tooltip:
+				'''
+				无兼容性问题
+				来自海洋的敌怪将不会发起进攻
+				'''
+		}
+
 		Junko: {
 			Label: 纯狐-纯化加成
 			Tooltip:
@@ -322,6 +436,21 @@ Configs: {
 	TouhouPetsExLocalConfigs: {
 		DisplayName: 特效修改
 
+		Tooltip_1: {
+			Label: 全部-主动效果描述
+			Tooltip: 禁用后将不再显示小伙伴增益上的主动效果描述
+		}
+
+		Tooltip_2: {
+			Label: 全部-被动效果描述
+			Tooltip: 禁用后将不再显示小伙伴增益上的被动效果描述
+		}
+
+		Tooltip_3: {
+			Label: 全部-能力上限显示
+			Tooltip: 禁用后将不再显示小伙伴增益下方的启用能力数与能力上限
+		}
+
 		Rumia: {
 			Label: 露米娅-黑暗特效
 			Tooltip: 禁用后将不再显示所有人的黑暗特效
@@ -334,28 +463,68 @@ Configs: {
 				可以修改自身触发即死时所释放的特效
 
 				有四种可选的范围：
-				1. {$Mods.TouhouPetsEx.Configs.YuyukoEffectType.Disabled.Label}
+				1. {$Mods.TouhouPetsEx.Configs.YuyukoEffect.Disabled.Label}
 				  - 自身不会释放特效
 				  - 不会显示任何人的特效
-				2. {$Mods.TouhouPetsEx.Configs.YuyukoEffectType.Butterfly.Label}
-				  - 自身所释放的特效将会是{$Mods.TouhouPetsEx.Configs.YuyukoEffectType.Butterfly.Label}的特效
+				2. {$Mods.TouhouPetsEx.Configs.YuyukoEffect.Butterfly.Label}
+				  - 自身所释放的特效将会是{$Mods.TouhouPetsEx.Configs.YuyukoEffect.Butterfly.Label}的特效
 				  - 不影响其他人所释放的特效
-				3. {$Mods.TouhouPetsEx.Configs.YuyukoEffectType.Die.Label}
-				  - 自身所释放的特效将会是{$Mods.TouhouPetsEx.Configs.YuyukoEffectType.Die.Label}的特效
+				3. {$Mods.TouhouPetsEx.Configs.YuyukoEffect.Die.Label}
+				  - 自身所释放的特效将会是{$Mods.TouhouPetsEx.Configs.YuyukoEffect.Die.Label}的特效
 				  - 不影响其他人所释放的特效
-				4. {$Mods.TouhouPetsEx.Configs.YuyukoEffectType.All.Label}
+				4. {$Mods.TouhouPetsEx.Configs.YuyukoEffect.All.Label}
 				  - 自身所释放的特效将会是随机的两种特效之一
 				  - 不影响其他人所释放的特效
 				'''
 		}
 	}
 
-	YuyukoEffectType: {
+	YuyukoEffect: {
 		Disabled.Label: 关闭
 		Butterfly.Label: 亡蝶葬仪
 		Die.Label: 生死界限
 		All.Label: 我全都要
 		Tooltip: ""
+	}
+}
+
+Items: {
+	MysteriousSlip: {
+		DisplayName: 用于介绍东方小祖宗模组详情的纸条
+		Tooltip:
+			'''
+			1. 注意事项：本模组是实打实的超模模组，如果您觉得哪个东西实在超模过头可以考虑不主动去使用。
+			2. 能力启用方法：手持单体伙伴物品，右键。对于被动能力则是携带在身上或宠物栏即可生效。
+			   启用后，您还需要保证身上带有伙伴增益，否则不会生效。
+			3. 能力的上限：能力默认上限为1，如果在达到上限时继续启用能力将会关闭最早启用的能力
+			   部分能力为被动能力，会带有特殊描述告知，被动能力不占用能力上限
+			   可以通过：携带赫卡提亚并击败肉山或月总、开启萝莉丝并使用100本书
+			   使用新造的偶（生命水晶 + ？？？）、使用被烧焦的偶（新造的偶 + ？？？）来增加能力上限
+			4. 能力的查看：每个带有能力的物品其物品描述都有标识大致的能力，增益描述上则显示着当前开启的能力。
+			   （可在视觉特效内关闭增益描述，其中主动能力和被动能力描述可以分别关闭）
+			   如想看具体数值可自行拆包查看txt文件。
+			5. 实验性玩法：同时具有补强和“这个角色应该有这个效果，但是加上太强了，扔实验性玩法吧”两种作用。
+			   如果您觉得哪个角色应该有某种能力那么欢迎投稿，我会视情况加入到实验性玩法。
+			6. BUG反馈：如果遇到任何BUG欢迎反馈，反馈渠道优先级：qq群、github、创意工坊评论
+			'''
+	}
+
+	NewlyMadeDoll: {
+		DisplayName: 新造的偶
+		Tooltip:
+			'''
+			永久提高能力上限
+			“它还有一些别名——肉块雕偶，或者 非常正常的偶”
+			'''
+	}
+
+	ABurntDoll: {
+		DisplayName: 被烧焦的偶
+		Tooltip:
+			'''
+			永久提高能力上限
+			“由某人亲手缝制，携带着独有的丝线”
+			'''
 	}
 }
 
@@ -371,6 +540,9 @@ Projectiles: {
 	ReisenEffect.DisplayName: 幻视调律
 	SanaeRegen.DisplayName: 奇迹「白昼的客星」
 	LightningStormProj.DisplayName: 雷符「Lightning Fish」
+	CorpseExplosionTechnique.DisplayName: 尸爆术
+	PopularityExplosionEffect.DisplayName: 人气！爆发！
+	Souless.DisplayName: 怨灵
 }
 
 Buffs: {
@@ -452,6 +624,19 @@ Buffs: {
 		DisplayName: Lei Zhe
 		Description: Mods.TouhouPetsEx.Buffs.LeiZhe.Description
 	}
+
+	Melt: {
+		DisplayName: Melt
+		Description: Mods.TouhouPetsEx.Buffs.Melt.Description
+	}
+
+	PopularityExplosion: {
+		DisplayName: 人气爆发
+		Description: 引人注目，全属性提升
+	}
 }
 
-Keybinds.ReisenKeyBind.DisplayName: 使用铃仙实验性玩法效果（需先启用）
+Keybinds: {
+	ReisenKeyBind.DisplayName: 铃仙-子弹偏转（需先启用）
+	KoishiKeyBind.DisplayName: 恋恋-切换人气爆发（需先启用）
+}
