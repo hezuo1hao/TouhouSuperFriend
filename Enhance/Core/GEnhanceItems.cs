@@ -7,8 +7,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using TouhouPetsEx.Achievements;
+using TouhouPetsEx.Buffs;
 
 namespace TouhouPetsEx.Enhance.Core
 {
@@ -112,6 +116,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
             if (player.MBP().Throw)
                 grabRange += 1600;
+
+            int grabRange2 = grabRange;
+            ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref grabRange2));
+            grabRange = grabRange2;
         }
         public override void HoldItem(Item item, Player player)
         {
@@ -130,6 +138,17 @@ namespace TouhouPetsEx.Enhance.Core
         public override bool? UseItem(Item item, Player player)
         {
             return ProcessDemonismAction(player, false, (enhance) => enhance.ItemUseItem(item, player));
+        }
+        public override void OnCreated(Item item, ItemCreationContext context)
+        {
+            if (ItemID.Sets.IsFood[item.type])
+            {
+                var mp = Main.LocalPlayer.GetModPlayer<EnhanceBuffPlayers>();
+                if (mp.Glutton && mp.Patience && mp.Throw)
+                    ModContent.GetInstance<TouhouMystiasIzakaya>().Condition.Complete();
+            }
+
+            ProcessDemonismAction((enhance) => enhance.ItemOnCreated(item, context));
         }
         public override void SetStaticDefaults()
         {
@@ -194,12 +213,11 @@ namespace TouhouPetsEx.Enhance.Core
             if (reesult.HasValue)
                 return reesult.Value;
 
-            if (def && item.ModItem?.Mod.Name == "TouhouPets" && player.altFunctionUse == 2
+            if (def && item.ModItem?.Mod.Name == "TouhouPets" && player.altFunctionUse == 2 && player.HasTouhouPetsBuff()
                 && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh) && enh.EnableRightClick)
             {
-                if (player.MP().ActiveEnhance.Contains(item.type))
+                if (player.MP().ActiveEnhance.Remove(item.type))
                 {
-                    player.MP().ActiveEnhance.Remove(item.type);
                     CombatText.NewText(player.getRect(), Color.Cyan, GetText("Disable"));
                 }
                 else

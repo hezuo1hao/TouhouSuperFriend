@@ -71,6 +71,7 @@ Aya:
 	乘风而行
 	'''
 Yuka: 接触向日葵会为你带来增益
+Yuka_1: 周围的向日葵会从事生产
 Sizuha: 你摇起树来更加得心应手
 Minoriko: 食物更好吃
 Hina: 减小伤害浮动的负面效果，并净化负面前缀
@@ -303,6 +304,15 @@ Configs: {
 				'''
 		}
 
+		Yuka: {
+			Label: 幽香-向阳花田
+			Tooltip:
+				'''
+				无兼容性问题
+				周围的向日葵会周期性的爆金币
+				'''
+		}
+
 		Sanae: {
 			Label: 早苗-奇迹「白昼的客星」
 			Tooltip:
@@ -434,7 +444,27 @@ Configs: {
 	}
 
 	TouhouPetsExLocalConfigs: {
-		DisplayName: 特效修改
+		DisplayName: 特效/其它修改
+
+		MarisaKoishi: {
+			Label: 纯粹享乐的两人
+			Tooltip:
+				'''
+				禁用后将不再显示由本模组所添加的魔理沙与恋恋的互动对话
+				为了方便对话的展示，魔理沙在拥有地灵殿一家时，会移动到秦心的位置
+				但因为本设置是本地设置，而修改伙伴坐标是服务器代码，所以修改位置效果为常驻，不可调整
+				“现实，亦或是其它的可能性、未来的只言片语...——总之，它于此展现”
+				'''
+		}
+
+		Box5: {
+			Label: 地灵殿的新家人
+			Tooltip:
+				'''
+				禁用后将不再显示由本模组所添加的秦心相关的地灵殿一家互动对话
+				“现实，亦或是其它的可能性、未来的只言片语...——总之，它于此展现”
+				'''
+		}
 
 		Tooltip_1: {
 			Label: 全部-主动效果描述
@@ -477,13 +507,39 @@ Configs: {
 				  - 不影响其他人所释放的特效
 				'''
 		}
+
+		Kaiko: {
+			Label: 雷鼓-震屏特效
+			Tooltip: 禁用后将不再显示闪电劈下时的震屏特效
+		}
+
+		Raiko: {
+			Label: Raiko
+			Tooltip: ""
+		}
 	}
 
 	YuyukoEffect: {
-		Disabled.Label: 关闭
-		Butterfly.Label: 亡蝶葬仪
-		Die.Label: 生死界限
-		All.Label: 我全都要
+		Disabled: {
+			Label: 关闭
+			Tooltip: ""
+		}
+
+		Butterfly: {
+			Label: 亡蝶葬仪
+			Tooltip: ""
+		}
+
+		Die: {
+			Label: 生死界限
+			Tooltip: ""
+		}
+
+		All: {
+			Label: 我全都要
+			Tooltip: ""
+		}
+
 		Tooltip: ""
 	}
 }
@@ -540,9 +596,11 @@ Projectiles: {
 	ReisenEffect.DisplayName: 幻视调律
 	SanaeRegen.DisplayName: 奇迹「白昼的客星」
 	LightningStormProj.DisplayName: 雷符「Lightning Fish」
+	Lightning.DisplayName: Lightning
 	CorpseExplosionTechnique.DisplayName: 尸爆术
 	PopularityExplosionEffect.DisplayName: 人气！爆发！
 	Souless.DisplayName: 怨灵
+	PlayerHead.DisplayName: 玩家的头
 }
 
 Buffs: {
@@ -639,4 +697,162 @@ Buffs: {
 Keybinds: {
 	ReisenKeyBind.DisplayName: 铃仙-子弹偏转（需先启用）
 	KoishiKeyBind.DisplayName: 恋恋-切换人气爆发（需先启用）
+}
+
+Achievements: {
+	FasterThanLight: {
+		FriendlyName: Faster Than Light（超越光速）
+		Description: 使用琪露诺能力投掷冰块，使其瞬时速度超过310.391419704094488英尺，同时高声大喊：“换挡，加速，起飞！”
+	}
+
+	Subnautica: {
+		FriendlyName: 深海迷航
+		Description: 启用若鹭姬能力后，在海底进行一次合成。
+	}
+
+	NovaDrift: {
+		FriendlyName: 新星漂移
+		Description: 启用射命丸文能力后，在太空中达到 100 mph 及以上，成为风神少女。
+	}
+
+	MathClassroom: {
+		FriendlyName: 先获得三个能力，再获得三合一能力，总共有几个能力？
+		Description: 答案是 答案是 3个 3个 为什么呢 为什么呢 那是因为 相同效果不准叠加的啦。
+	}
+
+	GoldenYuanCoupon: {
+		FriendlyName: 金圆券大放送
+		Description: 启用哆来咪能力后，睡觉时遇到泰拉瑞亚极小概率事件。
+	}
+
+	Teleportation: {
+		FriendlyName: 谣传
+		Description:
+			'''
+			在世界一侧，通过赤蛮奇的能力到达世界另一侧。
+			使用传送、飞行皆可。你应该是用的传送对吧...对吧？如果不是请配合《365里路》食用该成就...
+			'''
+	}
+
+	TouhouMystiasIzakaya: {
+		FriendlyName: 欢迎光临夜雀食堂！
+		Description: 在带有热火朝天的情况下，制作一份食物。
+	}
+
+	BurningWithRage: {
+		FriendlyName: 态度：怒火中烧
+		Description: 启用秦心能力后，让一名极其生气的npc为你服务。
+	}
+
+	TouhouFairyKnockout: {
+		FriendlyName: 滑踩乱战
+		Description: 启用全部妖精能力后，在一条命内分别触发大妖精和莉莉白的能力，成为不灭的妖精。
+	}
+
+	StartupCompleted: {
+		FriendlyName: 启动完毕
+		Description:
+			'''
+			启用姬虫百百世能力后，将能力强化至上限。启用姬虫百百世能力后，将能力强化至上限。
+			让别人知道，你不强是因为还没有启动。让别人知道，你不强是因为还没有启动。
+			'''
+	}
+
+	FacingTheMiracle: {
+		FriendlyName: 直面神迹
+		Description: 启用东风谷早苗能力，并开启奇迹「白昼的客星」，在一条命内触发其回复效果七次，达成不可能之奇迹。
+	}
+
+	Meltdown: {
+		FriendlyName: 熔毁
+		Description: 启用灵乌路空能力，并通过熔化减益击杀 1000 个敌怪，点火，焚烧一切。
+	}
+
+	WitchTrial: {
+		FriendlyName: 魔女审判
+		Description:
+			'''
+			很好很好，你已经找齐了足够的人数来开启学级裁判，哦不，魔女审判了。
+			不过我建议你最好在一周之内让这批人只留下一个存活的。
+			'''
+	}
+
+	IntMaxValue: {
+		FriendlyName: int.MaxValue
+		Description:
+			'''
+			做这个成就是为了证明我知道这件事，虽然是bug，但它很有趣，所以保留并做成成就。
+			如果你触发了这个成就说明你跟我的朋友一样很闲（
+			'''
+	}
+
+	GreatPurge: {
+		FriendlyName: 大清扫
+		Description: 启用留琴能力，并与留琴同行，触发一次清扫状态，而不是给榴弹发射器装上大清扫。
+	}
+
+	LikesToRead: {
+		FriendlyName: 读瘾犯了
+		Description: 启用萝莉丝能力，并阅读 100 本书，获取额外能力上限。
+	}
+
+	VeryLucky: {
+		FriendlyName: 超高校级的幸运
+		Description: 启用因幡帝能力，并获得 2 点幸运，到达“良幸”的境界。
+	}
+
+	Adversity: {
+		FriendlyName: 逆境印记
+		Description: 启用纯狐能力，并通过该能力获得 100% 暴击，并不需要在多个敌人的围攻下达成，也没有增益给你。
+	}
+
+	Start: {
+		FriendlyName: 指令通览
+		Description: 查阅初始赠予的纸条，了解这个模组的一切，让故事启程。
+	}
+
+	AutumnGodRanch: {
+		FriendlyName: 这是农场经营游戏
+		Description: 启用风见幽香能力，并开启向阳花田，同时让 32 朵向日葵爆金币。
+	}
+
+	TT2: {
+		FriendlyName: TT2协议
+		Description: 启用蓬莱山辉夜能力后，使其加减速时间之和达到一个小时，解锁成就后不会给你额外的星星。
+	}
+
+	ImproveGame: {
+		FriendlyName: 更好的体验
+		Description: 启用河城荷取能力后，记录 300 种制作站（无论它们是否被需要）。
+	}
+
+	SniperDuel: {
+		FriendlyName: 狙击手的对决
+		Description: 对{$NPCName.MossHornet}造成一次超级暴击，让丛林的蜜蜂见识一下专业红巢人所带出来的兵。
+	}
+
+	Nightmare: {
+		FriendlyName: 一场噩梦
+		Description: 见证一场噩梦。
+	}
+
+	TheBlueGuy: {
+		FriendlyName: 重铸召唤师荣光！
+		Description: 我们的世界正在被一些蓝色的东西摧毁！
+	}
+
+	SufferingFromVariousIllnesses: {
+		FriendlyName: 情况真是急转直下啊
+		Description: 敌怪先生，你的检查结果出来了，那个...你感染了病魔阴身、源石病、帕弥什感染、暴雨症候群、声带虫感染、坍缩症、抽象化、钱感染、辐光感染、赛博精神病、恐惧毒气吸入、思乡症、都市病、扭曲、慢休克、活尸化、失熵症、魔女化、狂厄化、崩坏病、超凡者失控、失温症、卡拉病菌、接触恐惧症、哈兰病毒感染、蠕虫病毒感染、黑暗以太侵蚀、星痕综合症、悲尸循环、尘肺病、震弹症、狂龙症、魔鳞病、喰生虫感染、狂笑病毒感染、洪魔感染、反生命方程式腐蚀、亚空间腐化、阿斯伯格症、决心过量融化、“陨落”、精神错乱、LV侵蚀、绝望综合征，泰伯利亚，特林顿综合征，銤元素感染，枯萎病，洛博思病毒，心灵控制，辐射损伤，凋零，基因完整，物资短缺死缓，寄群之患，绝望综合症，冥王症，矿石病，悲尸血患，时空错位症，E.L.I.D广域慢性辐射病，肺结核，月之诅咒,突变毒牙,海洋重擊，突变驾到，亚哈病毒,黄昏化。色彩化，魔石病，塔之诅咒，进阶之灾，魔力，死灵诅咒，两难困境，交换攻击力，油费，蒙哥马利压制，模因污染，纳垢神瘟，盖勒铁瘟，融蚀，高等精神病，海嗣化，雏见泽候症群，渊蚀综合征，破甲弹、高爆弹，稳定尾翼穿甲弹，大地新星恶性变异感染，刍见泽综合症，MATA化。
+	}
+
+	FantasyBand: {
+		FriendlyName: 堀普莉兹姆利巴乐团
+		Description: 同时启用露娜萨、梅露兰、莉莉卡、堀川雷鼓的能力。
+	}
+
+	BigSevenStars: {
+		FriendlyName: 大七星
+		Description: 解放全部能力上限，让能力，排列好吧！
+	}
 }

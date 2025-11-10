@@ -6,6 +6,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -21,7 +22,19 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPostUpdateEquips(Player player)
         {
-            player.GetCritChance(DamageClass.Generic) += (player.statLifeMax2 - player.statLife) * .2f;
+            float crit = (player.statLifeMax2 - player.statLife) * .2f;
+            player.GetCritChance(DamageClass.Generic) += crit;
+
+            if (player == Main.LocalPlayer)
+            {
+                var adversity = ModContent.GetInstance<Adversity>();
+
+                if (adversity.Condition.Value < crit)
+                    adversity.Condition.Value = crit;
+
+                if (adversity.Condition.Value >= Adversity.Max)
+                    adversity.Condition.Complete();
+            }
         }
         public override void PlayerModifyHitNPCWithItem(Player player, Item item, NPC target, ref NPC.HitModifiers modifiers)
         {

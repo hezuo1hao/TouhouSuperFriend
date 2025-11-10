@@ -5,6 +5,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 
@@ -50,6 +51,16 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
                 player.MP().LilyCD = 14400;
                 Projectile.NewProjectile(player.GetSource_Death(), player.Center, Vector2.Zero, ModContent.ProjectileType<LilyDodgeEffects>(), 0, 0, player.whoAmI);
+
+                if (player.EnableAllYousei() && player == Main.LocalPlayer)
+                {
+                    var touhouFairyKnockout = ModContent.GetInstance<TouhouFairyKnockout>();
+
+                    if (touhouFairyKnockout.Condition.Value == 0)
+                        touhouFairyKnockout.Condition.Value = 2;
+                    else if (touhouFairyKnockout.Condition.Value == 1)
+                        touhouFairyKnockout.Condition.Complete();
+                }
                 return false;
             }
 

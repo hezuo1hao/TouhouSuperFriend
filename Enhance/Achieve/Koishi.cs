@@ -4,9 +4,11 @@ using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
@@ -41,7 +43,8 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPostResetEffects(Player player)
         {
-            player.MP().Popularity -= 0.005f;
+            if (player.MP().Popularity > 0)
+                player.MP().Popularity -= 0.005f;
 
             if (!Config.Satori || !player.EnableEnhance<SatoriSlippers>())
                 return;
@@ -63,6 +66,9 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 player.statDefense += 10;
                 player.endurance += 0.16f;
+
+                if (player == Main.LocalPlayer && player.armor[0].type == ItemID.HallowedHood)
+                    ModContent.GetInstance<TheBlueGuy>().Condition.Complete();
             }
         }
         public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)

@@ -1,7 +1,9 @@
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -60,6 +62,13 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override void PlayerModifyHitNPCWithItem(Player player, Item item, NPC target, ref NPC.HitModifiers modifiers)
         {
             modifiers.SourceDamage *= 1.15f;
+        }
+        public override void ItemOnCreated(Item item, ItemCreationContext context)
+        {
+            if (!Main.LocalPlayer.EnableEnhance<WakasagihimeFishingRod>() || !Main.LocalPlayer.ZoneBeach || !Main.LocalPlayer.wet || Main.LocalPlayer.lavaWet || Main.LocalPlayer.honeyWet || Main.LocalPlayer.shimmerWet)
+                return;
+
+            ModContent.GetInstance<Subnautica>().Condition.Complete();
         }
     }
 }

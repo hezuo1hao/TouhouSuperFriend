@@ -11,6 +11,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Buffs;
 using static TouhouPetsEx.TouhouPetsEx;
 
@@ -91,6 +92,9 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override bool PreAI(NPC npc)
         {
+            if (Earth && MoonMist && Depression && Restless && Melt && npc.HasBuff(ModContent.BuffType<LeiZhe>()) && Main.netMode != NetmodeID.Server)
+                ModContent.GetInstance<SufferingFromVariousIllnesses>().Condition.Complete();
+
             bool? reesult = ProcessDemonismAction(false, (enhance) => enhance.NPCPreAI(npc));
 
             return reesult ?? base.PreAI(npc);
@@ -139,6 +143,19 @@ namespace TouhouPetsEx.Enhance.Core
         {
             if (Depression)
                 modifiers.FinalDamage *= 0.9f;
+        }
+        public override bool CheckDead(NPC npc)
+        {
+            if (Melt && Main.LocalPlayer.EnableEnhance<UtsuhoEye>())
+            {
+                var meltdown = ModContent.GetInstance<Meltdown>();
+                meltdown.Condition.Value++;
+
+                if (meltdown.Condition.Value == Meltdown.Max)
+                    meltdown.Condition.Complete();
+            }
+
+            return base.CheckDead(npc);
         }
     }
 }

@@ -17,10 +17,13 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.Net;
+using Terraria.Utilities;
 using Terraria.WorldBuilding;
+using TouhouPets;
 using TouhouPets.Content.Buffs.PetBuffs;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPets.Content.Projectiles.Pets;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Projectiles;
 using static Terraria.Localization.NetworkText;
 
@@ -53,6 +56,9 @@ namespace TouhouPetsEx.Enhance.Core
             On_ShopHelper.ProcessMood += On_ShopHelper_ProcessMood;
             On_Gore.NewGore_IEntitySource_Vector2_Vector2_int_float += On_Gore_NewGore_IEntitySource_Vector2_Vector2_int_float;
             MonoModHooks.Add(typeof(Koishi).GetMethod("ShouldKillPlayer", BindingFlags.Instance | BindingFlags.NonPublic), On_ShouldKillPlayer);
+            MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("MoveToPoint", BindingFlags.Instance | BindingFlags.NonPublic), On_MoveToPoint);
+            MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("ChangeDir", BindingFlags.Instance | BindingFlags.NonPublic), On_ChangeDir);
+            MonoModHooks.Add(typeof(Koishi).GetMethod("RegularDialogText", BindingFlags.Instance | BindingFlags.Public), On_RegularDialogText);
 
             // 锤子敲背景墙有特殊处理，要用On才能应用工具速度提升
             On_Player.ItemCheck_UseMiningTools_TryHittingWall += (orig, player, item, x, y) =>
@@ -64,8 +70,40 @@ namespace TouhouPetsEx.Enhance.Core
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
         }
+        private delegate WeightedRandom<LocalizedText> RegularDialogTextDelegate(Koishi self);
+        private WeightedRandom<LocalizedText> On_RegularDialogText(RegularDialogTextDelegate orig, Koishi self)
+        {
+            var rand = orig(self);
+            double weight = 0.5;
 
-        public delegate bool ShouldKillPlayerDelegate(Koishi koishi);
+            if (!LocalConfig.MarisaKoishi || ModCallSystem.NotHasPets(ModContent.ProjectileType<Marisa>()))
+            {
+                weight = 0.333;
+                rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_18"), weight);
+            }
+
+            rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_19"), weight);
+            rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_20"), weight);
+
+            return rand;
+        }
+        private delegate void ChangeDirDelegate(BasicTouhouPet self, float dist);
+        private void On_ChangeDir(ChangeDirDelegate orig, BasicTouhouPet self, float dist)
+        {
+            if (self.Type == ModContent.ProjectileType<Marisa>() && self.Owner.HasBuff(ModContent.BuffType<KomeijiBuff>()))
+                dist = 150;
+
+            orig(self, dist);
+        }
+        private delegate void MoveToPointDelegate(BasicTouhouPet self, Vector2 point, float speed, Vector2 center);
+        private void On_MoveToPoint(MoveToPointDelegate orig, BasicTouhouPet self, Vector2 point, float speed, Vector2 center)
+        {
+            if (self.Type == ModContent.ProjectileType<Marisa>() && self.Owner.HasBuff(ModContent.BuffType<KomeijiBuff>()))
+                point = new Vector2(-90 * self.Owner.direction, -60 + self.Owner.gfxOffY);
+
+            orig(self, point, speed, center);
+        }
+        private delegate bool ShouldKillPlayerDelegate(Koishi koishi);
         private bool On_ShouldKillPlayer(ShouldKillPlayerDelegate orig, Koishi koishi)
         {
             if (koishi.Owner.HasBuff(ModContent.BuffType<MarisaBuff>()))
@@ -112,7 +150,12 @@ namespace TouhouPetsEx.Enhance.Core
         private float On_ShopHelper_LimitAndRoundMultiplier(On_ShopHelper.orig_LimitAndRoundMultiplier orig, ShopHelper self, float priceAdjustment)
         {
             if (Main.LocalPlayer.EnableEnhance<KokoroMask>())
+            {
+                if (self._currentPriceAdjustment >= 1.5f)
+                    ModContent.GetInstance<BurningWithRage>().Condition.Complete();
+
                 return 0.75f;
+            }
 
             return orig(self, priceAdjustment);
         }
@@ -197,6 +240,16 @@ namespace TouhouPetsEx.Enhance.Core
 
             if (self.alchemyTable)
                 mp.adjOther[4] = true;
+
+            // 成就的触发
+            int count = mp.adjTile.Concat(mp.adjOther).Where(a => a).Count();
+            var improveGame = ModContent.GetInstance<ImproveGame>();
+
+            if (improveGame.Condition.Value < count)
+                improveGame.Condition.Value = count;
+
+            if (improveGame.Condition.Value >= ImproveGame.Max)
+                improveGame.Condition.Complete();
 
             self.adjWater = mp.adjOther[0];
             self.adjHoney = mp.adjOther[1];
@@ -313,6 +366,9 @@ namespace TouhouPetsEx.Enhance.Core
         {
             if (self.TryGetGlobalNPC(out GEnhanceNPCs gnpc) && gnpc.SuperCrit)
             {
+                if (self.type == NPCID.MossHornet)
+                    ModContent.GetInstance<SniperDuel>().Condition.Complete();
+
                 int index = NewText(new Rectangle((int)self.position.X, (int)self.position.Y, self.width, self.height), new Color(133, 0, 133), hit.Damage, true);
 
                 if (index <= Main.combatText.Length - 1)

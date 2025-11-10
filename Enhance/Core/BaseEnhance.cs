@@ -59,6 +59,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void ItemGrabRange(Item item, Player player, ref int grabRange)
+        {
+
+        }
         public virtual void ItemHoldItem(Item item, Player player)
         {
 
@@ -78,6 +82,10 @@ namespace TouhouPetsEx.Enhance.Core
         public virtual bool? ItemUseItem(Item item, Player player)
         {
             return null;
+        }
+        public virtual void ItemOnCreated(Item item, ItemCreationContext context)
+        {
+
         }
         public virtual bool? ItemPreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {

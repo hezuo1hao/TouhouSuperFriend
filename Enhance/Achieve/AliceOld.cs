@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -38,6 +39,15 @@ namespace TouhouPetsEx.Enhance.Achieve
             }
 
             player.statManaMax2 += Math.Clamp(player.MP().EatBook, 0, 100);
+
+            if (player == Main.LocalPlayer)
+            {
+                var likesToRead = ModContent.GetInstance<LikesToRead>();
+                likesToRead.Condition.Value = player.MP().EatBook;
+
+                if (likesToRead.Condition.Value >= LikesToRead.Max)
+                    likesToRead.Condition.Complete();
+            }
         }
         public override void PlayerPostUpdate(Player player)
         {

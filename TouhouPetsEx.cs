@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -30,12 +31,14 @@ namespace TouhouPetsEx
         public static Effect DistortShader;
         public static Effect TransformShader;
         public static BlendState InverseColor;
+        public static int TransparentHead = -1;
         public override void Load()
         {
             Instance = this;
             RingShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Ring", AssetRequestMode.ImmediateLoad).Value;
             DistortShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Distort", AssetRequestMode.ImmediateLoad).Value;
             TransformShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Transform", AssetRequestMode.ImmediateLoad).Value;
+            TransparentHead = EquipLoader.AddEquipTexture(this, "TouhouPetsEx/Projectiles/DaiyouseiBoom", EquipType.Head, name: "TouhouPetsEx.TransparentHead");
             InverseColor = new BlendState()
             {
                 Name = "BlendState.InverseColor",
@@ -61,6 +64,8 @@ namespace TouhouPetsEx
 
             if (Main.netMode != NetmodeID.Server && Main.rand.NextBool(25))
                 Main.instance.Window.Title = GetText("KoishiNo1");
+
+            ArmorIDs.Head.Sets.DrawHead[TransparentHead] = false;
         }
         public override void Unload()
         {

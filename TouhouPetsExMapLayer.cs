@@ -13,6 +13,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 
 namespace TouhouPetsEx
 {
@@ -28,13 +29,20 @@ namespace TouhouPetsEx
 
             if (Main.LocalPlayer.EnableEnhance<StarSapphire>() || Main.LocalPlayer.EnableEnhance<LightsJewels>())
             {
+                int i = 0;
                 foreach (NPC npc in Main.ActiveNPCs)
                 {
                     if (npc.friendly || NPCID.Sets.CountsAsCritter[npc.type])
                         continue;
 
                     context.Draw(tex, npc.Center / 16, Color.Red, new SpriteFrame(1, 1, 0, 0), 2f, 2f, Alignment.Center);
+
+                    if (npc.Center.Distance(Main.LocalPlayer.Center) < 1200)
+                        i++;
                 }
+
+                if (i >= 100)
+                    ModContent.GetInstance<Nightmare>().Condition.Complete();
             }
         }
     }

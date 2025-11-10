@@ -12,6 +12,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Enhance.Core;
+using TouhouPetsEx.Achievements;
 
 namespace TouhouPetsEx.Enhance.Achieve
 {
@@ -46,7 +47,13 @@ namespace TouhouPetsEx.Enhance.Achieve
                 DelegateMethods.tileCutIgnore = TileID.Sets.TileCutIgnore.None;
 
                 float range = 240;
-                if (rukotoSweeping) range *= 2;
+                if (rukotoSweeping)
+                {
+                    range *= 2;
+
+                    if (player == Main.LocalPlayer)
+                        ModContent.GetInstance<GreatPurge>().Condition.Complete();
+                }
 
                 Utils.PlotTileLine(player.Center + Vector2.UnitX * range, player.Center - Vector2.UnitX * range, range * 2, DelegateMethods.CutTiles);
 

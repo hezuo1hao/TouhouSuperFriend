@@ -10,6 +10,7 @@ using Terraria.ModLoader;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPets.Content.Items.PetItems;
 using Terraria.ID;
+using TouhouPetsEx.Achievements;
 
 namespace TouhouPetsEx
 {
@@ -73,6 +74,10 @@ namespace TouhouPetsEx
                 if (!int.TryParse(args[1], out stack))
                     throw new UsageException(GetText("Give.Error_6") + args[1]);
             }
+
+            // 不是哥们，怎么数量为int.MaxValue，奖励你一个成就
+            if (stack == int.MaxValue)
+                ModContent.GetInstance<IntMaxValue>().Condition.Complete();
 
             // 在输入命令的玩家身上生成物品
             caller.Player.QuickSpawnItem(new EntitySource_DebugCommand($"{nameof(TouhouPetsEx)}_{nameof(TouhouPetsExModCommand)}"), type, stack);

@@ -5,6 +5,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 
@@ -16,6 +17,11 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<LunasaViolin>());
+        }
+        public override void PlayerPostUpdateEquips(Player player)
+        {
+            if (player == Main.LocalPlayer && player.EnableEnhance<MerlinTrumpet>() && player.EnableEnhance<LyricaKeyboard>() && player.EnableEnhance<RaikoDrum>())
+                ModContent.GetInstance<FantasyBand>().Condition.Complete();
         }
         public override void PlayerPostUpdate(Player player)
         {

@@ -8,6 +8,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPets.Content.Projectiles.Pets;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -26,6 +27,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (player.sleeping.isSleeping && Main.LocalPlayer == player && Main.rand.NextBool(10000))
             {
                 PopupText.NewText(new AdvancedPopupRequest() { Velocity = -Vector2.UnitY, DurationInFrames = 90, Color = Color.White, Text = GetText("Ez") }, player.Center - Vector2.UnitY * player.height);
+                ModContent.GetInstance<GoldenYuanCoupon>().Condition.Complete();
             }
         }
         public override void SystemPostUpdateEverything()

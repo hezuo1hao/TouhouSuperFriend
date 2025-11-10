@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -28,6 +29,22 @@ namespace TouhouPetsEx.Enhance.Achieve
             player.statLifeMax2 += plr.ExtraAddition[3];
             player.lavaMax += plr.ExtraAddition[4];
             player.endurance += plr.ExtraAddition[5] / 1000f;
+
+            if (player != Main.LocalPlayer)
+                return;
+
+            bool a = true;
+            for (int i = 0; i < plr.ExtraAddition.Length; i++)
+            {
+                if (i is 2 or 4)
+                    continue;
+
+                if (plr.ExtraAddition[i] < EnhancePlayers.ExtraAdditionMax[i])
+                    a = false;
+            }
+
+            if (a)
+                ModContent.GetInstance<StartupCompleted>().Condition.Complete();
         }
         public override void PlayerModifyHitNPC(Player player, NPC target, ref NPC.HitModifiers modifiers)
         {

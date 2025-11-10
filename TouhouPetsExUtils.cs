@@ -12,6 +12,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPetsEx.Enhance.Core;
 using Terraria.ID;
+using TouhouPets.Content.Items.PetItems;
 
 namespace TouhouPetsEx
 {
@@ -27,6 +28,7 @@ namespace TouhouPetsEx
         public static bool HasEnhance(this Player player, int type) => player.MP()?.ActiveEnhance.Concat(player.MP()?.ActivePassiveEnhance).Contains(type) == true;
         public static bool EnableEnhance<T>(this Player player) where T : ModItem => player.HasEnhance<T>() && player.HasTouhouPetsBuff();
         public static bool EnableEnhance(this Player player, int type) => player.HasEnhance(type) && player.HasTouhouPetsBuff();
+        public static bool EnableAllYousei(this Player player) => player.EnableEnhance<CirnoIceShard>() && player.EnableEnhance<DaiyouseiBomb>() && player.EnableEnhance<LilyOneUp>() && player.EnableEnhance<HecatiaPlanet>() && (player.EnableEnhance<LightsJewels>() || (player.EnableEnhance<SunnyMilk>() && player.EnableEnhance<LunaMoon>() && player.EnableEnhance<StarSapphire>()));
         public static bool WorldEnableEnhance<T>() where T : ModItem => EnhanceCount.TryGetValue(ModContent.ItemType<T>(), out int value) && value > 0;
         public static int GetTooltipsLastIndex(this List<TooltipLine> tooltips)
         {

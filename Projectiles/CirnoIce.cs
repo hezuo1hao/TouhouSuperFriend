@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ID;
 using TouhouPetsEx.Enhance.Achieve;
+using TouhouPetsEx.Achievements;
 
 namespace TouhouPetsEx.Projectiles
 {
@@ -50,6 +51,20 @@ namespace TouhouPetsEx.Projectiles
                 Projectile.rotation += Projectile.velocity.X * 0.2f;
             else
                 Projectile.rotation -= Projectile.rotation % MathHelper.PiOver2;
+
+            if (Main.myPlayer == Projectile.owner)
+            {
+                var FTL = ModContent.GetInstance<FasterThanLight>();
+
+                if (!FTL.IsCloneable)
+                {
+                    if (FTL.Condition.Value < Projectile.velocity.Length())
+                        FTL.Condition.Value = Projectile.velocity.Length();
+
+                    if (Projectile.velocity.Length() >= FasterThanLight.LightSpeed)
+                        FTL.Condition.Complete();
+                }
+            }
         }
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {

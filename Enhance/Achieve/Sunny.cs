@@ -2,6 +2,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -19,6 +20,11 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             if (Main.LocalPlayer.EnableEnhance<SunnyMilk>() || Main.LocalPlayer.EnableEnhance<LightsJewels>())
                 scale *= 1.03f;
+        }
+        public override void PlayerPostUpdateEquips(Player player)
+        {
+            if (player == Main.LocalPlayer && player.EnableEnhance<SunnyMilk>() && player.EnableEnhance<LunaMoon>() && player.EnableEnhance<SunnyMilk>() && player.EnableEnhance<StarSapphire>() && player.EnableEnhance<LightsJewels>())
+                ModContent.GetInstance<MathClassroom>().Condition.Complete();
         }
     }
 }

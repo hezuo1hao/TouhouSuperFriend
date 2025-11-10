@@ -18,6 +18,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Items;
 using TouhouPetsEx.Projectiles;
@@ -51,6 +52,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// 风见幽香用
         /// </summary>
         public int FragrantAromaFillsTheAirCD = 0;
+        /// <summary>
+        /// 风见幽香-向阳花田用
+        /// </summary>
+        public int YukaCD = 0;
         /// <summary>
         /// 蕾蒂用
         /// </summary>
@@ -181,6 +186,9 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void ResetEffects()
         {
+            if (Player == Main.LocalPlayer && !ModContent.GetInstance<WitchTrial>().IsCloneable)
+                ModContent.GetInstance<WitchTrial>().Condition.Value = 0;
+
             ActiveEnhanceCount = 1;
 
             if (NewlyMadeDoll)
@@ -191,6 +199,15 @@ namespace TouhouPetsEx.Enhance.Core
 
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerResetEffects(Player));
             ProcessDemonismAction((enhance) => enhance.PlayerResetEffectsAlways(Player));
+
+            if (Player == Main.LocalPlayer)
+            {
+                var bigSevenStars = ModContent.GetInstance<BigSevenStars>();
+
+                bigSevenStars.Condition.Value = ActiveEnhanceCount;
+                if (bigSevenStars.Condition.Value >= BigSevenStars.Max)
+                    bigSevenStars.Condition.Complete();
+            }
 
             ActivePassiveEnhance = [];
 
@@ -408,6 +425,12 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
         {
+            if (Player == Main.LocalPlayer)
+            {
+                ModContent.GetInstance<TouhouFairyKnockout>().Condition.Value = 0;
+                ModContent.GetInstance<FacingTheMiracle>().Condition.Value = 0;
+            }
+
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerKill(Player, damage, hitDirection, pvp, damageSource));
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

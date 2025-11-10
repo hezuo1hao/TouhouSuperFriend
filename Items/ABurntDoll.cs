@@ -7,6 +7,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Items
@@ -40,6 +41,18 @@ namespace TouhouPetsEx.Items
             EnhancePlayers.AwardPlayerSync(Mod, -1, player.whoAmI);
 
             return true;
+        }
+        public override void UpdateInventory(Player player)
+        {
+            if (player == Main.LocalPlayer)
+            {
+                var witchTrial = ModContent.GetInstance<WitchTrial>();
+
+                witchTrial.Condition.Value += Item.stack;
+
+                if (witchTrial.Condition.Value >= WitchTrial.Max)
+                    witchTrial.Condition.Complete();
+            }
         }
         public override void Update(ref float gravity, ref float maxFallSpeed)
         {

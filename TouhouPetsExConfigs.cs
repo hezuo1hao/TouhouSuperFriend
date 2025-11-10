@@ -44,6 +44,9 @@ namespace TouhouPetsEx
         public bool Eirin;
 
         [DefaultValue(false)]
+        public bool Yuka;
+
+        [DefaultValue(false)]
         public bool Sanae;
 
         [DefaultValue(false)]
@@ -91,6 +94,12 @@ namespace TouhouPetsEx
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
         [DefaultValue(true)]
+        public bool MarisaKoishi;
+
+        [DefaultValue(true)]
+        public bool Box5;
+
+        [DefaultValue(true)]
         public bool Tooltip_1;
 
         [DefaultValue(true)]
@@ -105,6 +114,9 @@ namespace TouhouPetsEx
         [DefaultValue(YuyukoEffect.All)]
         [DrawTicks]
         public YuyukoEffect Yuyuko;
+
+        [DefaultValue(true)]
+        public bool Raiko;
     }
     public enum YuyukoEffect
     {

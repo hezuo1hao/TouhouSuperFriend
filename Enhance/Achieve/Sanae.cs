@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 using static TouhouPetsEx.TouhouPetsEx;
@@ -48,6 +49,15 @@ namespace TouhouPetsEx.Enhance.Achieve
                         player.ClearBuff(buffType);
                 }
                 Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<SanaeRegen>(), 0, 0, player.whoAmI);
+
+                if (player == Main.LocalPlayer)
+                {
+                    var facingTheMiracle = ModContent.GetInstance<FacingTheMiracle>();
+                    facingTheMiracle.Condition.Value++;
+
+                    if (facingTheMiracle.Condition.Value == FacingTheMiracle.Max)
+                        facingTheMiracle.Condition.Complete();
+                }
             }
         }
         public override bool? ItemCanUseItem(Item item, Player player, ref bool def)
@@ -84,6 +94,9 @@ namespace TouhouPetsEx.Enhance.Achieve
                         CombatText.NewText(player.getRect(), new Color(0, 255, 0), GetText("Sanae_0_3"));
                     }
                 }
+
+                if (Main.netMode == NetmodeID.SinglePlayer)
+                    return false;
 
                 ModPacket packet = Instance.GetPacket();
 
