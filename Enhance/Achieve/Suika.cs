@@ -3,6 +3,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -13,6 +14,22 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SuikaGourd>());
+        }
+        public override bool? ItemUseItem(Item item, Player player)
+        {
+            var touhouLegendOfFakeWine = ModContent.GetInstance<TouhouLegendOfFakeWine>();
+
+            if (item.type is ItemID.Ale or ItemID.Sake && !touhouLegendOfFakeWine.IsCloneable)
+            {
+                touhouLegendOfFakeWine.Condition.Value++;
+
+                if (touhouLegendOfFakeWine.Condition.Value == TouhouLegendOfFakeWine.Max)
+                    touhouLegendOfFakeWine.Condition.Complete();
+
+                return true;
+            }
+
+            return null;
         }
         public override void PlayerModifyItemScale(Player player, Item item, ref float scale)
         {

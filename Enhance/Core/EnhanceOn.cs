@@ -59,6 +59,7 @@ namespace TouhouPetsEx.Enhance.Core
             MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("MoveToPoint", BindingFlags.Instance | BindingFlags.NonPublic), On_MoveToPoint);
             MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("ChangeDir", BindingFlags.Instance | BindingFlags.NonPublic), On_ChangeDir);
             MonoModHooks.Add(typeof(Koishi).GetMethod("RegularDialogText", BindingFlags.Instance | BindingFlags.Public), On_RegularDialogText);
+            MonoModHooks.Add(typeof(ChatRoomHelper).GetMethod("SetChat_Inner", BindingFlags.Static | BindingFlags.NonPublic), On_SetChat_Inner);
 
             // 锤子敲背景墙有特殊处理，要用On才能应用工具速度提升
             On_Player.ItemCheck_UseMiningTools_TryHittingWall += (orig, player, item, x, y) =>
@@ -70,20 +71,116 @@ namespace TouhouPetsEx.Enhance.Core
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
         }
+        static bool delicacy;
+        private delegate void SetChat_InnerDelegate(Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely);
+        private static void On_SetChat_Inner(SetChat_InnerDelegate orig, Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely)
+        {
+            orig(projectile, config, lag, text, forcely);
+
+            //若被设置对象并非东方宠物，则不再执行后续
+            if (!projectile.IsATouhouPet())
+                return;
+
+            BasicTouhouPet pet = projectile.AsTouhouPet();
+
+            //若宠物非玩家本人召唤，则不再执行后续
+            if (projectile.owner != Main.myPlayer)
+                return;
+
+            if (pet.chatText == Language.GetText("Mods.TouhouPetsEx.TouhouPets.Response.Kokoro_58") || pet.chatText == Language.GetText("Mods.TouhouPetsEx.TouhouPets.Response.Marisa_56") ||
+                pet.chatText == Language.GetText("Mods.TouhouPetsEx.TouhouPets.Response.Utsuho_58_1") || pet.chatText == Language.GetText("Mods.TouhouPetsEx.TouhouPets.Response.Rin_47"))
+            {
+                if (delicacy)
+                    return;
+
+                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/delicacy"), Main.player[projectile.owner].Center);
+                delicacy = true;
+            }
+            else if (pet.chatText == Language.GetText("Mods.TouhouPetsEx.TouhouPets.Response.Marisa_59") && pet.chatTimeLeft < 10)
+            {
+                if (delicacy)
+                    return;
+
+                Main.combatText[CombatText.NewText(Main.LocalPlayer.getRect(), Color.Pink, GetText("TouhouPets.Response.Extra_1"))].lifeTime *= 3;
+                delicacy = true;
+            }
+            else if (pet.chatText == Language.GetText("Mods.TouhouPetsEx.TouhouPets.Response.Utsuho_58"))
+            {
+                if (delicacy)
+                    return;
+
+                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/delicacyFail"), Main.player[projectile.owner].Center);
+                delicacy = true;
+            }
+            else delicacy = false;
+        }
         private delegate WeightedRandom<LocalizedText> RegularDialogTextDelegate(Koishi self);
         private WeightedRandom<LocalizedText> On_RegularDialogText(RegularDialogTextDelegate orig, Koishi self)
         {
             var rand = orig(self);
-            double weight = 0.5;
 
-            if (!LocalConfig.MarisaKoishi || ModCallSystem.NotHasPets(ModContent.ProjectileType<Marisa>()))
+            // 小五
+            if (ModCallSystem.HasPets(ModContent.ProjectileType<Satori>()))
             {
-                weight = 0.333;
-                rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_18"), weight);
+                double weight = 0.333;
+
+                // 没有魔理沙
+                if (!LocalConfig.MarisaKoishi || ModCallSystem.NotHasPets(ModContent.ProjectileType<Marisa>()))
+                {
+                    weight = 0.25;
+                    rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_18"), weight);
+                }
+
+                rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_19"), weight);
+                rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_20"), weight);
+                rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_49"), weight);
+
+                // 地灵殿一家
+                if (ModCallSystem.HasPets(ModContent.ProjectileType<Utsuho>(), ModContent.ProjectileType<Rin>()))
+                {
+                    // 只有地灵殿一家
+                    if (ModCallSystem.NotHasPets(ModContent.ProjectileType<Marisa>(), ModContent.ProjectileType<Kokoro>()))
+                    {
+                        weight = 0.5;
+                        rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_47"), weight);
+                        rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_48"), weight);
+                    }
+                }
             }
 
-            rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_19"), weight);
-            rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_20"), weight);
+            // 没有小五
+            if (ModCallSystem.NotHasPets(ModContent.ProjectileType<Satori>()))
+            {
+                // 秦心
+                if (ModCallSystem.HasPets(ModContent.ProjectileType<Kokoro>()))
+                {
+                    double weight = 0.5;
+
+                    if (LocalConfig.Box5)
+                        rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_41"), weight);
+                    else
+                        rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_40"), weight);
+
+                    rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_39"), weight);
+                }
+
+                // 魔理沙
+                if (LocalConfig.MarisaKoishi && ModCallSystem.HasPets(ModContent.ProjectileType<Marisa>()))
+                {
+                    double weight = 0.333;
+                    rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_42"), weight);
+                    rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_43"), weight);
+                    rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_44"), weight);
+                }
+
+                // 阿空
+                if (ModCallSystem.HasPets(ModContent.ProjectileType<Utsuho>()))
+                {
+                    double weight = 0.5;
+                    rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_45"), weight);
+                    rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_46"), weight);
+                }
+            }
 
             return rand;
         }

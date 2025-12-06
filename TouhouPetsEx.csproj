@@ -17,6 +17,11 @@
     <Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
 	<ItemGroup>
+	</ItemGroup>
+	<ItemGroup>
+		<Publicize Include="TouhouPets" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Reference Include="TouhouPets">
 		  <HintPath>..\TouhouPets\bin\Debug\net8.0\TouhouPets.dll</HintPath>
 	  </Reference>

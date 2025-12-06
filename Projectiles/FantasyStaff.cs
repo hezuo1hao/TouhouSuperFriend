@@ -71,13 +71,12 @@ namespace TouhouPetsEx.Projectiles
             writer.WriteVector2(P[1]);
             writer.WriteVector2(P[2]);
         }
-        Texture2D tex;
-        Texture2D tex2;
+        Asset<Texture2D> tex2;
         public override bool PreDraw(ref Color lightColor)
         {
             List<VertexInfo2> vertices = [];
-            tex ??= TextureAssets.Projectile[ModContent.ProjectileType<YukaEffects>()].Value;
-            tex2 ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/NoBlackPointLight").Value;
+            var tex = TextureAssets.Projectile[ModContent.ProjectileType<YukaEffects>()].Value;
+            tex2 ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/NoBlackPointLight");
             Color color = Color.White * ((255 - Projectile.alpha) / 255f);
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
@@ -103,11 +102,15 @@ namespace TouhouPetsEx.Projectiles
                 Main.spriteBatch.Draw(tex, Projectile.oldPos[(int)Projectile.ai[0] - 2] - Main.screenPosition, null, color, Projectile.ai[0] * 0.02f * (Projectile.ai[1] == 1 ? 1 : -1), tex.Size() / 2f, 0.4f, SpriteEffects.None, 0);
 
             if (Projectile.ai[0] > 43)
-                Main.spriteBatch.Draw(tex2, Projectile.oldPos[(int)Projectile.ai[0] - 43] - Main.screenPosition, null, color, 0, tex2.Size() / 2f, MathHelper.Clamp((Projectile.ai[0] - 43) * 0.04f, 0, 0.4f), SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(tex2.Value, Projectile.oldPos[(int)Projectile.ai[0] - 43] - Main.screenPosition, null, color, 0, tex2.Size() / 2f, MathHelper.Clamp((Projectile.ai[0] - 43) * 0.04f, 0, 0.4f), SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             return false;
+        }
+        public override void Unload()
+        {
+            tex2 = null;
         }
     }
 }

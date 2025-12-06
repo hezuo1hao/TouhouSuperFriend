@@ -33,14 +33,13 @@ namespace TouhouPetsEx.Projectiles
 
             Projectile.ai[0]++;
         }
-        Texture2D tex;
         RenderTarget2D render = null;
         public override bool PreDraw(ref Color lightColor)
         {
             if (Projectile.ai[1] == 1)
                 return false;
 
-            tex ??= TextureAssets.Projectile[Type].Value;
+            var tex = TextureAssets.Projectile[Type].Value;
             render ??= new(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
             var shader = TouhouPetsEx.DistortShader;
             var spriteBatch = Main.spriteBatch;

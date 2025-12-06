@@ -71,13 +71,13 @@ namespace TouhouPetsEx.Projectiles
 
             Projectile.ai[0]++;
         }
-        public static Texture2D tex3;
+        public static Asset<Texture2D> tex3;
         public override bool PreDraw(ref Color lightColor)
         {
             var spriteBatch = Main.spriteBatch;
             var tex = TextureAssets.Projectile[Type].Value;
             var tex2 = TextureAssets.HotbarRadial[0].Value;
-            tex3 ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Ex1").Value;
+            tex3 ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Ex1");
             var pos = Projectile.Center - Main.screenPosition;
             var a = (255 - Projectile.alpha) / 255f;
 
@@ -124,8 +124,8 @@ namespace TouhouPetsEx.Projectiles
                     vertices3.Add(new VertexInfo2(Projectile.Center - Main.screenPosition + MathHelper.ToRadians(r).ToRotationVector2() * (Projectile.ai[0] * 2.5f - 45), new Vector3(r / 360f, 1f, 1 - r / 360f), new Color(220, 220, 120) * a));
                 }
             }
-                //引用贴图
-                Main.graphics.GraphicsDevice.Textures[0] = tex3;
+            //引用贴图
+            Main.graphics.GraphicsDevice.Textures[0] = tex3.Value;
             foreach (List<VertexInfo2> vertices in verticess)
                 if (vertices.Count >= 3)//判断是否有三个点
                 {
@@ -143,6 +143,10 @@ namespace TouhouPetsEx.Projectiles
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             return false;
+        }
+        public override void Unload()
+        {
+            tex3 = null;
         }
     }
 }

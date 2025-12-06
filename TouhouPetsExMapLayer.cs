@@ -19,10 +19,10 @@ namespace TouhouPetsEx
 {
     public class TouhouPetsExMapLayer : ModMapLayer
     {
-        private static Texture2D tex;
+        private static Asset<Texture2D> tex;
         public override void Draw(ref MapOverlayDrawContext context, ref string text)
         {
-            tex ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Point", AssetRequestMode.ImmediateLoad).Value;
+            tex ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Point", AssetRequestMode.ImmediateLoad);
 
             if (text == "" && Main.mapFullscreen && (!Main.CurrentFrameFlags.AnyActiveBossNPC || Config.Yukari) && Main.LocalPlayer.MP().YukariCD == 0 && Main.LocalPlayer.EnableEnhance<YukarisItem>())
                 text = GetText("Tp");
@@ -35,7 +35,7 @@ namespace TouhouPetsEx
                     if (npc.friendly || NPCID.Sets.CountsAsCritter[npc.type])
                         continue;
 
-                    context.Draw(tex, npc.Center / 16, Color.Red, new SpriteFrame(1, 1, 0, 0), 2f, 2f, Alignment.Center);
+                    context.Draw(tex.Value, npc.Center / 16, Color.Red, new SpriteFrame(1, 1, 0, 0), 2f, 2f, Alignment.Center);
 
                     if (npc.Center.Distance(Main.LocalPlayer.Center) < 1200)
                         i++;
@@ -44,6 +44,10 @@ namespace TouhouPetsEx
                 if (i >= 100)
                     ModContent.GetInstance<Nightmare>().Condition.Complete();
             }
+        }
+        public override void Unload()
+        {
+            tex = null;
         }
     }
 }

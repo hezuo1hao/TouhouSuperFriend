@@ -41,11 +41,10 @@ namespace TouhouPetsEx.Projectiles
 
             Projectile.ai[0]++;
         }
-        public static Texture2D tex = null;
         public override bool PreDraw(ref Color lightColor)
         {
             var spriteBatch = Main.spriteBatch;
-            tex ??= TextureAssets.Projectile[Type].Value;
+            var tex = TextureAssets.Projectile[Type].Value;
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);

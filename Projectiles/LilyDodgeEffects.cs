@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -38,10 +39,10 @@ namespace TouhouPetsEx.Projectiles
 
             Projectile.ai[0]++;
         }
-        public static Texture2D tex = ModContent.Request<Texture2D>("TouhouPetsEx/Projectiles/LilyDodgeEffects", AssetRequestMode.ImmediateLoad).Value;
-        public static Texture2D tex2 = ModContent.Request<Texture2D>("TouhouPetsEx/Projectiles/LilyDodgeEffects_1", AssetRequestMode.ImmediateLoad).Value;
+        public static Asset<Texture2D> tex2 = ModContent.Request<Texture2D>("TouhouPetsEx/Projectiles/LilyDodgeEffects_1", AssetRequestMode.ImmediateLoad);
         public override bool PreDraw(ref Color lightColor)
         {
+            Texture2D tex = TextureAssets.Projectile[Type].Value;
             Color pink = new(255, 174, 200, 0);
             Color white = new(255, 255, 255, 0);
 
@@ -52,8 +53,12 @@ namespace TouhouPetsEx.Projectiles
             }
 
             Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.Lerp(pink, white, Projectile.ai[0] / 300f), Projectile.ai[0] / 11f, tex.Size() / 2f, Projectile.ai[0] / 360f, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(tex2, Projectile.Center - Main.screenPosition, null, Color.Lerp(white, pink, Projectile.ai[0] / 300f), Projectile.ai[0] / -17f, tex2.Size() / 2f, Projectile.ai[0] / 360f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(tex2.Value, Projectile.Center - Main.screenPosition, null, Color.Lerp(white, pink, Projectile.ai[0] / 300f), Projectile.ai[0] / -17f, tex2.Size() / 2f, Projectile.ai[0] / 360f, SpriteEffects.None, 0);
             return false;
+        }
+        public override void Unload()
+        {
+            tex2 = null;
         }
     }
 }

@@ -80,10 +80,9 @@ namespace TouhouPetsEx.Projectiles
             }
             #endregion
         }
-        static Texture2D tex = null;
         public override bool PreDraw(ref Color lightColor)
         {
-            tex ??= TextureAssets.Projectile[Type].Value;
+            var tex = TextureAssets.Projectile[Type].Value;
             SpriteBatch sb = Main.spriteBatch;
             Rectangle rec = new(Projectile.frame * 56, 0, 56, 52);
             Color color = Color.White * ((255 - Projectile.alpha) / 255f);

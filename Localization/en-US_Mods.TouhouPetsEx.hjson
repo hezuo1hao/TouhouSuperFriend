@@ -508,14 +508,9 @@ Configs: {
 				'''
 		}
 
-		Kaiko: {
+		Raiko: {
 			Label: 雷鼓-震屏特效
 			Tooltip: 禁用后将不再显示闪电劈下时的震屏特效
-		}
-
-		Raiko: {
-			Label: Raiko
-			Tooltip: ""
 		}
 	}
 
@@ -854,5 +849,10 @@ Achievements: {
 	BigSevenStars: {
 		FriendlyName: 大七星
 		Description: 解放全部能力上限，让能力，排列好吧！
+	}
+
+	TouhouLegendOfFakeWine: {
+		FriendlyName: 假酒传奇/醉游稽传
+		Description: 启用伊吹萃香能力，喝 100 杯酒。
 	}
 }

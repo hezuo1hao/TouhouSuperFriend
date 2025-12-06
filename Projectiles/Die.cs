@@ -36,15 +36,14 @@ namespace TouhouPetsEx.Projectiles
 
             Projectile.ai[0]++;
         }
-        public static Texture2D tex;
-        public static Texture2D tex2;
+        public static Asset<Texture2D> tex2;
         public override bool PreDraw(ref Color lightColor)
         {
             if (LocalConfig.Yuyuko == YuyukoEffect.Disabled)
                 return false;
 
-            tex ??= TextureAssets.Projectile[Type].Value;
-            tex2 ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Ex1").Value;
+            var tex = TextureAssets.Projectile[Type].Value;
+            tex2 ??= ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Ex1");
             int interval = tex.Height / 2;
             Vector2 pos = Vector2.UnitY * interval / 4f;
             Vector2 pos2 = Math.Max(0, Projectile.ai[0] - 30) * Projectile.ai[1].ToRotationVector2() * 2;
@@ -79,7 +78,7 @@ namespace TouhouPetsEx.Projectiles
                 vertices2.Add(new VertexInfo2(routeCenter - Main.screenPosition + nV * -i * .1f + (nV.ToRotation() - MathHelper.PiOver2).ToRotationVector2() * ((dis / 2f > i) ? (30 / dis * i) : (30 - 30 / dis * i)) * (255 - Projectile.alpha) / 255f, new Vector3(1f, 1f, 1), Color.Red));
             }
             //引用贴图
-            Main.graphics.GraphicsDevice.Textures[0] = tex2;
+            Main.graphics.GraphicsDevice.Textures[0] = tex2.Value;
             if (vertices.Count >= 3)//判断是否有三个点
             {
                 Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices.ToArray(), 0, vertices.Count - 2);
@@ -92,6 +91,10 @@ namespace TouhouPetsEx.Projectiles
                                    //开始绘制
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             return false;
+        }
+        public override void Unload()
+        {
+            tex2 = null;
         }
     }
 }

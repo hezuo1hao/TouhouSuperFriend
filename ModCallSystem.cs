@@ -124,6 +124,27 @@ namespace TouhouPetsEx
                 TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori, rin, utsuho, kokoro) && LocalConfig.Box5);
                 // 恋恋、魔理沙
                 TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(marisa) && NotHasPets(satori, rin, utsuho, kokoro) && LocalConfig.MarisaKoishi);
+                // 地灵殿全员 或 只有恋恋
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => ((HasPets(satori, rin, utsuho) && NotHasPets(kokoro, marisa)) || NotHasPets(satori, rin, utsuho, kokoro, marisa)));
+                // 恋恋、小五
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori) && NotHasPets(rin, utsuho, kokoro, marisa));
+                // 恋恋、阿空
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(utsuho) && NotHasPets(satori, rin, kokoro, marisa));
+                // 恋恋、秦心
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(kokoro) && NotHasPets(satori, rin, utsuho, marisa));
+                // 新地灵殿全员
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori, rin, utsuho, kokoro) && LocalConfig.Box5);
+                // 恋恋、魔理沙
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(marisa) && NotHasPets(satori, rin, utsuho, kokoro) && LocalConfig.MarisaKoishi);
+                // 小五、恋恋
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Satori, "Satori", ref keyCount, () => HasPets(koishi) && (!LocalConfig.Box5 || NotHasPets(kokoro)));
+                // 新地灵殿一家：小五、恋恋、秦心
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Satori, "Satori", ref keyCount, () => HasPets(koishi, kokoro) && LocalConfig.Box5);
+                keyCount[(int)TouhouPetID.Koishi] += 11;
+                // 恋恋、小五
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori) && NotHasPets(rin, utsuho, kokoro, marisa));
+                // 新地灵殿全员
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori, rin, utsuho, kokoro) && LocalConfig.Box5, 114514);
 
                 List<(TouhouPetID, string, int)> chatRoom1 =
                 [
@@ -794,6 +815,529 @@ namespace TouhouPetsEx
                     (TouhouPetID.Koishi, "Marisa_45", 9),
                 ];
 
+                List<(TouhouPetID, string, int)> chatRoom34 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_33", -1),
+                    (TouhouPetID.Rin, "Rin_32", 0),
+                    (TouhouPetID.Koishi, "Koishi_106", 1),
+                    (TouhouPetID.Rin, "Rin_33", 2),
+                    (TouhouPetID.Utsuho, "Utsuho_35", 3),
+                    (TouhouPetID.Utsuho, "Utsuho_36", 4),
+                    (TouhouPetID.Utsuho, "Utsuho_37", 5),
+                    (TouhouPetID.Rin, "Rin_34", 6),
+                    (TouhouPetID.Satori, "Satori_75", 7),
+                    (TouhouPetID.Rin, "Rin_35", 8),
+                    (TouhouPetID.Satori, "Satori_76", 9),
+                    (TouhouPetID.Rin, "Rin_36", 10),
+                    (TouhouPetID.Utsuho, "Utsuho_38", 10),
+                    (TouhouPetID.Koishi, "Koishi_107", 10),
+                    (TouhouPetID.Satori, "Satori_77", 11),
+                    (TouhouPetID.Koishi, "Koishi_108", 12),
+                    (TouhouPetID.Satori, "Satori_78", 13),
+                    (TouhouPetID.Satori, "Satori_79", 14),
+                    (TouhouPetID.Utsuho, "Utsuho_39", 15),
+                    (TouhouPetID.Rin, "Rin_37", 16),
+                    (TouhouPetID.Satori, "Satori_80", 17),
+                    (TouhouPetID.Satori, "Satori_81", 18),
+                    (TouhouPetID.Koishi, "Koishi_109", 19),
+                    (TouhouPetID.Utsuho, "Utsuho_40", 20),
+                    (TouhouPetID.Rin, "Rin_38", 20),
+                    (TouhouPetID.Satori, "Satori_82", 21),
+                    (TouhouPetID.Koishi, "Koishi_110", 22),
+                    (TouhouPetID.Satori, "Satori_83", 23),
+                    (TouhouPetID.Utsuho, "Utsuho_41", 24),
+                    (TouhouPetID.Rin, "Rin_39", 24),
+                    (TouhouPetID.Satori, "Satori_84", 25),
+                    (TouhouPetID.Satori, "Satori_85", 26),
+                    (TouhouPetID.Utsuho, "Utsuho_42", 27),
+                    (TouhouPetID.Rin, "Rin_40", 27),
+                    (TouhouPetID.Koishi, "Koishi_111", 27),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom35 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_34", -1),
+                    (TouhouPetID.Satori, "Satori_86", 0),
+                    (TouhouPetID.Koishi, "Koishi_116", 1),
+                    (TouhouPetID.Koishi, "Koishi_117", 2),
+                    (TouhouPetID.Satori, "Satori_87", 3),
+                    (TouhouPetID.Koishi, "Koishi_118", 5),
+                    (TouhouPetID.Satori, "Satori_88", 6),
+                    (TouhouPetID.Koishi, "Koishi_119", 7),
+                    (TouhouPetID.Koishi, "Koishi_120", 8),
+                    (TouhouPetID.Satori, "Satori_89", 9),
+                    (TouhouPetID.Satori, "Satori_90", 10),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom36 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_35", -1),
+                    (TouhouPetID.Utsuho, "Utsuho_43", 0),
+                    (TouhouPetID.Koishi, "Koishi_112", 1),
+                    (TouhouPetID.Utsuho, "Utsuho_44", 2),
+                    (TouhouPetID.Utsuho, "Utsuho_45", 3),
+                    (TouhouPetID.Koishi, "Koishi_113", 4),
+                    (TouhouPetID.Utsuho, "Utsuho_46", 5),
+                    (TouhouPetID.Utsuho, "Utsuho_47", 6),
+                    (TouhouPetID.Utsuho, "Utsuho_48", 7),
+                    (TouhouPetID.Utsuho, "Utsuho_49", 8),
+                    (TouhouPetID.Utsuho, "Utsuho_50", 9),
+                    (TouhouPetID.Koishi, "Koishi_114", 10),
+                    (TouhouPetID.Koishi, "Koishi_115", 11),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom37 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_36", -1),
+                    (TouhouPetID.Kokoro, "Kokoro_42", 0),
+                    (TouhouPetID.Koishi, "Koishi_121", 1),
+                    (TouhouPetID.Kokoro, "Kokoro_43", 2),
+                    (TouhouPetID.Koishi, "Koishi_122", 3),
+                    (TouhouPetID.Koishi, "Koishi_123", 4),
+                    (TouhouPetID.Kokoro, "Kokoro_44", 5),
+                    (TouhouPetID.Kokoro, "Kokoro_45", 6),
+                    (TouhouPetID.Koishi, "Koishi_124", 7),
+                    (TouhouPetID.Kokoro, "Kokoro_46", 8),
+                    (TouhouPetID.Koishi, "Koishi_125", 9),
+                    (TouhouPetID.Kokoro, "Kokoro_47", 10),
+                    (TouhouPetID.Koishi, "Koishi_126", 11),
+                    (TouhouPetID.Kokoro, "Kokoro_48", 12),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom38 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_37", -1),
+                    (TouhouPetID.Kokoro, "Kokoro_49", 0),
+                    (TouhouPetID.Kokoro, "Kokoro_50", 1),
+                    (TouhouPetID.Utsuho, "Utsuho_51", 2),
+                    (TouhouPetID.Utsuho, "Utsuho_52", 3),
+                    (TouhouPetID.Rin, "Rin_41", 4),
+                    (TouhouPetID.Satori, "Satori_91", 5),
+                    (TouhouPetID.Satori, "Satori_92", 6),
+                    (TouhouPetID.Koishi, "Koishi_132", 7),
+                    (TouhouPetID.Koishi, "Koishi_133", 8),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom39 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_38", -1),
+                    (TouhouPetID.Marisa, "Marisa_46", 0),
+                    (TouhouPetID.Koishi, "Koishi_127", 1),
+                    (TouhouPetID.Marisa, "Marisa_47", 2),
+                    (TouhouPetID.Koishi, "Koishi_128", 3),
+                    (TouhouPetID.Marisa, "Marisa_48", 4),
+                    (TouhouPetID.Koishi, "Koishi_129", 5),
+                    (TouhouPetID.Marisa, "Marisa_49", 6),
+                    (TouhouPetID.Koishi, "Koishi_130", 7),
+                    (TouhouPetID.Marisa, "Marisa_50", 8),
+                    (TouhouPetID.Koishi, "Koishi_131", 9),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom40 =
+                [
+                    (TouhouPetID.Satori, "Satori_3", -1),
+                    (TouhouPetID.Koishi, "Koishi_134", 0),
+                    (TouhouPetID.Satori, "Satori_93", 1),
+                    (TouhouPetID.Satori, "Satori_94", 2),
+                    (TouhouPetID.Koishi, "Koishi_135", 3),
+                    (TouhouPetID.Satori, "Satori_95", 4),
+                    (TouhouPetID.Koishi, "Koishi_136", 5),
+                    (TouhouPetID.Koishi, "Koishi_137", 6),
+                    (TouhouPetID.Satori, "Satori_96", 7),
+                    (TouhouPetID.Satori, "Satori_97", 8),
+                    (TouhouPetID.Satori, "Satori_98", 9),
+                    (TouhouPetID.Koishi, "Koishi_138", 10),
+                    (TouhouPetID.Koishi, "Koishi_139", 11),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom41 =
+                [
+                    (TouhouPetID.Satori, "Satori_4", -1),
+                    (TouhouPetID.Satori, "Satori_99", 0),
+                    (TouhouPetID.Koishi, "Koishi_134", 1),
+                    (TouhouPetID.Kokoro, "Kokoro_51", 1),
+                    (TouhouPetID.Satori, "Satori_93", 2),
+                    (TouhouPetID.Satori, "Satori_94", 3),
+                    (TouhouPetID.Koishi, "Koishi_135", 4),
+                    (TouhouPetID.Satori, "Satori_100", 5),
+                    (TouhouPetID.Satori, "Satori_101", 6),
+                    (TouhouPetID.Koishi, "Koishi_136", 7),
+                    (TouhouPetID.Kokoro, "Kokoro_52", 7),
+                    (TouhouPetID.Kokoro, "Kokoro_53", 8),
+                    (TouhouPetID.Satori, "Satori_96", 9),
+                    (TouhouPetID.Satori, "Satori_97", 10),
+                    (TouhouPetID.Satori, "Satori_98", 11),
+                    (TouhouPetID.Koishi, "Koishi_138", 12),
+                    (TouhouPetID.Koishi, "Koishi_139", 13),
+                    (TouhouPetID.Kokoro, "Kokoro_54", 14),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom42 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_39", -1),
+                    (TouhouPetID.Kokoro, "Kokoro_55", 0),
+                    (TouhouPetID.Koishi, "Koishi_140", 1),
+                    (TouhouPetID.Kokoro, "Kokoro_56", 2),
+                    (TouhouPetID.Koishi, "Koishi_141", 3),
+                    (TouhouPetID.Kokoro, "Kokoro_57", 4),
+                    (TouhouPetID.Koishi, "Koishi_142", 5),
+                    (TouhouPetID.Koishi, "Koishi_143", 6),
+                    (TouhouPetID.Koishi, "Kokoro_58", 7),
+                    (TouhouPetID.Kokoro, "Kokoro_58", 7),
+                    (TouhouPetID.Koishi, "Koishi_144", 8),
+                    (TouhouPetID.Kokoro, "Kokoro_59", 9),
+                    (TouhouPetID.Koishi, "Koishi_145", 10),
+                    (TouhouPetID.Kokoro, "Kokoro_60", 11),
+                    (TouhouPetID.Koishi, "Koishi_146", 12),
+                    (TouhouPetID.Kokoro, "Kokoro_61", 13),
+                    (TouhouPetID.Kokoro, "Kokoro_62", 14),
+                    (TouhouPetID.Koishi, "Koishi_147", 15),
+                    (TouhouPetID.Kokoro, "Kokoro_63", 16),
+                    (TouhouPetID.Koishi, "Koishi_148", 17),
+                    (TouhouPetID.Kokoro, "Kokoro_64", 18),
+                    (TouhouPetID.Koishi, "Koishi_149", 19),
+                    (TouhouPetID.Kokoro, "Kokoro_65", 20),
+                    (TouhouPetID.Koishi, "Kokoro_65", 20),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom43 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_40", -1),
+                    (TouhouPetID.Koishi, "Koishi_150", 0),
+                    (TouhouPetID.Kokoro, "Kokoro_66", 1),
+                    (TouhouPetID.Koishi, "Koishi_151", 2),
+                    (TouhouPetID.Koishi, "Koishi_152", 3),
+                    (TouhouPetID.Kokoro, "Kokoro_67", 4),
+                    (TouhouPetID.Koishi, "Koishi_153", 5),
+                    (TouhouPetID.Kokoro, "Kokoro_68", 6),
+                    (TouhouPetID.Koishi, "Koishi_154", 7),
+                    (TouhouPetID.Kokoro, "Kokoro_69", 8),
+                    (TouhouPetID.Kokoro, "Kokoro_70", 9),
+                    (TouhouPetID.Koishi, "Koishi_155", 10),
+                    (TouhouPetID.Koishi, "Koishi_156", 11),
+                    (TouhouPetID.Kokoro, "Kokoro_71", 12),
+                    (TouhouPetID.Koishi, "Koishi_157", 13),
+                    (TouhouPetID.Kokoro, "Kokoro_72", 14),
+                    (TouhouPetID.Koishi, "Koishi_158", 15),
+                    (TouhouPetID.Koishi, "Koishi_159", 16),
+                    (TouhouPetID.Kokoro, "Kokoro_73", 17),
+                    (TouhouPetID.Koishi, "Koishi_160", 18),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom43_1 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_41", -1),
+                    (TouhouPetID.Koishi, "Koishi_150", 0),
+                    (TouhouPetID.Kokoro, "Kokoro_66_1", 1),
+                    (TouhouPetID.Koishi, "Koishi_151", 2),
+                    (TouhouPetID.Koishi, "Koishi_152", 3),
+                    (TouhouPetID.Kokoro, "Kokoro_67", 4),
+                    (TouhouPetID.Koishi, "Koishi_153", 5),
+                    (TouhouPetID.Kokoro, "Kokoro_68", 6),
+                    (TouhouPetID.Koishi, "Koishi_154", 7),
+                    (TouhouPetID.Kokoro, "Kokoro_69", 8),
+                    (TouhouPetID.Kokoro, "Kokoro_70", 9),
+                    (TouhouPetID.Koishi, "Koishi_155", 10),
+                    (TouhouPetID.Koishi, "Koishi_156", 11),
+                    (TouhouPetID.Kokoro, "Kokoro_71", 12),
+                    (TouhouPetID.Koishi, "Koishi_157", 13),
+                    (TouhouPetID.Kokoro, "Kokoro_72", 14),
+                    (TouhouPetID.Koishi, "Koishi_158", 15),
+                    (TouhouPetID.Koishi, "Koishi_159", 16),
+                    (TouhouPetID.Kokoro, "Kokoro_73", 17),
+                    (TouhouPetID.Koishi, "Koishi_160", 18),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom44 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_42", -1),
+                    (TouhouPetID.Marisa, "Marisa_51", 0),
+                    (TouhouPetID.Koishi, "Koishi_161", 1),
+                    (TouhouPetID.Marisa, "Marisa_52", 2),
+                    (TouhouPetID.Marisa, "Marisa_53", 3),
+                    (TouhouPetID.Koishi, "Koishi_162", 4),
+                    (TouhouPetID.Marisa, "Marisa_54", 5),
+                    (TouhouPetID.Marisa, "Marisa_55", 6),
+                    (TouhouPetID.Marisa, "Marisa_56", 7),
+                    (TouhouPetID.Koishi, "Koishi_163", 8),
+                    (TouhouPetID.Marisa, "Marisa_57", 9),
+                    (TouhouPetID.Marisa, "Marisa_58", 10),
+                    (TouhouPetID.Koishi, "Koishi_164", 11),
+                    (TouhouPetID.Marisa, "Marisa_59", 12),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom45 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_43", -1),
+                    (TouhouPetID.Marisa, "Marisa_51", 0),
+                    (TouhouPetID.Koishi, "Koishi_161", 1),
+                    (TouhouPetID.Marisa, "Marisa_52", 2),
+                    (TouhouPetID.Marisa, "Marisa_53", 3),
+                    (TouhouPetID.Koishi, "Koishi_162", 4),
+                    (TouhouPetID.Marisa, "Marisa_54", 5),
+                    (TouhouPetID.Marisa, "Marisa_55", 6),
+                    (TouhouPetID.Marisa, "Marisa_56", 7),
+                    (TouhouPetID.Koishi, "Koishi_163", 8),
+                    (TouhouPetID.Marisa, "Marisa_57", 9),
+                    (TouhouPetID.Marisa, "Marisa_58", 10),
+                    (TouhouPetID.Koishi, "Koishi_165", 11),
+                    (TouhouPetID.Marisa, "Marisa_60", 12),
+                    (TouhouPetID.Marisa, "Marisa_61", 13),
+                    (TouhouPetID.Koishi, "Koishi_166", 14),
+                    (TouhouPetID.Marisa, "Marisa_62", 15),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom46 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_44", -1),
+                    (TouhouPetID.Marisa, "Marisa_63", 0),
+                    (TouhouPetID.Koishi, "Koishi_167", 1),
+                    (TouhouPetID.Marisa, "Marisa_64", 2),
+                    (TouhouPetID.Marisa, "Marisa_65", 3),
+                    (TouhouPetID.Koishi, "Koishi_168", 4),
+                    (TouhouPetID.Marisa, "Marisa_66", 5),
+                    (TouhouPetID.Marisa, "Marisa_67", 6),
+                    (TouhouPetID.Koishi, "Koishi_169", 7),
+                    (TouhouPetID.Marisa, "Marisa_68", 8),
+                    (TouhouPetID.Koishi, "Koishi_170", 9),
+                    (TouhouPetID.Marisa, "Marisa_69", 10),
+                    (TouhouPetID.Marisa, "Marisa_70", 11),
+                    (TouhouPetID.Koishi, "Koishi_171", 12),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom47 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_45", -1),
+                    (TouhouPetID.Utsuho, "Utsuho_53", 0),
+                    (TouhouPetID.Koishi, "Koishi_172", 1),
+                    (TouhouPetID.Koishi, "Koishi_173", 2),
+                    (TouhouPetID.Utsuho, "Utsuho_54", 3),
+                    (TouhouPetID.Koishi, "Koishi_174", 4),
+                    (TouhouPetID.Utsuho, "Utsuho_55", 5),
+                    (TouhouPetID.Utsuho, "Utsuho_56", 6),
+                    (TouhouPetID.Utsuho, "Utsuho_57", 7),
+                    (TouhouPetID.Utsuho, "Utsuho_58", 8),
+                    (TouhouPetID.Utsuho, "Utsuho_59", 9),
+                    (TouhouPetID.Koishi, "Koishi_175", 10),
+                    (TouhouPetID.Utsuho, "Utsuho_60", 11),
+                    (TouhouPetID.Koishi, "Koishi_176", 12),
+                    (TouhouPetID.Koishi, "Koishi_177", 13),
+                    (TouhouPetID.Utsuho, "Utsuho_61", 14),
+                    (TouhouPetID.Koishi, "Koishi_178", 15),
+                    (TouhouPetID.Utsuho, "Utsuho_62", 16),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom48 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_46", -1),
+                    (TouhouPetID.Utsuho, "Utsuho_53", 0),
+                    (TouhouPetID.Koishi, "Koishi_172", 1),
+                    (TouhouPetID.Koishi, "Koishi_173", 2),
+                    (TouhouPetID.Utsuho, "Utsuho_54", 3),
+                    (TouhouPetID.Koishi, "Koishi_174", 4),
+                    (TouhouPetID.Utsuho, "Utsuho_55", 5),
+                    (TouhouPetID.Utsuho, "Utsuho_56", 6),
+                    (TouhouPetID.Utsuho, "Utsuho_57", 7),
+                    (TouhouPetID.Utsuho, "Utsuho_58_1", 8),
+                    (TouhouPetID.Utsuho, "Utsuho_59", 9),
+                    (TouhouPetID.Koishi, "Koishi_179", 10),
+                    (TouhouPetID.Koishi, "Koishi_180", 11),
+                    (TouhouPetID.Utsuho, "Utsuho_63", 12),
+                    (TouhouPetID.Koishi, "Koishi_181", 13),
+                    (TouhouPetID.Utsuho, "Utsuho_64", 14),
+                    (TouhouPetID.Koishi, "Koishi_182", 15),
+                    (TouhouPetID.Koishi, "Koishi_183", 16),
+                    (TouhouPetID.Utsuho, "Utsuho_65", 17),
+                    (TouhouPetID.Koishi, "Koishi_184", 18),
+                    (TouhouPetID.Utsuho, "Utsuho_66", 19),
+                    (TouhouPetID.Koishi, "Koishi_185", 20),
+                    (TouhouPetID.Utsuho, "Utsuho_67", 21),
+                    (TouhouPetID.Koishi, "Koishi_186", 22),
+                    (TouhouPetID.Utsuho, "Utsuho_68", 23),
+                    (TouhouPetID.Koishi, "Koishi_187", 24),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom49 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_47", -1),
+                    (TouhouPetID.Utsuho, "Utsuho_69", 0),
+                    (TouhouPetID.Rin, "Rin_42", 1),
+                    (TouhouPetID.Koishi, "Koishi_188", 2),
+                    (TouhouPetID.Satori, "Satori_102", 3),
+                    (TouhouPetID.Rin, "Rin_43", 4),
+                    (TouhouPetID.Satori, "Satori_103", 5),
+                    (TouhouPetID.Utsuho, "Utsuho_70", 6),
+                    (TouhouPetID.Koishi, "Koishi_189", 6),
+                    (TouhouPetID.Rin, "Rin_44", 7),
+                    (TouhouPetID.Rin, "Rin_45", 8),
+                    (TouhouPetID.Rin, "Rin_46", 9),
+                    (TouhouPetID.Rin, "Rin_47", 10),
+                    (TouhouPetID.Rin, "Rin_48", 11),
+                    (TouhouPetID.Koishi, "Koishi_190", 12),
+                    (TouhouPetID.Utsuho, "Utsuho_71", 13),
+                    (TouhouPetID.Satori, "Satori_104", 14),
+                    (TouhouPetID.Satori, "Satori_105", 15),
+                    (TouhouPetID.Koishi, "Koishi_191", 16),
+                    (TouhouPetID.Utsuho, "Utsuho_72", 16),
+                    (TouhouPetID.Rin, "Rin_49", 17),
+                    (TouhouPetID.Satori, "Satori_106", 18),
+                    (TouhouPetID.Satori, "Satori_107", 19),
+                    (TouhouPetID.Rin, "Rin_50", 20),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom50 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_48", -1),
+                    (TouhouPetID.Utsuho, "Utsuho_73", 0),
+                    (TouhouPetID.Rin, "Rin_51", 1),
+                    (TouhouPetID.Satori, "Satori_108", 2),
+                    (TouhouPetID.Koishi, "Koishi_192", 3),
+                    (TouhouPetID.Satori, "Satori_109", 4),
+                    (TouhouPetID.Koishi, "Koishi_193", 5),
+                    (TouhouPetID.Utsuho, "Utsuho_74", 5),
+                    (TouhouPetID.Rin, "Rin_52", 5),
+                    (TouhouPetID.Satori, "Satori_110", 6),
+                    (TouhouPetID.Satori, "Satori_111", 7),
+                    (TouhouPetID.Satori, "Satori_112", 8),
+                    (TouhouPetID.Utsuho, "Utsuho_75", 9),
+                    (TouhouPetID.Rin, "Rin_53", 9),
+                    (TouhouPetID.Koishi, "Koishi_194", 10),
+                    (TouhouPetID.Satori, "Satori_113", 11),
+                    (TouhouPetID.Koishi, "Koishi_195", 12),
+                    (TouhouPetID.Satori, "Satori_114", 13),
+                    (TouhouPetID.Satori, "Satori_115", 14),
+                    (TouhouPetID.Utsuho, "Utsuho_76", 15),
+                    (TouhouPetID.Rin, "Rin_54", 16),
+                    (TouhouPetID.Utsuho, "Utsuho_77", 17),
+                    (TouhouPetID.Satori, "Satori_116", 18),
+                    (TouhouPetID.Koishi, "Koishi_196", 19),
+                    (TouhouPetID.Satori, "Satori_117", 20),
+                    (TouhouPetID.Koishi, "Koishi_197", 21),
+                    (TouhouPetID.Utsuho, "Utsuho_78", 21),
+                    (TouhouPetID.Rin, "Rin_55", 21),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom51 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_49", -1),
+                    (TouhouPetID.Koishi, "Koishi_198", 0),
+                    (TouhouPetID.Satori, "Satori_118", 1),
+                    (TouhouPetID.Koishi, "Koishi_199", 2),
+                    (TouhouPetID.Satori, "Satori_119", 3),
+                    (TouhouPetID.Satori, "Satori_120", 4),
+                    (TouhouPetID.Koishi, "Koishi_200", 5),
+                    (TouhouPetID.Koishi, "Koishi_201", 6),
+                    (TouhouPetID.Satori, "Satori_121", 7),
+                    (TouhouPetID.Koishi, "Koishi_202", 8),
+                    (TouhouPetID.Satori, "Satori_122", 9),
+                    (TouhouPetID.Satori, "Satori_123", 10),
+                    (TouhouPetID.Satori, "Satori_124", 11),
+                    (TouhouPetID.Satori, "Satori_125", 12),
+                    (TouhouPetID.Satori, "Satori_126", 13),
+                    (TouhouPetID.Satori, "Satori_127", 14),
+                    (TouhouPetID.Koishi, "Koishi_203", 15),
+                    (TouhouPetID.Satori, "Satori_128", 16),
+                    (TouhouPetID.Koishi, "Koishi_204", 17),
+                    (TouhouPetID.Satori, "Satori_129", 18),
+                    (TouhouPetID.Koishi, "Koishi_205", 19),
+                    (TouhouPetID.Satori, "Satori_130", 20),
+                    (TouhouPetID.Koishi, "Koishi_206", 21),
+                    (TouhouPetID.Satori, "Satori_131", 22),
+                    (TouhouPetID.Koishi, "Koishi_207", 23),
+                    (TouhouPetID.Satori, "Satori_132", 24),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom52 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_50", -1),
+                    (TouhouPetID.Koishi, "Koishi_208", 0),
+                    (TouhouPetID.Satori, "Satori_133", 1),
+                    (TouhouPetID.Koishi, "Koishi_209", 2),
+                    (TouhouPetID.Satori, "Satori_134", 3),
+                    (TouhouPetID.Satori, "Satori_135", 4),
+                    (TouhouPetID.Koishi, "Koishi_210", 5),
+                    (TouhouPetID.Koishi, "Koishi_211", 6),
+                    (TouhouPetID.Satori, "Satori_136", 7),
+                    (TouhouPetID.Koishi, "Koishi_212", 8),
+                    (TouhouPetID.Satori, "Satori_137", 9),
+                    (TouhouPetID.Koishi, "Koishi_213", 10),
+                    (TouhouPetID.Satori, "Satori_138", 11),
+                    (TouhouPetID.Koishi, "Koishi_214", 12),
+                    (TouhouPetID.Koishi, "Koishi_215", 13),
+                    (TouhouPetID.Satori, "Satori_139", 14),
+                    (TouhouPetID.Koishi, "Koishi_216", 15),
+                    (TouhouPetID.Koishi, "Koishi_217", 16),
+                    (TouhouPetID.Satori, "Satori_140", 17),
+                    (TouhouPetID.Koishi, "Koishi_218", 18),
+                    (TouhouPetID.Satori, "Satori_141", 19),
+                    (TouhouPetID.Koishi, "Koishi_219", 20),
+                    (TouhouPetID.Satori, "Satori_142", 21),
+                ];
+
+                List<(TouhouPetID, string, int)> chatRoom53 =
+                [
+                    (TouhouPetID.Koishi, "Koishi_51", -1),
+                    (TouhouPetID.Kokoro, "Kokoro_74", 0),
+                    (TouhouPetID.Rin, "Rin_56", 1),
+                    (TouhouPetID.Utsuho, "Utsuho_79", 2),
+                    (TouhouPetID.Satori, "Satori_143", 3),
+                    (TouhouPetID.Koishi, "Koishi_220", 4),
+                    (TouhouPetID.Satori, "Satori_144", 5),
+                    (TouhouPetID.Koishi, "Koishi_221", 6),
+                    (TouhouPetID.Kokoro, "Kokoro_75", 6),
+                    (TouhouPetID.Rin, "Rin_57", 6),
+                    (TouhouPetID.Utsuho, "Utsuho_80", 6),
+                    (TouhouPetID.Koishi, "Koishi_222", 7),
+                    (TouhouPetID.Kokoro, "Kokoro_76", 7),
+                    (TouhouPetID.Rin, "Rin_58", 7),
+                    (TouhouPetID.Utsuho, "Utsuho_81", 7),
+                    (TouhouPetID.Satori, "Satori_145", 8),
+                    (TouhouPetID.Satori, "Satori_146", 9),
+                    (TouhouPetID.Satori, "Satori_147", 10),
+                    (TouhouPetID.Satori, "Satori_148", 11),
+                    (TouhouPetID.Utsuho, "Utsuho_82", 12),
+                    (TouhouPetID.Rin, "Rin_59", 13),
+                    (TouhouPetID.Kokoro, "Kokoro_77", 14),
+                    (TouhouPetID.Koishi, "Koishi_223", 15),
+                    (TouhouPetID.Satori, "Satori_149", 16),
+                    (TouhouPetID.Satori, "Satori_150", 17),
+                    (TouhouPetID.Utsuho, "Utsuho_83", 18),
+                    (TouhouPetID.Koishi, "Koishi_224", 19),
+                    (TouhouPetID.Kokoro, "Kokoro_78", 20),
+                    (TouhouPetID.Rin, "Rin_60", 21),
+                    (TouhouPetID.Satori, "Satori_151", 22),
+                    (TouhouPetID.Satori, "Satori_152", 23),
+                    (TouhouPetID.Koishi, "Koishi_225", 24),
+                    (TouhouPetID.Kokoro, "Kokoro_79", 24),
+                    (TouhouPetID.Rin, "Rin_61", 24),
+                    (TouhouPetID.Utsuho, "Utsuho_84", 24),
+                    (TouhouPetID.Satori, "Satori_153", 25),
+                    (TouhouPetID.Koishi, "Koishi_226", 26),
+                    (TouhouPetID.Kokoro, "Koishi_226", 26),
+                    (TouhouPetID.Rin, "Koishi_226", 26),
+                    (TouhouPetID.Utsuho, "Koishi_226", 26),
+                    (TouhouPetID.Satori, "Koishi_226", 26),
+                    (TouhouPetID.Utsuho, "Utsuho_85", 27),
+                    (TouhouPetID.Rin, "Rin_62", 28),
+                    (TouhouPetID.Kokoro, "Kokoro_80", 29),
+                    (TouhouPetID.Koishi, "Koishi_227", 30),
+                    (TouhouPetID.Satori, "Satori_154", 31),
+                    (TouhouPetID.Koishi, "Koishi_228", 32),
+                    (TouhouPetID.Satori, "Satori_155", 33),
+                    (TouhouPetID.Utsuho, "Utsuho_86", 34),
+                    (TouhouPetID.Satori, "Satori_156", 35),
+                    (TouhouPetID.Koishi, "Koishi_229", 36),
+                    (TouhouPetID.Kokoro, "Kokoro_81", 36),
+                    (TouhouPetID.Rin, "Rin_63", 36),
+                    (TouhouPetID.Satori, "Satori_157", 37),
+                    (TouhouPetID.Koishi, "Koishi_230", 38),
+                    (TouhouPetID.Koishi, "Koishi_231", 39),
+                    (TouhouPetID.Kokoro, "Kokoro_82", 39),
+                    (TouhouPetID.Utsuho, "Utsuho_87", 39),
+                    (TouhouPetID.Rin, "Rin_64", 40),
+                    (TouhouPetID.Satori, "Satori_158", 41),
+                ];
+
                 TouhouPetsAdd(TouhouPets, chatRoom1);
                 TouhouPetsAdd(TouhouPets, chatRoom2);
                 TouhouPetsAdd(TouhouPets, chatRoom3);
@@ -836,6 +1380,27 @@ namespace TouhouPetsEx
                 TouhouPetsAdd(TouhouPets, chatRoom31_1);
                 TouhouPetsAdd(TouhouPets, chatRoom32);
                 TouhouPetsAdd(TouhouPets, chatRoom33);
+                TouhouPetsAdd(TouhouPets, chatRoom34);
+                TouhouPetsAdd(TouhouPets, chatRoom35);
+                TouhouPetsAdd(TouhouPets, chatRoom36);
+                TouhouPetsAdd(TouhouPets, chatRoom37);
+                TouhouPetsAdd(TouhouPets, chatRoom38);
+                TouhouPetsAdd(TouhouPets, chatRoom39);
+                TouhouPetsAdd(TouhouPets, chatRoom40);
+                TouhouPetsAdd(TouhouPets, chatRoom41);
+                TouhouPetsAdd(TouhouPets, chatRoom42);
+                TouhouPetsAdd(TouhouPets, chatRoom43);
+                TouhouPetsAdd(TouhouPets, chatRoom43_1);
+                TouhouPetsAdd(TouhouPets, chatRoom44);
+                TouhouPetsAdd(TouhouPets, chatRoom45);
+                TouhouPetsAdd(TouhouPets, chatRoom46);
+                TouhouPetsAdd(TouhouPets, chatRoom47);
+                TouhouPetsAdd(TouhouPets, chatRoom48);
+                TouhouPetsAdd(TouhouPets, chatRoom49);
+                TouhouPetsAdd(TouhouPets, chatRoom50);
+                TouhouPetsAdd(TouhouPets, chatRoom51);
+                TouhouPetsAdd(TouhouPets, chatRoom52);
+                TouhouPetsAdd(TouhouPets, chatRoom53);
                 //TODO: 做阿燐和恋恋、小五和阿空的召唤物
             }
             #endregion
