@@ -45,10 +45,13 @@ namespace TouhouPetsEx
                     ModContent.GetInstance<Nightmare>().Condition.Complete();
             }
         }
+        public override void Load()
+        {
+            tex = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Point", AssetRequestMode.ImmediateLoad);
+        }
         public override void Unload()
         {
-            //TODO: mmp这里及相关的试图清除引用反而会炸，这tmd到底有没有卸载不干净问题
-            //tex = null;
+            tex = null;
         }
     }
 }

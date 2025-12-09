@@ -17,7 +17,7 @@ namespace TouhouPetsEx.PlrDrawLayers
         {
             return !Main.gameMenu && LocalConfig.Rumia && !drawInfo.drawPlayer.dead && drawInfo.drawPlayer.EnableEnhance<RumiaRibbon>();
         }
-        public static Asset<Texture2D> tex = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/NoBlackPointLight", AssetRequestMode.ImmediateLoad);
+        public static Asset<Texture2D> tex;
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
             if (drawInfo.shadow == 0f)
@@ -27,9 +27,13 @@ namespace TouhouPetsEx.PlrDrawLayers
                     tex.Size() * 0.5f, 2f, SpriteEffects.None, 0));
             }
         }
+        public override void Load()
+        {
+            tex = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/NoBlackPointLight", AssetRequestMode.ImmediateLoad);
+        }
         public override void Unload()
         {
-            //tex = null;
+            tex = null;
         }
     }
 }
