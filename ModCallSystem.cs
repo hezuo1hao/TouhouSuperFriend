@@ -144,7 +144,7 @@ namespace TouhouPetsEx
                 // 恋恋、小五
                 TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori) && NotHasPets(rin, utsuho, kokoro, marisa));
                 // 新地灵殿全员
-                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori, rin, utsuho, kokoro) && LocalConfig.Box5, 114514);
+                TouhouPetsAdd(TouhouPets, TouhouPetID.Koishi, "Koishi", ref keyCount, () => HasPets(satori, rin, utsuho, kokoro) && LocalConfig.Box5);
 
                 List<(TouhouPetID, string, int)> chatRoom1 =
                 [

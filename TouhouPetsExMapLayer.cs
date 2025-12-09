@@ -47,7 +47,8 @@ namespace TouhouPetsEx
         }
         public override void Unload()
         {
-            tex = null;
+            //TODO: mmp这里及相关的试图清除引用反而会炸，这tmd到底有没有卸载不干净问题
+            //tex = null;
         }
     }
 }

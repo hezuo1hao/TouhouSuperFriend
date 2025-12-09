@@ -146,7 +146,7 @@ namespace TouhouPetsEx.Projectiles
         }
         public override void Unload()
         {
-            tex3 = null;
+            //tex3 = null;
         }
     }
 }

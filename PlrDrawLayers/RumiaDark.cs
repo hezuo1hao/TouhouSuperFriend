@@ -29,7 +29,7 @@ namespace TouhouPetsEx.PlrDrawLayers
         }
         public override void Unload()
         {
-            tex = null;
+            //tex = null;
         }
     }
 }

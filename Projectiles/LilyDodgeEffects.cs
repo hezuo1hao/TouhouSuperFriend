@@ -58,7 +58,7 @@ namespace TouhouPetsEx.Projectiles
         }
         public override void Unload()
         {
-            tex2 = null;
+            //tex2 = null;
         }
     }
 }
