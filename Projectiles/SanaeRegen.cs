@@ -144,9 +144,13 @@ namespace TouhouPetsEx.Projectiles
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             return false;
         }
+        public override void Load()
+        {
+            tex3 = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Ex1");
+        }
         public override void Unload()
         {
-            //tex3 = null;
+            tex3 = null;
         }
     }
 }
