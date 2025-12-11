@@ -16,6 +16,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override void PlayerPostUpdateEquips(Player player)
         {
             player.maxMinions += 1;
+            player.maxTurrets += 1;
         }
     }
 }
