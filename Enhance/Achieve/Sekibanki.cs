@@ -11,6 +11,7 @@ namespace TouhouPetsEx.Enhance.Achieve
     {
         public override string Text => GetText("Sekibanki");
         public override bool Passive => true;
+        public override bool EnableBuffText => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SekibankiBow>());

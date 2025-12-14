@@ -41,6 +41,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public int DaiyouseiCD = 0;
         /// <summary>
+        /// 咲夜用，用于在关闭时将跳帧类型重置回去
+        /// </summary>
+        public Terraria.Enums.FrameSkipMode? frameSkipMode = null;
+        /// <summary>
         /// 莉莉白用
         /// </summary>
         public int LilyCD = 0;
@@ -213,10 +217,13 @@ namespace TouhouPetsEx.Enhance.Core
 
             FragrantAromaFillsTheAir = false;
 
-            foreach (Item item in Player.miscEquips)
+            if (Config.PetInv)
             {
-                if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !Player.EnableEnhance(item.type))
-                    ActivePassiveEnhance.Add(item.type);
+                foreach (Item item in Player.miscEquips)
+                {
+                    if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !Player.EnableEnhance(item.type))
+                        ActivePassiveEnhance.Add(item.type);
+                }
             }
 
             ProcessDemonismAction((enhance) => enhance.PlayerPostResetEffects(Player));

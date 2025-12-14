@@ -19,6 +19,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override bool Passive => true;
         public override bool[] Experimental => [Config.Sanae];
         public override string[] ExperimentalText => [GetText("Sanae_1")];
+        public override bool EnableBuffText => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SanaeCoin>());

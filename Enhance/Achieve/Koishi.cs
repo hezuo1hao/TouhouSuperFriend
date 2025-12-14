@@ -46,7 +46,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (player.MP().Popularity > 0)
                 player.MP().Popularity -= 0.005f;
 
-            if (!Config.Satori || !player.EnableEnhance<SatoriSlippers>())
+            if (!Config.Satori || !Config.PetInv || !player.EnableEnhance<SatoriSlippers>())
                 return;
 
             foreach (Item item in player.miscEquips)

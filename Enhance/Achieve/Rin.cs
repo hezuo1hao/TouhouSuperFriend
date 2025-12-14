@@ -36,7 +36,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPostResetEffects(Player player)
         {
-            if (!Config.Satori || !player.EnableEnhance<SatoriSlippers>())
+            if (!Config.Satori || !Config.PetInv || !player.EnableEnhance<SatoriSlippers>())
                 return;
 
             foreach (Item item in player.miscEquips)

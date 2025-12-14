@@ -45,42 +45,24 @@ namespace TouhouPetsEx.Enhance.Core
 
             if (BuffLoader.GetBuff(type)?.Mod.Name == "TouhouPets")
             {
-                List<int> allActiveEnhance = [.. player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance)];
-                if (allActiveEnhance.Count != 0)
-                    tip += "\n" + GetText("Common");
+                List<int> allActiveEnhance = [];
+
+                if (LocalConfig.Tooltip_1)
+                    allActiveEnhance.AddRange(player.MP().ActiveEnhance.Where(id => TouhouPetsEx.GEnhanceInstances[id].EnableBuffText));
+
+                if (LocalConfig.Tooltip_2)
+                    allActiveEnhance.AddRange(player.MP().ActivePassiveEnhance.Where(id => TouhouPetsEx.GEnhanceInstances[id].EnableBuffText));
 
                 HashSet<int> allBanTootips = [];
-                allActiveEnhance.ForEach(type => allBanTootips.UnionWith(TouhouPetsEx.GEnhanceInstances[type].BanTootips));
+                allActiveEnhance.ForEach(id => allBanTootips.UnionWith(TouhouPetsEx.GEnhanceInstances[id].BanTootips));
+                allActiveEnhance.RemoveAll(allBanTootips.Contains);
 
-                foreach (int id in player.MP().ActiveEnhance)
+                if (allActiveEnhance.Count != 0)
+                    tip += "\n" + GetText("Common");
+                else return;
+
+                foreach (int id in allActiveEnhance)
                 {
-                    if (!LocalConfig.Tooltip_1)
-                        break;
-
-                    if (allBanTootips.Contains(id))
-                        continue;
-
-                    var enh = TouhouPetsEx.GEnhanceInstances[id];
-
-                    tip += "\n" + enh.Text;
-
-                    for (int i = 0; i < enh.Experimental.Length; i++)
-                    {
-                        if (enh.Experimental[i] && enh.ExperimentalText[i] != "")
-                        {
-                            tip += "\n" + enh.ExperimentalText[i];
-                        }
-                    }
-                }
-
-                foreach (int id in player.MP().ActivePassiveEnhance)
-                {
-                    if (!LocalConfig.Tooltip_2)
-                        break;
-
-                    if (allBanTootips.Contains(id))
-                        continue;
-
                     var enh = TouhouPetsEx.GEnhanceInstances[id];
 
                     tip += "\n" + enh.Text;

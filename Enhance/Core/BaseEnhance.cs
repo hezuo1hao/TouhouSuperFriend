@@ -12,6 +12,7 @@ using Terraria.ModLoader;
 
 namespace TouhouPetsEx.Enhance.Core
 {
+    //TODO: 部分实验性玩法的描述写成替换原描述好了
 	public class BaseEnhance
 	{
         /// <summary>
@@ -23,6 +24,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// <br>如果某一索引为""则当对应实验性玩法启动时并不会显示新描述</br>
         /// </summary>
         public virtual string[] ExperimentalText => [];
+        /// <summary>
+        /// 是否启用Buff能力描述，默认启用
+        /// </summary>
+        public virtual bool EnableBuffText => true;
         /// <summary>
         /// 是否启用右键，默认启用
         /// </summary>

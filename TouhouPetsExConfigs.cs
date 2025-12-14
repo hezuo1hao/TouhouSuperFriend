@@ -9,6 +9,9 @@ namespace TouhouPetsEx
         public override void OnLoaded() => Config = this;
         public override ConfigScope Mode => ConfigScope.ServerSide;
 
+        [DefaultValue(true)]
+        public bool PetInv;
+
         [DefaultValue(false)]
         public bool AliceOld;
 

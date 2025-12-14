@@ -55,10 +55,33 @@ namespace TouhouPetsEx.Enhance.Achieve
                         ModContent.GetInstance<GreatPurge>().Condition.Complete();
                 }
 
-                Utils.PlotTileLine(player.Center + Vector2.UnitX * range, player.Center - Vector2.UnitX * range, range * 2, DelegateMethods.CutTiles);
+                Utils.PlotTileLine(player.Center + Vector2.UnitX * range, player.Center - Vector2.UnitX * range, range * 2, CutTiles);
 
                 DelegateMethods.tileCutIgnore = null;
             }
+        }
+        bool CutTiles(int x, int y)
+        {
+            if (!WorldGen.InWorld(x, y, 1))
+                return false;
+
+            if (Main.tile[x, y] == null)
+                return false;
+
+            if (!Main.tileCut[Main.tile[x, y].type] && !TileID.Sets.CrackedBricks[Main.tile[x, y].type])
+                return true;
+
+            if (DelegateMethods.tileCutIgnore[Main.tile[x, y].type])
+                return true;
+
+            if (WorldGen.CanCutTile(x, y, DelegateMethods.tilecut_0) || TileID.Sets.CrackedBricks[Main.tile[x, y].type])
+            {
+                WorldGen.KillTile(x, y);
+                if (Main.netMode != NetmodeID.SinglePlayer)
+                    NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 0, x, y);
+            }
+
+            return true;
         }
     }
 }
