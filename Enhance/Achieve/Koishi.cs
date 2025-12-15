@@ -132,7 +132,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (!Config.Koishi_2 || item.defense == 0 || item.headSlot == -1 || !Main.LocalPlayer.EnableEnhance<KoishiTelephone>())
                 return;
 
-            tooltips[0].Text = $"{Language.GetTextValue("Prefix.Warding")} {Language.GetTextValue("Prefix.Warding")} {Language.GetTextValue("Prefix.Armored")} " + tooltips[0].Text;
+            tooltips[0].Text = $"{Language.GetTextValue("Prefix.Warding")} {Language.GetTextValue("Prefix.Warding")} {Language.GetTextValue("Prefix.Guarding")} " + tooltips[0].Text;
 
             int index = tooltips.FindIndex(tip => tip.Name == "Defense" && tip.Mod == "Terraria");
 

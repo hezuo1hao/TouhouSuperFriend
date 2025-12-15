@@ -118,14 +118,14 @@ namespace TouhouPetsEx.Enhance.Core
         public float Popularity;
         /// <summary>
         /// 姬虫百百世用
-        /// <para>索引决定对应的加成：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲</para>
+        /// <para>索引决定对应的加成：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲、11—防御效力</para>
         /// </summary>
-        public int[] ExtraAddition = new int[11];
+        public int[] ExtraAddition = new int[12];
         /// <summary>
         /// 姬虫百百世用
-        /// <para>索引决定对应的加成上限：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲</para>
+        /// <para>索引决定对应的加成上限：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲、11—防御效力</para>
         /// </summary>
-        public static int[] ExtraAdditionMax = [50, 50, int.MaxValue, 100, int.MaxValue, 50, 200, 10, 4, 1, 150];
+        public static int[] ExtraAdditionMax = [50, 50, int.MaxValue, 100, int.MaxValue, 50, 200, 10, 4, 1, 150, int.MaxValue];
         private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
         {
             if (!player.HasTouhouPetsBuff())
@@ -269,6 +269,7 @@ namespace TouhouPetsEx.Enhance.Core
             else
             adjOther = new bool[5];
             if (tag.GetIntArray("ExtraAddition").Length != 0) ExtraAddition = tag.GetIntArray("ExtraAddition");
+            if (ExtraAddition.Length < ExtraAdditionMax.Length) Array.Resize(ref ExtraAddition, ExtraAdditionMax.Length);
 
             adjTile = (bool[])Player.adjTile.Clone();
 

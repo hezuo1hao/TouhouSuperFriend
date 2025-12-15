@@ -156,6 +156,7 @@ Momoyo_7: 暴击伤害+{0}%/20%
 Momoyo_8: 运气+{0}/0.3
 Momoyo_9: 百分比穿甲+{0}%/30%
 Momoyo_10: 运气+{0}/0.1
+Momoyo_11: 也许...能吃？
 Common: 特殊能力：
 Passive: （背包/宠物栏内生效）
 Experimental: 实验性玩法：
@@ -860,5 +861,10 @@ Achievements: {
 	TouhouLegendOfFakeWine: {
 		FriendlyName: 假酒传奇/醉游稽传
 		Description: 启用伊吹萃香能力，喝 100 杯酒。
+	}
+
+	ExcellentCuisine: {
+		FriendlyName: 过硬的菜肴
+		Description: 泰君的货实在是太纯了鼓咯！
 	}
 }

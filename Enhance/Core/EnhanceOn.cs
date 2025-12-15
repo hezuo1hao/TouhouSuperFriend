@@ -564,9 +564,16 @@ namespace TouhouPetsEx.Enhance.Core
         private float On_Player_VanillaBaseDefenseEffectiveness(On_Player.orig_VanillaBaseDefenseEffectiveness orig)
         {
             float effectiveness = orig();
+            EnhancePlayers mp = Main.LocalPlayer.MP();
 
-            if (Main.LocalPlayer.MP()?.FragrantAromaFillsTheAir == true)
+            if (mp == null)
+                return effectiveness;
+
+            if (mp.FragrantAromaFillsTheAir == true)
                 effectiveness += 0.25f;
+
+            if (Main.LocalPlayer.EnableEnhance<MomoyoPickaxe>())
+                effectiveness += Math.Clamp(mp.ExtraAddition[11], 0, 514) / 5140f;
 
             return effectiveness;
         }
