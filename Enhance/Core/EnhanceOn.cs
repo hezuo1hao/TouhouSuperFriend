@@ -1,6 +1,8 @@
 using Humanizer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,13 +50,13 @@ namespace TouhouPetsEx.Enhance.Core
             Main.OnPostFullscreenMapDraw += TeleportFromMap;
             On_Main.DamageVar_float_int_float += LuckUp;
             On_WorldGen.ShakeTree += On_WorldGen_ShakeTree;
-            On_Player.AdjTiles += On_Player_AdjTiles;
             On_BirthdayParty.NaturalAttempt += On_BirthdayParty_NaturalAttempt;
             On_Main.UpdateTime_StartNight += On_Main_UpdateTime_StartNight;
             On_WorldGen.UpdateWorld_GrassGrowth += On_WorldGen_UpdateWorld_GrassGrowth;
             On_ShopHelper.LimitAndRoundMultiplier += On_ShopHelper_LimitAndRoundMultiplier;
             On_ShopHelper.ProcessMood += On_ShopHelper_ProcessMood;
             On_Gore.NewGore_IEntitySource_Vector2_Vector2_int_float += On_Gore_NewGore_IEntitySource_Vector2_Vector2_int_float;
+            IL_Player.AdjTiles += IL_Player_AdjTiles;
             MonoModHooks.Add(typeof(Koishi).GetMethod("ShouldKillPlayer", BindingFlags.Instance | BindingFlags.NonPublic), On_ShouldKillPlayer);
             MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("MoveToPoint", BindingFlags.Instance | BindingFlags.NonPublic), On_MoveToPoint);
             MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("ChangeDir", BindingFlags.Instance | BindingFlags.NonPublic), On_ChangeDir);
@@ -301,60 +303,97 @@ namespace TouhouPetsEx.Enhance.Core
             }
         }
 
-        private void On_Player_AdjTiles(On_Player.orig_AdjTiles orig, Player self)
+        private static void IL_Player_AdjTiles(ILContext il)
         {
-            orig(self);
+            var c = new ILCursor(il);
 
-            if (!self.EnableEnhance<NitoriCucumber>())
-                return;
+            // 查找具体的模式：if (!Main.playerInventory) return;
+            // 对应的 IL 可能是：
+            // IL_XXXX: ldsfld     bool Terraria.Main::playerInventory
+            // IL_XXXX: brtrue.s   IL_XXXX  // 如果为 true，跳转到 if 块之后
+            // IL_XXXX: ret                  // return 语句
 
-            EnhancePlayers mp = self.MP();
-
-            for (int i = 0; i < self.adjTile.Length; i++)
+            // 查找 ldsfld + brtrue + ret 的模式
+            if (!c.TryGotoNext(MoveType.Before,
+                i => i.MatchLdsfld(typeof(Main), "playerInventory"),
+                i => i.MatchBrtrue(out _),      // 匹配 brtrue 或 brtrue.s
+                i => i.MatchRet()))             // 匹配 ret
             {
-                if (!self.adjTile[i])
-                    continue;
-
-                mp.adjTile[i] = true;
-
-                if (i < TileID.Count)
-                    mp.adjTileVanilla[i] = true;
-                else if (!mp.adjTileMod.Contains(TileLoader.GetTile(i).FullName))
-                    mp.adjTileMod.Add(TileLoader.GetTile(i).FullName);
+                // 尝试其他可能的模式
+                c.Index = 0;
+                if (!c.TryGotoNext(MoveType.Before,
+                    i => i.MatchLdsfld<Main>("playerInventory")))
+                {
+                    throw new Exception("无法定位到 if (!Main.playerInventory) return; 语句");
+                }
             }
 
-            if (self.adjWater)
-                mp.adjOther[0] = true;
+            // 现在 c 指向 ldsfld Main.playerInventory
+            // 我们要在这个语句之前插入代码
 
-            if (self.adjHoney)
-                mp.adjOther[1] = true;
+            // 插入我们的自定义逻辑
+            c.Emit(OpCodes.Ldarg_0);  // 加载 this (Player)
+            c.EmitDelegate<Action<Player>>(player =>
+            {
+                if (player.EnableEnhance<NitoriCucumber>())
+                {
+                    EnhancePlayers mp = player.MP();
 
-            if (self.adjLava)
-                mp.adjOther[2] = true;
+                    for (int i = 0; i < player.adjTile.Length; i++)
+                    {
+                        if (!player.adjTile[i])
+                            continue;
 
-            if (self.adjShimmer)
-                mp.adjOther[3] = true;
+                        mp.adjTile[i] = true;
 
-            if (self.alchemyTable)
-                mp.adjOther[4] = true;
+                        if (i < TileID.Count)
+                            mp.adjTileVanilla[i] = true;
+                        else if (!mp.adjTileMod.Contains(TileLoader.GetTile(i).FullName))
+                            mp.adjTileMod.Add(TileLoader.GetTile(i).FullName);
+                    }
 
-            // 成就的触发
-            int count = mp.adjTile.Concat(mp.adjOther).Where(a => a).Count();
-            var improveGame = ModContent.GetInstance<ImproveGame>();
+                    if (player.adjWater)
+                        mp.adjOther[0] = true;
 
-            if (improveGame.Condition.Value < count)
-                improveGame.Condition.Value = count;
+                    if (player.adjHoney)
+                        mp.adjOther[1] = true;
 
-            if (improveGame.Condition.Value >= ImproveGame.Max)
-                improveGame.Condition.Complete();
+                    if (player.adjLava)
+                        mp.adjOther[2] = true;
 
-            self.adjWater = mp.adjOther[0];
-            self.adjHoney = mp.adjOther[1];
-            self.adjLava = mp.adjOther[2];
-            self.adjShimmer = mp.adjOther[3];
-            self.alchemyTable = mp.adjOther[4];
-            self.adjTile = (bool[])mp.adjTile.Clone();
-            Recipe.FindRecipes();
+                    if (player.adjShimmer)
+                        mp.adjOther[3] = true;
+
+                    if (player.alchemyTable)
+                        mp.adjOther[4] = true;
+
+                    // 成就的触发
+                    int count = mp.adjTile.Concat(mp.adjOther).Where(a => a).Count();
+                    var improveGame = ModContent.GetInstance<ImproveGame>();
+
+                    if (improveGame.Condition.Value < count)
+                        improveGame.Condition.Value = count;
+
+                    if (improveGame.Condition.Value >= ImproveGame.Max)
+                        improveGame.Condition.Complete();
+
+                    player.adjWater = mp.adjOther[0];
+                    player.adjHoney = mp.adjOther[1];
+                    player.adjLava = mp.adjOther[2];
+                    player.adjShimmer = mp.adjOther[3];
+                    player.alchemyTable = mp.adjOther[4];
+                    player.adjTile = (bool[])mp.adjTile.Clone();
+                }
+            });
+
+            // 如果你想完全跳过原来的 if 检查，可以这样做：
+            /*
+            // 移动到 brtrue 指令
+            c.GotoNext(MoveType.Before, i => i.MatchBrtrue(out _));
+
+            // 修改 brtrue 的条件（更复杂，需要理解具体逻辑）
+            // 或者直接修改跳转目标
+            */
         }
 
         private void On_WorldGen_ShakeTree(On_WorldGen.orig_ShakeTree orig, int i, int j)
