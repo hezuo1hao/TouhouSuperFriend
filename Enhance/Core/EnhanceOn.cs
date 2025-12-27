@@ -339,6 +339,9 @@ namespace TouhouPetsEx.Enhance.Core
                 {
                     EnhancePlayers mp = player.MP();
 
+                    if (mp.adjTile is null || mp.adjOther is null)
+                        return;
+
                     for (int i = 0; i < player.adjTile.Length; i++)
                     {
                         if (!player.adjTile[i])
@@ -385,15 +388,6 @@ namespace TouhouPetsEx.Enhance.Core
                     player.adjTile = (bool[])mp.adjTile.Clone();
                 }
             });
-
-            // 如果你想完全跳过原来的 if 检查，可以这样做：
-            /*
-            // 移动到 brtrue 指令
-            c.GotoNext(MoveType.Before, i => i.MatchBrtrue(out _));
-
-            // 修改 brtrue 的条件（更复杂，需要理解具体逻辑）
-            // 或者直接修改跳转目标
-            */
         }
 
         private void On_WorldGen_ShakeTree(On_WorldGen.orig_ShakeTree orig, int i, int j)
