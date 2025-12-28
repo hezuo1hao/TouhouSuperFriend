@@ -21,10 +21,27 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             AddEnhance(ModContent.ItemType<ReisenGun>());
         }
-        public override bool? PlayerFreeDodge(Player player, Player.HurtInfo info)
+        public override void PlayerModifyHurt(Player player, ref Player.HurtModifiers modifiers)
         {
+            player.MP().ReisenDodge = false;
+
             if (Main.rand.Next(100) < 17)
             {
+                player.MP().ReisenDodge = true;
+                modifiers.ModifyHurtInfo += Modifiers_ModifyHurtInfo;
+            }
+        }
+
+        private void Modifiers_ModifyHurtInfo(ref Player.HurtInfo info)
+        {
+            info.Dodgeable = true;
+        }
+
+        public override bool? PlayerFreeDodge(Player player, Player.HurtInfo info)
+        {
+            if (player.MP().ReisenDodge)
+            {
+                player.MP().ReisenDodge = false;
                 int time = player.longInvince ? 120 : 80;
                 player.immune = true;
                 player.immuneTime += time;

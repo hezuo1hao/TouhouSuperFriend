@@ -36,6 +36,17 @@ namespace TouhouPetsEx.Enhance.Achieve
             Main.FrameSkipMode = Terraria.Enums.FrameSkipMode.Off;
             Main.UpdateTimeAccumulator -= Main.gameTimeCache.ElapsedGameTime.TotalSeconds / 1.67f;
         }
+        public override void PlayerModifyHurt(Player player, ref Player.HurtModifiers modifiers)
+        {
+            if (Config.Sakuya && modifiers.DamageSource.TryGetCausingEntity(out var entity) && player.MP().SakuyaCD == 0)
+                modifiers.ModifyHurtInfo += Modifiers_ModifyHurtInfo;
+        }
+
+        private void Modifiers_ModifyHurtInfo(ref Player.HurtInfo info)
+        {
+            info.Dodgeable = true;
+        }
+
         public override bool? PlayerFreeDodge(Player player, Player.HurtInfo info)
         {
             if (Config.Sakuya && info.DamageSource.TryGetCausingEntity(out var entity) && player.MP().SakuyaCD == 0)
@@ -51,13 +62,14 @@ namespace TouhouPetsEx.Enhance.Achieve
                 Vector2 vec = entity.velocity == Vector2.Zero ? Vector2.Zero : Vector2.Normalize(entity.velocity);
                 Collision.LaserScan(player.Center, vec, player.height, entity.Size.Length() + 250, samples);
                 float maxDis = (samples[0] + samples[1]) * 0.5f;
+                int time = player.longInvince ? 360 : 240;
 
                 player.Center -= vec * maxDis;
                 player.immune = true;
-                player.immuneTime += 240;
+                player.immuneTime += time;
                 for (int i = 0; i < player.hurtCooldowns.Length; i++)
                 {
-                    player.hurtCooldowns[i] += 240;
+                    player.hurtCooldowns[i] += time;
                 }
 
                 return true;

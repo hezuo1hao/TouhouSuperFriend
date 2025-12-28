@@ -89,6 +89,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public int[] KeineCD = [0, -1];
         /// <summary>
+        /// ¡Âœ…”√£¨º«¬º…¡±‹
+        /// </summary>
+        public bool ReisenDodge;
+        /// <summary>
         /// ≈Ó¿≥…Ωª‘“π”√
         /// </summary>
         public int[] OldBuff;
@@ -368,11 +372,19 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override bool FreeDodge(Player.HurtInfo info)
         {
-            if (info.DamageSource.SourceNPCIndex > -1)
+            bool? reesult = ProcessDemonismAction(Player, true, (enhance) => enhance.PlayerFreeDodge(Player, info));
+
+            return reesult ?? base.FreeDodge(info);
+        }
+        public override void ModifyHurt(ref Player.HurtModifiers modifiers)
+        {
+            if (modifiers.DamageSource.SourceNPCIndex > -1)
             {
-                NPC npc = Main.npc[info.DamageSource.SourceNPCIndex];
+                NPC npc = Main.npc[modifiers.DamageSource.SourceNPCIndex];
                 if (npc.GetGlobalNPC<GEnhanceNPCs>().MoonMist && Main.rand.NextBool(10))
                 {
+                    modifiers.Cancel();
+
                     ParticleOrchestrator.RequestParticleSpawn(clientOnly: true, ParticleOrchestraType.TownSlimeTransform, new ParticleOrchestraSettings
                     {
                         UniqueInfoPiece = 1,
@@ -386,17 +398,9 @@ namespace TouhouPetsEx.Enhance.Core
                     {
                         Player.hurtCooldowns[i] += Player.longInvince ? 60 : 20;
                     }
-
-                    return true;
                 }
             }
 
-            bool? reesult = ProcessDemonismAction(Player, true, (enhance) => enhance.PlayerFreeDodge(Player, info));
-
-            return reesult ?? base.FreeDodge(info);
-        }
-        public override void ModifyHurt(ref Player.HurtModifiers modifiers)
-        {
             Player.HurtModifiers modifiers2 = modifiers;
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHurt(Player, ref modifiers2));
             modifiers = modifiers2;

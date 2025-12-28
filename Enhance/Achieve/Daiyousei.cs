@@ -26,15 +26,28 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (player.MP().DaiyouseiCD == 1)
                 SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_cardget"), player.Center);
         }
+        public override void PlayerModifyHurt(Player player, ref Player.HurtModifiers modifiers)
+        {
+            if (player.MP().DaiyouseiCD == 0)
+                modifiers.ModifyHurtInfo += Modifiers_ModifyHurtInfo;
+        }
+
+        private void Modifiers_ModifyHurtInfo(ref Player.HurtInfo info)
+        {
+            info.Dodgeable = true;
+        }
+
         public override bool? PlayerFreeDodge(Player player, Player.HurtInfo info)
         {
             if (player.MP().DaiyouseiCD == 0)
             {
+                int time = player.longInvince ? 240 : 180;
+
                 player.immune = true;
-                player.immuneTime += 180;
+                player.immuneTime += time;
                 for (int i = 0; i < player.hurtCooldowns.Length; i++)
                 {
-                    player.hurtCooldowns[i] += 180;
+                    player.hurtCooldowns[i] += time;
                 }
                 player.MP().DaiyouseiCD = 5400;
                 Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<DaiyouseiBoom>(), (info.ReflectionDamage() + 10) * 10, 5, player.whoAmI);
