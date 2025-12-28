@@ -30,6 +30,22 @@ namespace TouhouPetsEx
         public static bool EnableEnhance(this Player player, int type) => player.HasEnhance(type) && player.HasTouhouPetsBuff();
         public static bool EnableAllYousei(this Player player) => player.EnableEnhance<CirnoIceShard>() && player.EnableEnhance<DaiyouseiBomb>() && player.EnableEnhance<LilyOneUp>() && player.EnableEnhance<HecatiaPlanet>() && (player.EnableEnhance<LightsJewels>() || (player.EnableEnhance<SunnyMilk>() && player.EnableEnhance<LunaMoon>() && player.EnableEnhance<StarSapphire>()));
         public static bool WorldEnableEnhance<T>() where T : ModItem => EnhanceCount.TryGetValue(ModContent.ItemType<T>(), out int value) && value > 0;
+        public static int ReflectionDamage(this Player.HurtInfo info)
+        {
+            int damage = info.Damage;
+            info.DamageSource.TryGetCausingEntity(out var npcOrProj);
+
+            if (damage < info.SourceDamage)
+                damage = info.SourceDamage;
+
+            if (npcOrProj is NPC npc && damage < npc.damage)
+                damage = npc.damage;
+
+            if (npcOrProj is Projectile proj && damage < proj.damage)
+                damage = proj.damage;
+
+            return damage;
+        }
         public static int GetTooltipsLastIndex(this List<TooltipLine> tooltips)
         {
             return tooltips

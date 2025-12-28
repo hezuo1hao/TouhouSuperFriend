@@ -20,7 +20,6 @@ namespace TouhouPetsEx.Projectiles
             Projectile.height = 24;
             Projectile.aiStyle = -1;
             Projectile.friendly = true;
-            Projectile.alpha = 100;
             Projectile.light = 0.3f;
             Projectile.DamageType = DamageClass.Magic;
             Projectile.localNPCHitCooldown = 1;

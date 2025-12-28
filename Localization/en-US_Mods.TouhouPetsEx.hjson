@@ -20,6 +20,7 @@ Koakuma:
 	'''
 Patchouli: 使用七曜魔法对敌人造成额外效果
 Sakuya: 减缓时间的流逝
+Sakuya_1: 学会碰瓷
 Remilia: 近战增加吸血能力，削弱吸血限制
 Flandre: 可以更加轻松地破坏各种物块
 Letty: 会使用原生寒冷系攻击对付敌人
@@ -210,6 +211,15 @@ Configs: {
 				'''
 				无兼容性问题
 				在夜晚时，敌怪会时不时地混乱
+				'''
+		}
+
+		Sakuya: {
+			Label: 咲夜-完美女仆
+			Tooltip:
+				'''
+				可能有兼容性问题
+				160scd，被弹幕/敌怪命中时，免疫此伤害并瞬移至其身后，如果是敌怪则释放大量飞刀，如果是弹幕则cd减半
 				'''
 		}
 
@@ -492,6 +502,11 @@ Configs: {
 			Tooltip: 禁用后将不再显示所有人的黑暗特效
 		}
 
+		Sakuya: {
+			Label: 咲夜-时缓效果
+			Tooltip: 禁用后就算启用咲夜能力，时间也会正常流逝
+		}
+
 		Yuyuko: {
 			Label: 幽幽子-即死特效
 			Tooltip:
@@ -598,22 +613,24 @@ Projectiles: {
 	ReisenEffect.DisplayName: 幻视调律
 	SanaeRegen.DisplayName: 奇迹「白昼的客星」
 	LightningStormProj.DisplayName: 雷符「Lightning Fish」
-	Lightning.DisplayName: Lightning
+	Lightning.DisplayName: 天地人间大放电
 	CorpseExplosionTechnique.DisplayName: 尸爆术
 	PopularityExplosionEffect.DisplayName: 人气！爆发！
 	Souless.DisplayName: 怨灵
 	PlayerHead.DisplayName: 玩家的头
+	PerfectMaid.DisplayName: 真是完完又美美
+	FlyingKnife.DisplayName: 飞刀
 }
 
 Buffs: {
 	Earth: {
-		DisplayName: Earth
-		Description: Mods.TouhouPetsEx.Buffs.Earth.Description
+		DisplayName: 土
+		Description: 敌怪防御*0.5
 	}
 
 	MoonMist: {
-		DisplayName: Moon Mist
-		Description: Mods.TouhouPetsEx.Buffs.MoonMist.Description
+		DisplayName: 月雾
+		Description: 敌怪有概率不造成伤害
 	}
 
 	FragrantAromaFillsTheAir: {
@@ -622,13 +639,13 @@ Buffs: {
 	}
 
 	Depression: {
-		DisplayName: Depression
-		Description: Mods.TouhouPetsEx.Buffs.Depression.Description
+		DisplayName: 忧郁
+		Description: 敌怪造成的伤害*0.9
 	}
 
 	Restless: {
-		DisplayName: Restless
-		Description: Mods.TouhouPetsEx.Buffs.Restless.Description
+		DisplayName: 躁动
+		Description: 敌怪受到的伤害*1.05
 	}
 
 	Glutton: {
@@ -681,13 +698,13 @@ Buffs: {
 	}
 
 	LeiZhe: {
-		DisplayName: Lei Zhe
-		Description: Mods.TouhouPetsEx.Buffs.LeiZhe.Description
+		DisplayName: 雷蛰
+		Description: 敌怪受到的伤害增加
 	}
 
 	Melt: {
-		DisplayName: Melt
-		Description: Mods.TouhouPetsEx.Buffs.Melt.Description
+		DisplayName: 熔化
+		Description: 敌怪持续受到伤害，距离玩家越近伤害越高
 	}
 
 	PopularityExplosion: {

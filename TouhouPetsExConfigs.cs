@@ -19,6 +19,9 @@ namespace TouhouPetsEx
         public bool Rumia;
 
         [DefaultValue(false)]
+        public bool Sakuya;
+
+        [DefaultValue(false)]
         public bool Lily;
 
         [DefaultValue(false)]
@@ -113,6 +116,9 @@ namespace TouhouPetsEx
 
         [DefaultValue(true)]
         public bool Rumia;
+
+        [DefaultValue(true)]
+        public bool Sakuya;
 
         [DefaultValue(YuyukoEffect.All)]
         [DrawTicks]

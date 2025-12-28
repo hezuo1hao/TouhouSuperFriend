@@ -37,7 +37,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                     player.hurtCooldowns[i] += 180;
                 }
                 player.MP().DaiyouseiCD = 5400;
-                Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<DaiyouseiBoom>(), (info.Damage + 10) * 10, 5, player.whoAmI);
+                Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<DaiyouseiBoom>(), (info.ReflectionDamage() + 10) * 10, 5, player.whoAmI);
 
                 if (player.EnableAllYousei())
                 {

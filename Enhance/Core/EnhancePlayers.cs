@@ -45,6 +45,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public Terraria.Enums.FrameSkipMode? frameSkipMode = null;
         /// <summary>
+        /// ÜD“π”√
+        /// </summary>
+        public int SakuyaCD;
+        /// <summary>
         /// ¿Ú¿Ú∞◊”√
         /// </summary>
         public int LilyCD = 0;

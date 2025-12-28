@@ -30,6 +30,7 @@ namespace TouhouPetsEx
         public static Effect RingShader;
         public static Effect DistortShader;
         public static Effect TransformShader;
+        public static Effect GrayishWhiteShader;
         public static BlendState InverseColor;
         public static int TransparentHead = -1;
         public override void Load()
@@ -38,6 +39,7 @@ namespace TouhouPetsEx
             RingShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Ring", AssetRequestMode.ImmediateLoad).Value;
             DistortShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Distort", AssetRequestMode.ImmediateLoad).Value;
             TransformShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/Transform", AssetRequestMode.ImmediateLoad).Value;
+            GrayishWhiteShader = ModContent.Request<Effect>("TouhouPetsEx/Effects/GrayishWhite", AssetRequestMode.ImmediateLoad).Value;
             TransparentHead = EquipLoader.AddEquipTexture(this, "TouhouPetsEx/Projectiles/DaiyouseiBoom", EquipType.Head, name: "TouhouPetsEx.TransparentHead");
             InverseColor = new BlendState()
             {
@@ -79,6 +81,7 @@ namespace TouhouPetsEx
             RingShader = null;
             DistortShader = null;
             TransformShader = null;
+            GrayishWhiteShader = null;
             InverseColor?.Dispose();
         }
         internal enum MessageType : byte
