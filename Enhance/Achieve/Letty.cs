@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -46,7 +47,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 for (int i = -1; i <= 1; i++)
                     Projectile.NewProjectile(player.GetSource_ItemUse_WithPotentialAmmo(item, 0), player.MountedCenter + Vector2.UnitY,
                         Vector2.Normalize(Main.MouseWorld - player.MountedCenter).RotatedBy(i * MathHelper.TwoPi / 36f) * (item.shootSpeed > 1 ? item.shootSpeed : 11f),
-                        projType, player.GetWeaponDamage(item) / 10, 0.1f, player.whoAmI, ai2: (projType == ModContent.ProjectileType<CirnoIce>() ? 20 : 0));
+                        projType, (int)Math.Ceiling(player.GetWeaponDamage(item) / 9f), 0.1f, player.whoAmI, ai2: (projType == ModContent.ProjectileType<CirnoIce>() ? 20 : 0));
 
                 player.MP().LettyCD = 120;
             }
