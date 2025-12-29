@@ -59,12 +59,13 @@ namespace TouhouPetsEx.Enhance.Achieve
                 Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<PerfectMaid>(), 0, 0, player.whoAmI, ai1: info.DamageSource.SourceNPCIndex, ai2: (int)Math.Ceiling(info.ReflectionDamage() / 5f));
 
                 float[] samples = new float[2];
-                Vector2 vec = entity.velocity == Vector2.Zero ? Vector2.Zero : Vector2.Normalize(entity.velocity);
+                Vector2 vec = entity.velocity == Vector2.Zero ? Vector2.One * (player.velocity.X > 0 ? 1 : -1) : Vector2.Normalize(entity.velocity);
+                vec *= -1;
                 Collision.LaserScan(player.Center, vec, player.height, entity.Size.Length() + 250, samples);
                 float maxDis = (samples[0] + samples[1]) * 0.5f;
                 int time = player.longInvince ? 360 : 240;
 
-                player.Center -= vec * maxDis;
+                player.Center += vec * maxDis;
                 player.immune = true;
                 player.immuneTime += time;
                 for (int i = 0; i < player.hurtCooldowns.Length; i++)
