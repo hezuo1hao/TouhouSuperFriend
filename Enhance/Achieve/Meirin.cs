@@ -9,6 +9,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Meirin : BaseEnhance
     {
         public override string Text => GetText("Meirin");
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<MeirinPanda>());

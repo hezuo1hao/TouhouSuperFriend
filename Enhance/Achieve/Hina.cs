@@ -1,8 +1,10 @@
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -38,6 +40,26 @@ namespace TouhouPetsEx.Enhance.Achieve
                 item.ResetPrefix();
                 item.Prefix(-2);
                 i++;
+            }
+        }
+        float[] rots = new float[200];
+        public override void PlayerPostUpdate(Player player)
+        {
+            if (DateTime.Now.Month != 4 || DateTime.Now.Day != 1)
+                return;
+
+            player.fullRotation -= 0.07f;
+
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if ((npc.Distance(player.Center) < 500 || npc.target == player.whoAmI))
+                {
+                    rots[npc.whoAmI] += 0.07f;
+                    npc.rotation = rots[npc.whoAmI];
+
+                    if (npc.boss && player == Main.LocalPlayer)
+                        ModContent.GetInstance<SpinSpinSpin>().Condition.Complete();
+                }
             }
         }
     }

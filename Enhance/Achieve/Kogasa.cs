@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -19,6 +22,37 @@ namespace TouhouPetsEx.Enhance.Achieve
         int time;
         public override void ItemHoldItem(Item item, Player player)
         {
+            if (item.type == ModContent.ItemType<KogasaUmbrella>())
+            {
+                player.fallStart = (int)(player.position.Y / 16f);
+                if (player.gravDir == -1f && player.velocity.Y < -2f && !player.controlDown)
+                {
+                    player.velocity.Y = -2f;
+                }
+                else if (player.velocity.Y > 2f && !player.controlDown)
+                {
+                    player.velocity.Y = 2f;
+                }
+
+                if (player == Main.LocalPlayer)
+                {
+                    var cavesCliffs = ModContent.GetInstance<CavesCliffs>();
+
+                    if (player.ZoneSkyHeight)
+                        cavesCliffs.Condition.Value = 1;
+
+                    if (player.velocity.Y == 0)
+                        cavesCliffs.Condition.Value = 0;
+
+                    if (player.ZoneUnderworldHeight && cavesCliffs.Condition.Value == 1)
+                        cavesCliffs.Condition.Complete();
+                }
+
+            }
+            else if (player == Main.LocalPlayer && !ModContent.GetInstance<CavesCliffs>().Condition.IsCompleted)
+                ModContent.GetInstance<CavesCliffs>().Condition.Value = 0;
+
+
             if (time == 120)
             {
                 time = 0;
@@ -79,6 +113,10 @@ namespace TouhouPetsEx.Enhance.Achieve
                 return false;
 
             return null;
+        }
+        public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
+        {
+            tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new("ExTooltip", Language.GetTextValue("ItemTooltip.TragicUmbrella")));
         }
     }
 }

@@ -1,6 +1,7 @@
 using Terraria;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -20,6 +21,9 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 player.empressBrooch = true;
                 player.moveSpeed += 0.075f;
+
+                if (player == Main.LocalPlayer && player.wingsLogic > 0 && player.velocity.Y < 0)
+                    ModContent.GetInstance<FlyMyWings>().Condition.Complete();
             }
         }
     }
