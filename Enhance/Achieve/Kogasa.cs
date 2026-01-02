@@ -116,7 +116,8 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new("ExTooltip", Language.GetTextValue("ItemTooltip.TragicUmbrella")));
+            if (item.type == ModContent.ItemType<KogasaUmbrella>())
+                tooltips.Insert(tooltips.GetTooltipsLastIndex() + 1, new("ExTooltip", Language.GetTextValue("ItemTooltip.TragicUmbrella")));
         }
     }
 }
