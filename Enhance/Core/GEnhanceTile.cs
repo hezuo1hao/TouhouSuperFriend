@@ -15,22 +15,17 @@ namespace TouhouPetsEx.Enhance.Core
 {
 	public class GEnhanceTile : GlobalTile
     {
-        private static void ProcessDemonismAction(Action<BaseEnhance> action)
-        {
-            foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
-            {
-                action(enhance);
-            }
-        }
         public override void DrawEffects(int i, int j, int type, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
             TileDrawInfo drawData2 = drawData;
-            ProcessDemonismAction((enhance) => enhance.TileDrawEffects(i, j, type, spriteBatch, ref drawData2));
+            foreach (BaseEnhance enhance in EnhanceHookRegistry.TileDrawEffects)
+                enhance.TileDrawEffects(i, j, type, spriteBatch, ref drawData2);
             drawData = drawData2;
         }
         public override void RandomUpdate(int i, int j, int type)
         {
-            ProcessDemonismAction((enhance) => enhance.TileRandomUpdate(i, j, type));
+            foreach (BaseEnhance enhance in EnhanceHookRegistry.TileRandomUpdate)
+                enhance.TileRandomUpdate(i, j, type);
         }
     }
 }

@@ -20,68 +20,34 @@ namespace TouhouPetsEx.Enhance.Core
     public class GEnhanceNPCs : GlobalNPC
     {
         /// <summary>
-        /// ºÕ¿¨ÌáÑÇ+Æ¤Ë¿ÓÃ
+        /// èµ«å¡æäºš+çš®ä¸ç”¨
         /// </summary>
         public int TorchDamage;
         /// <summary>
-        /// ÍÁdebuff£¬ÅÁÇïÀòÓÃ
+        /// åœŸdebuffï¼Œå¸•ç§‹è‰ç”¨
         /// </summary>
         public bool Earth;
         /// <summary>
-        /// ÔÂÎídebuff£¬ÅÁÇïÀòÓÃ
+        /// æœˆé›¾debuffï¼Œå¸•ç§‹è‰ç”¨
         /// </summary>
         public bool MoonMist;
         /// <summary>
-        /// ÓÇÓôdebuff£¬Â¶ÄÈÈøÓÃ
+        /// å¿§éƒdebuffï¼Œéœ²å¨œè¨ç”¨
         /// </summary>
         public bool Depression;
         /// <summary>
-        /// Ôê¶¯ddebuff£¬Ã·Â¶À¼ÓÃ
+        /// èºåŠ¨ddebuffï¼Œæ¢…éœ²å…°ç”¨
         /// </summary>
         public bool Restless;
         /// <summary>
-        /// ³¬¼¶±©»÷£¬÷Ò÷ÑBuffÓÃ£¨Ã×Ë¹µÙæ«ÄÜÁ¦Ïà¹Ø£©
+        /// è¶…çº§æš´å‡»ï¼Œé¥•é¤®Buffç”¨ï¼ˆç±³æ–¯è’‚å¨…èƒ½åŠ›ç›¸å…³ï¼‰
         /// </summary>
         public bool SuperCrit;
         /// <summary>
-        /// ÈÛ»¯debuff£¬ÁéÎÚÂ·¿ÕÓÃ
+        /// ç†”åŒ–debuffï¼Œçµä¹Œè·¯ç©ºç”¨
         /// </summary>
         public bool Melt;
         public override bool InstancePerEntity => true;
-        private static void ProcessDemonismAction(Action<BaseEnhance> action)
-        {
-            foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
-            {
-                action(enhance);
-            }
-        }
-        /// <param name="priority">ÌîĞ´ĞèÒªÓÅÏÈ·µ»ØµÄbool½á¹û£¬Èç£ºÖ´ĞĞÈı´Î£¬Á©falseÒ»true£¬ĞèÇótrue£¬Ôò·µ»Øtrue½á¹û
-        /// <br>ÌØ±ğµÄ£¬Èç¹ûÌînullÔò»á·µ»Ø×îºóÒ»¸ö·ÇnullµÄ½á¹û</br>
-        /// </param>
-        private static bool? ProcessDemonismAction(bool? priority, Func<BaseEnhance, bool?> action)
-        {
-            if (priority == null)
-            {
-                bool? @return = null;
-                foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
-                {
-                    bool? a = action(enhance);
-                    if (a != null) @return = a;
-                }
-                return @return;
-            }
-            else
-            {
-                bool? @return = null;
-                foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
-                {
-                    bool? a = action(enhance);
-                    if (a == priority) return a;
-                    else if (a != null) @return = a;
-                }
-                return @return;
-            }
-        }
         public override void ResetEffects(NPC npc)
         {
             Earth = false;
@@ -95,13 +61,22 @@ namespace TouhouPetsEx.Enhance.Core
             if (Earth && MoonMist && Depression && Restless && Melt && npc.HasBuff(ModContent.BuffType<LeiZhe>()) && Main.netMode != NetmodeID.Server)
                 ModContent.GetInstance<SufferingFromVariousIllnesses>().Condition.Complete();
 
-            bool? reesult = ProcessDemonismAction(false, (enhance) => enhance.NPCPreAI(npc));
+            bool? reesult = null;
+            foreach (BaseEnhance enhance in EnhanceHookRegistry.NPCPreAI)
+            {
+                bool? a = enhance.NPCPreAI(npc);
+                if (a == false)
+                    return false;
+                if (a != null)
+                    reesult = a;
+            }
 
             return reesult ?? base.PreAI(npc);
         }
         public override void AI(NPC npc)
         {
-            ProcessDemonismAction((enhance) => enhance.NPCAI(npc));
+            foreach (BaseEnhance enhance in EnhanceHookRegistry.NPCAI)
+                enhance.NPCAI(npc);
         }
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
@@ -116,7 +91,15 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override bool CanHitNPC(NPC npc, NPC target)
         {
-            bool? reesult = ProcessDemonismAction(false, (enhance) => enhance.NPCCanHitNPC(npc, target));
+            bool? reesult = null;
+            foreach (BaseEnhance enhance in EnhanceHookRegistry.NPCCanHitNPC)
+            {
+                bool? a = enhance.NPCCanHitNPC(npc, target);
+                if (a == false)
+                    return false;
+                if (a != null)
+                    reesult = a;
+            }
 
             return reesult ?? base.CanHitNPC(npc, target);
         }
