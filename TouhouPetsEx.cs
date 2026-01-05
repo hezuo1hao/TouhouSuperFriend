@@ -52,7 +52,11 @@ namespace TouhouPetsEx
         }
         public override void PostSetupContent()
         {
-            ColdProjAll.AddRange(ColdProjVanilla);
+            // 方便我排查有没有破坏性模组出现
+            if (ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod mod))
+                Logger.Info($"侦测到 {mod.DisplayName} ，请不要将任何问题报告提交给 {DisplayName}");
+
+			ColdProjAll.AddRange(ColdProjVanilla);
             ColdProjAll.AddRange(ContentSamples.ProjectilesByType.Where(kv => kv.Value.coldDamage && !kv.Value.hostile && kv.Value.friendly && kv.Key >= ProjectileID.Count).Select(kv => kv.Key));
 
             foreach (var kvp in ContentSamples.NpcsByNetId)

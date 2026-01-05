@@ -15,6 +15,7 @@ using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.GameContent.Events;
+using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -33,8 +34,22 @@ namespace TouhouPetsEx.Enhance.Core
 {
 	public class EnhanceOn : ModSystem
     {
+        /// <summary>
+        /// 用于绘制特定弹幕特效
+        /// </summary>
+        static RenderTarget2D Render;
+        public override void Unload()
+        {
+            Render.Dispose();
+        }
         public override void Load()
         {
+            Main.RunOnMainThread(() =>
+            {
+                Render = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
+                Main.OnResolutionChanged += Main_OnResolutionChanged;
+            });
+            On_FilterManager.EndCapture += On_FilterManager_EndCapture;
             On_Player.GetDamage += On_Player_GetDamage;
             On_Player.GetCritChance += On_Player_GetCritChance;
             On_Player.GetAttackSpeed += On_Player_GetAttackSpeed;
@@ -73,6 +88,117 @@ namespace TouhouPetsEx.Enhance.Core
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
         }
+
+        private void On_FilterManager_EndCapture(On_FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
+        {
+            bool perfectMaid = false;
+            bool reisenEffect = false;
+            int perfectMaidType = ModContent.ProjectileType<PerfectMaid>();
+            int reisenEffectType = ModContent.ProjectileType<ReisenEffect>();
+            foreach (Projectile proj in Main.ActiveProjectiles)
+            {
+                if (proj.type == perfectMaidType)
+                    perfectMaid = true;
+
+                if (proj.type == reisenEffectType && proj.ai[1] != 1)
+                    reisenEffect = true;
+            }
+
+            bool draw = perfectMaid || reisenEffect;
+
+            if (!draw)
+            {
+                orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
+                return;
+            }
+
+            var spriteBatch = Main.spriteBatch;
+            var graphicsDevice = Main.instance.GraphicsDevice;
+            var screenTarget = screenTarget1;
+            var screenTargetSwap = screenTarget2;
+
+            if (perfectMaid)
+            {
+                var shader = TouhouPetsEx.GrayishWhiteShader;
+
+                graphicsDevice.SetRenderTarget(screenTargetSwap);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
+                spriteBatch.End();
+
+                graphicsDevice.SetRenderTarget(Render);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                TouhouPetsEx.RingShader.Parameters["width"].SetValue(0);
+                TouhouPetsEx.RingShader.CurrentTechnique.Passes[0].Apply();
+
+                foreach (Projectile proj in Main.ActiveProjectiles)
+                {
+                    if (proj.type == perfectMaidType)
+                    {
+                        var dPosition = proj.Center - Main.screenPosition;
+
+                        spriteBatch.Draw(TextureAssets.MagicPixel.Value, dPosition, null, Color.White * ((255 - proj.alpha) / 255f), 0, TextureAssets.MagicPixel.Size() / 2f, new Vector2(proj.width, proj.width * 0.001f), SpriteEffects.None, 0);
+                    }
+                }
+
+                spriteBatch.End();
+                graphicsDevice.SetRenderTarget(screenTarget);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                Main.instance.GraphicsDevice.Textures[1] = Render;
+                shader.CurrentTechnique.Passes[0].Apply();
+                spriteBatch.Draw(screenTargetSwap, Vector2.Zero, Color.White);
+                spriteBatch.End();
+            }
+
+            if (reisenEffect)
+            {
+                var shader = TouhouPetsEx.DistortShader;
+                var tex = TextureAssets.Projectile[reisenEffectType].Value;
+
+                graphicsDevice.SetRenderTarget(screenTargetSwap);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
+                spriteBatch.End();
+
+                graphicsDevice.SetRenderTarget(Render);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+                foreach (Projectile proj in Main.ActiveProjectiles)
+                {
+                    if (proj.type == reisenEffectType)
+                    {
+                        var dPosition = proj.Center - Main.screenPosition;
+
+                        spriteBatch.Draw(tex, dPosition, null, Color.White * ((255 - proj.alpha) / 255f), 0, tex.Size() / 2f, proj.ai[0] * proj.ai[0] / 300f, SpriteEffects.None, 0);
+                    }
+                }
+
+                spriteBatch.End();
+                graphicsDevice.SetRenderTarget(screenTarget);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                shader.Parameters["tex0"].SetValue(Render);
+                shader.Parameters["mult"].SetValue(0.02f);
+                shader.CurrentTechnique.Passes[0].Apply();
+                spriteBatch.Draw(screenTargetSwap, Vector2.Zero, Color.White);
+
+                spriteBatch.End();
+            }
+
+            orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
+        }
+
+        private void Main_OnResolutionChanged(Vector2 obj)
+        {
+            Render?.Dispose();
+            Render = new(Main.graphics.GraphicsDevice, (int)obj.X, (int)obj.Y);
+        }
+
         static bool delicacy;
         private delegate void SetChat_InnerDelegate(Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely);
         private static void On_SetChat_Inner(SetChat_InnerDelegate orig, Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely)
@@ -508,7 +634,7 @@ namespace TouhouPetsEx.Enhance.Core
                     text.rotation *= 2;
                     hit.HideCombatText = true;
                 }
-                self.GetGlobalNPC<GEnhanceNPCs>().SuperCrit = false;
+                gnpc.SuperCrit = false;
             }
 
             return orig(self, hit, fromNet, noPlayerInteraction);

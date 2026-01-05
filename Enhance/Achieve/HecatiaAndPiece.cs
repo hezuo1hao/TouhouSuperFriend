@@ -41,7 +41,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             // 总体设置
             int cycle = 60;  // 总的时间为 60 帧
             int damage = 0;
-            int Radius = 15;
+            int Radius = 225; // 乘方后结果，这样下面计算距离时不用开方
             int minTileX = (int)(npc.Center.X / 16f - Radius);
             int maxTileX = (int)(npc.Center.X / 16f + Radius);
             int minTileY = (int)(npc.Center.Y / 16f - Radius);
@@ -77,14 +77,15 @@ namespace TouhouPetsEx.Enhance.Achieve
             int tileIndex = 0;
             for (int i = minTileX; i <= maxTileX; i++)
             {
+                // 计算到 NPC 的距离（其一）
+                float diffX = Math.Abs(i - npc.position.X / 16f);
                 for (int j = minTileY; j <= maxTileY; j++)
                 {
                     if (tileIndex >= startTileIndex && tileIndex <= endTileIndex)
                     {
-                        // 计算到 NPC 的距离
-                        float diffX = Math.Abs(i - npc.position.X / 16f);
+                        // 计算到 NPC 的距离（剩下的）
                         float diffY = Math.Abs(j - npc.position.Y / 16f);
-                        double distanceToTile = Math.Sqrt(diffX * diffX + diffY * diffY);
+                        double distanceToTile = diffX * diffX + diffY * diffY;
 
                         // 判断是否在范围内且是火把类型的砖块
                         if (distanceToTile < Radius && TileID.Sets.Torch[Framing.GetTileSafely(i, j).TileType])

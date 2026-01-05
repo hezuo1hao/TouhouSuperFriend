@@ -60,52 +60,8 @@ namespace TouhouPetsEx.Projectiles
 
             a = true;
         }
-        RenderTarget2D render = null;
         public override bool PreDraw(ref Color lightColor)
         {
-            //spriteBatch.End();
-            //spriteBatch.Begin(SpriteSortMode.Immediate, TouhouPetsEx.InverseColor, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-
-            //TouhouPetsEx.RingShader.Parameters["width"].SetValue(Math.Max(0f, 0.5f - (50f / Projectile.width)));
-            //TouhouPetsEx.RingShader.CurrentTechnique.Passes[0].Apply();
-            //TouhouPetsEx.GrayishWhiteShader.CurrentTechnique.Passes[0].Apply();
-            //spriteBatch.Draw(TextureAssets.MagicPixel.Value, Projectile.Center - Main.screenPosition, null, Color.White * ((255 - Projectile.alpha) / 255f), 0, TextureAssets.MagicPixel.Size() / 2f, new Vector2(Projectile.width, Projectile.width * 0.001f), SpriteEffects.None, 0);
-
-            //spriteBatch.End();
-            //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-
-            render ??= new(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
-            var shader = TouhouPetsEx.GrayishWhiteShader;
-            var spriteBatch = Main.spriteBatch;
-            var graphicsDevice = Main.instance.GraphicsDevice;
-            var screenTarget = Main.screenTarget;
-            var screenTargetSwap = Main.screenTargetSwap;
-            var dPosition = Projectile.Center - Main.screenPosition;
-
-
-            graphicsDevice.SetRenderTarget(screenTargetSwap);
-            graphicsDevice.Clear(Color.Transparent);
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
-            spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
-            spriteBatch.End();
-
-            graphicsDevice.SetRenderTarget(render);
-            graphicsDevice.Clear(Color.Transparent);
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-            TouhouPetsEx.RingShader.Parameters["width"].SetValue(0);
-            TouhouPetsEx.RingShader.CurrentTechnique.Passes[0].Apply();
-            spriteBatch.Draw(TextureAssets.MagicPixel.Value, Projectile.Center - Main.screenPosition, null, Color.White * ((255 - Projectile.alpha) / 255f), 0, TextureAssets.MagicPixel.Size() / 2f, new Vector2(Projectile.width, Projectile.width * 0.001f), SpriteEffects.None, 0);
-            spriteBatch.End();
-
-            graphicsDevice.SetRenderTarget(screenTarget);
-            graphicsDevice.Clear(Color.Transparent);
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
-            Main.instance.GraphicsDevice.Textures[1] = render;
-            shader.CurrentTechnique.Passes[0].Apply();
-            spriteBatch.Draw(screenTargetSwap, Vector2.Zero, Color.White);
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             return false;
         }
     }

@@ -16,8 +16,11 @@ using TouhouPetsEx.Buffs;
 
 namespace TouhouPetsEx.Enhance.Core
 {
-	public class GEnhanceItems : GlobalItem
+    public class GEnhanceItems : GlobalItem
     {
+        #region 防止闭包的私有字段们
+        int GrabRange_grabRange;
+        #endregion
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
             foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
@@ -108,6 +111,7 @@ namespace TouhouPetsEx.Enhance.Core
                 return @return;
             }
         }
+        public override bool InstancePerEntity => true;
         public override void SetDefaults(Item entity)
         {
             ProcessDemonismAction(entity, (enhance) => enhance.ItemSD(entity));
@@ -117,9 +121,9 @@ namespace TouhouPetsEx.Enhance.Core
             if (player.MBP().Throw)
                 grabRange += 1600;
 
-            int grabRange2 = grabRange;
-            ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref grabRange2));
-            grabRange = grabRange2;
+            GrabRange_grabRange = grabRange;
+            ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref GrabRange_grabRange));
+            grabRange = GrabRange_grabRange;
         }
         public override void HoldItem(Item item, Player player)
         {

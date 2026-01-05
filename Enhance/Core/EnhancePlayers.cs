@@ -134,6 +134,24 @@ namespace TouhouPetsEx.Enhance.Core
         /// <para>索引决定对应的加成上限：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲、11—防御效力</para>
         /// </summary>
         public static int[] ExtraAdditionMax = [50, 50, int.MaxValue, 100, int.MaxValue, 50, 200, 10, 4, 1, 150, int.MaxValue];
+        #region 防止闭包的私有字段们
+        float ModifyLuck_luck;
+        int GetHealLife_healValue;
+        int GetHealMana_healValue;
+        float ModifyItemScale_scale;
+        float DrawEffects_r;
+        float DrawEffects_g;
+        float DrawEffects_b;
+        float DrawEffects_a;
+        bool DrawEffects_fullBright;
+        Player.HurtModifiers ModifyHurt_modifiers;
+        NPC.HitModifiers ModifyHitNPCWithItem_modifiers;
+        NPC.HitModifiers ModifyHitNPCWithProj_modifiers;
+        NPC.HitModifiers ModifyHitNPC_modifiers;
+        bool PreKill_playSound;
+        bool PreKill_genDust;
+        PlayerDeathReason PreKill_damageSource;
+        #endregion
         private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
         {
             if (!player.HasTouhouPetsBuff())
@@ -299,9 +317,9 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void ModifyLuck(ref float luck)
         {
-            float luck2 = luck;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyLuck(Player, ref luck2));
-            luck = luck2;
+            ModifyLuck_luck = luck;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyLuck(Player, ref ModifyLuck_luck));
+            luck = ModifyLuck_luck;
         }
         public override void UpdateLifeRegen()
         {
@@ -309,15 +327,15 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void GetHealLife(Item item, bool quickHeal, ref int healValue)
         {
-            int healValue2 = healValue;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerGetHealLife(Player, item, quickHeal, ref healValue2));
-            healValue = healValue2;
+            GetHealLife_healValue = healValue;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerGetHealLife(Player, item, quickHeal, ref GetHealLife_healValue));
+            healValue = GetHealLife_healValue;
         }
         public override void GetHealMana(Item item, bool quickHeal, ref int healValue)
         {
-            int healValue2 = healValue;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerGetHealMana(Player, item, quickHeal, ref healValue2));
-            healValue = healValue2;
+            GetHealMana_healValue = healValue;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerGetHealMana(Player, item, quickHeal, ref GetHealMana_healValue));
+            healValue = GetHealMana_healValue;
         }
         public override void PreUpdate()
         {
@@ -348,9 +366,9 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void ModifyItemScale(Item item, ref float scale)
         {
-            float scale2 = scale;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyItemScale(Player, item, ref scale2));
-            scale = scale2;
+            ModifyItemScale_scale = scale;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyItemScale(Player, item, ref ModifyItemScale_scale));
+            scale = ModifyItemScale_scale;
         }
         public override float UseTimeMultiplier(Item item)
         {
@@ -358,17 +376,17 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
-            float r2 = r;
-            float g2 = g;
-            float b2 = b;
-            float a2 = a;
-            bool fullBright2 = fullBright;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerDrawEffects(drawInfo, ref r2, ref g2, ref b2, ref a2, ref fullBright2));
-            r = r2;
-            g = g2;
-            b = b2;
-            a = a2;
-            fullBright = fullBright2;
+            DrawEffects_r = r;
+            DrawEffects_g = g;
+            DrawEffects_b = b;
+            DrawEffects_a = a;
+            DrawEffects_fullBright = fullBright;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerDrawEffects(drawInfo, ref DrawEffects_r, ref DrawEffects_g, ref DrawEffects_b, ref DrawEffects_a, ref DrawEffects_fullBright));
+            r = DrawEffects_r;
+            g = DrawEffects_g;
+            b = DrawEffects_b;
+            a = DrawEffects_a;
+            fullBright = DrawEffects_fullBright;
         }
         public override bool FreeDodge(Player.HurtInfo info)
         {
@@ -401,9 +419,9 @@ namespace TouhouPetsEx.Enhance.Core
                 }
             }
 
-            Player.HurtModifiers modifiers2 = modifiers;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHurt(Player, ref modifiers2));
-            modifiers = modifiers2;
+            ModifyHurt_modifiers = modifiers;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHurt(Player, ref ModifyHurt_modifiers));
+            modifiers = ModifyHurt_modifiers;
         }
         public override void PostHurt(Player.HurtInfo info)
         {
@@ -411,31 +429,31 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void ModifyHitNPCWithItem(Item item, NPC target, ref NPC.HitModifiers modifiers)
         {
-            NPC.HitModifiers modifiers2 = modifiers;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPCWithItem(Player, item, target, ref modifiers2));
-            modifiers = modifiers2;
+            ModifyHitNPCWithItem_modifiers = modifiers;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPCWithItem(Player, item, target, ref ModifyHitNPCWithItem_modifiers));
+            modifiers = ModifyHitNPCWithItem_modifiers;
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
         {
-            NPC.HitModifiers modifiers2 = modifiers;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPCWithProjectile(Player, proj, target, ref modifiers2));
-            modifiers = modifiers2;
+            ModifyHitNPCWithProj_modifiers = modifiers;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPCWithProjectile(Player, proj, target, ref ModifyHitNPCWithProj_modifiers));
+            modifiers = ModifyHitNPCWithProj_modifiers;
         }
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
-            NPC.HitModifiers modifiers2 = modifiers;
-            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPC(Player, target, ref modifiers2));
-            modifiers = modifiers2;
+            ModifyHitNPC_modifiers = modifiers;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyHitNPC(Player, target, ref ModifyHitNPC_modifiers));
+            modifiers = ModifyHitNPC_modifiers;
         }
         public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
         {
-            bool playSound2 = playSound;
-            bool genDust2 = genDust;
-            PlayerDeathReason damageSource2 = damageSource;
-            bool? result = ProcessDemonismAction(Player, false, (enhance) => enhance.PlayerPreKill(Player, damage, hitDirection, pvp, ref playSound2, ref genDust2, ref damageSource2));
-            playSound = playSound2;
-            genDust = genDust2;
-            damageSource = damageSource2;
+            PreKill_playSound = playSound;
+            PreKill_genDust = genDust;
+            PreKill_damageSource = damageSource;
+            bool? result = ProcessDemonismAction(Player, false, (enhance) => enhance.PlayerPreKill(Player, damage, hitDirection, pvp, ref PreKill_playSound, ref PreKill_genDust, ref PreKill_damageSource));
+            playSound = PreKill_playSound;
+            genDust = PreKill_genDust;
+            damageSource = PreKill_damageSource;
 
             return result ?? base.PreKill(damage, hitDirection, pvp, ref playSound, ref genDust, ref damageSource);
         }
@@ -455,6 +473,12 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void OnEnterWorld()
         {
+            // 免责声明
+            if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod mod))
+            {
+                Main.NewText($"侦测到开启 {mod.DisplayName}，请注意在此情况下产生的任何问题/报错/BUG均有可能是因为该模组导致（由于该模组使用了大量破坏/不兼容性代码），请不要在 {Mod.DisplayName} 处反馈", Color.Red);
+            }
+
             if (Player == Main.LocalPlayer && Main.netMode == NetmodeID.MultiplayerClient)
             {
                 AwardPlayerSync(Mod, -1, Main.myPlayer, true);
