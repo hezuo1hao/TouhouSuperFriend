@@ -40,7 +40,7 @@ namespace TouhouPetsEx.Enhance.Core
         static RenderTarget2D Render;
         public override void Unload()
         {
-            Render.Dispose();
+            Main.RunOnMainThread(() => Render?.Dispose());
         }
         public override void Load()
         {
