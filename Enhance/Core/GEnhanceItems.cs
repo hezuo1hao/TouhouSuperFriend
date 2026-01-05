@@ -51,8 +51,8 @@ namespace TouhouPetsEx.Enhance.Core
             }
             return @return;
         }
-        /// <param name="priority">ÌîĞ´ĞèÒªÓÅÏÈ·µ»ØµÄbool½á¹û£¬Èç£ºÖ´ĞĞÈı´Î£¬Á©falseÒ»true£¬ĞèÇótrue£¬Ôò·µ»Øtrue½á¹û
-        /// <br>ÌØ±ğµÄ£¬Èç¹ûÌînullÔò»á·µ»Ø×îºóÒ»¸ö·ÇnullµÄ½á¹û</br>
+        /// <param name="priority">å¡«å†™éœ€è¦ä¼˜å…ˆè¿”å›çš„boolç»“æœï¼Œå¦‚ï¼šæ‰§è¡Œä¸‰æ¬¡ï¼Œä¿©falseä¸€trueï¼Œéœ€æ±‚trueï¼Œåˆ™è¿”å›trueç»“æœ
+        /// <br>ç‰¹åˆ«çš„ï¼Œå¦‚æœå¡«nullåˆ™ä¼šè¿”å›æœ€åä¸€ä¸ªénullçš„ç»“æœ</br>
         /// </param>
         private static bool? ProcessDemonismAction(Player player, bool? priority, Func<BaseEnhance, bool?> action)
         {
@@ -81,8 +81,8 @@ namespace TouhouPetsEx.Enhance.Core
                 return @return;
             }
         }
-        /// <param name="priority">ÌîĞ´ĞèÒªÓÅÏÈ·µ»ØµÄbool½á¹û£¬Èç£ºÖ´ĞĞÈı´Î£¬Á©falseÒ»true£¬ĞèÇótrue£¬Ôò·µ»Øtrue½á¹û
-        /// <br>ÌØ±ğµÄ£¬Èç¹ûÌînullÔò»á·µ»Ø×îºóÒ»¸ö·ÇnullµÄ½á¹û</br>
+        /// <param name="priority">å¡«å†™éœ€è¦ä¼˜å…ˆè¿”å›çš„boolç»“æœï¼Œå¦‚ï¼šæ‰§è¡Œä¸‰æ¬¡ï¼Œä¿©falseä¸€trueï¼Œéœ€æ±‚trueï¼Œåˆ™è¿”å›trueç»“æœ
+        /// <br>ç‰¹åˆ«çš„ï¼Œå¦‚æœå¡«nullåˆ™ä¼šè¿”å›æœ€åä¸€ä¸ªénullçš„ç»“æœ</br>
         /// </param>
         private static bool? ProcessDemonismAction(bool? priority, Func<BaseEnhance, bool?> action)
         {
@@ -170,6 +170,7 @@ namespace TouhouPetsEx.Enhance.Core
                 object enhance = Activator.CreateInstance(types);
                 BaseEnhance thisEnhance = enhance as BaseEnhance;
                 thisEnhance.ItemSSD();
+                EnhanceHookRegistry.Register(thisEnhance);
             }
         }
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)

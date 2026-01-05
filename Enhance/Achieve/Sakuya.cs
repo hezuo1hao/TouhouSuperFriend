@@ -96,13 +96,11 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override bool? NPCPreAI(NPC npc)
         {
-            foreach (Projectile proj in Main.ActiveProjectiles)
+            bool[] stopped = TouhouPetsExModSystem.SakuyaStoppedNPC;
+            if (stopped != null && (uint)npc.whoAmI < (uint)stopped.Length && stopped[npc.whoAmI])
             {
-                if (proj.type == ModContent.ProjectileType<PerfectMaid>() && proj.ai[1] == npc.whoAmI)
-                {
-                    npc.velocity = Vector2.Zero;
-                    return false;
-                }
+                npc.velocity = Vector2.Zero;
+                return false;
             }
 
             return null;

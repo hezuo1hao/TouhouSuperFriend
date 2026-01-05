@@ -1,3 +1,4 @@
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,11 +17,23 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPreUpdateBuffsAlways(Player player)
         {
-            player.MP().OldBuff = (int[])player.buffTime.Clone();
+            var mp = player.MP();
+            if (mp == null)
+                return;
+
+            int length = player.buffTime.Length;
+            if (mp.OldBuff == null || mp.OldBuff.Length != length)
+                mp.OldBuff = new int[length];
+
+            Array.Copy(player.buffTime, mp.OldBuff, length);
         }
         public override void BuffUpdate(int type, Player player, ref int buffIndex)
         {
-            if (player.MP().OldBuff[buffIndex] == player.buffTime[buffIndex] || BuffID.Sets.TimeLeftDoesNotDecrease[type] || BuffID.Sets.NurseCannotRemoveDebuff[type])
+            var mp = player.MP();
+            if (mp?.OldBuff == null || (uint)buffIndex >= (uint)mp.OldBuff.Length)
+                return;
+
+            if (mp.OldBuff[buffIndex] == player.buffTime[buffIndex] || BuffID.Sets.TimeLeftDoesNotDecrease[type] || BuffID.Sets.NurseCannotRemoveDebuff[type])
                 return;
 
             if (Main.debuff[type])
