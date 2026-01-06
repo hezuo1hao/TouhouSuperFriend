@@ -1,6 +1,6 @@
 displayName = 东方小祖宗 ~ Ultimate pet force
 author = hezuo1hao
-version = 1.1.5.816
+version = 1.1.5.817
 includeSource = true
 modReferences = TouhouPets@1.1.5.8
 homepage = https://github.com/hezuo1hao/TouhouSuperFriend

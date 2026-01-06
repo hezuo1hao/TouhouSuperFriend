@@ -44,11 +44,12 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void Load()
         {
-            Main.RunOnMainThread(() =>
-            {
-                Render = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
-                Main.OnResolutionChanged += Main_OnResolutionChanged;
-            });
+            if (Main.netMode != NetmodeID.Server)
+                Main.RunOnMainThread(() =>
+                {
+                    Render = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
+                    Main.OnResolutionChanged += Main_OnResolutionChanged;
+                });
             On_FilterManager.EndCapture += On_FilterManager_EndCapture;
             On_Player.GetDamage += On_Player_GetDamage;
             On_Player.GetCritChance += On_Player_GetCritChance;
