@@ -29,12 +29,24 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override void ItemHoldItem(Item item, Player player)
         {
             if (Config.Satori && item.type == ModContent.ItemType<UtsuhoEye>() && player.EnableEnhance<SatoriSlippers>())
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            {
+                if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                {
+                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                }
+            }
         }
         public override void ItemUpdateInventory(Item item, Player player)
         {
             if (Config.Satori && item.type == ModContent.ItemType<UtsuhoEye>() && player.EnableEnhance<SatoriSlippers>())
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            {
+                if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                {
+                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                }
+            }
         }
         public override void PlayerPostResetEffects(Player player)
         {
@@ -45,7 +57,11 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 if (item.type == ModContent.ItemType<UtsuhoEye>())
                 {
-                    player.MP().ActivePassiveEnhance.Add(item.type);
+                    if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                    {
+                        if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                            player.MP().ActivePassiveEnhance.Add(enhanceId);
+                    }
                     break;
                 }
             }

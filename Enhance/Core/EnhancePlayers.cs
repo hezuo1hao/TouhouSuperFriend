@@ -25,12 +25,24 @@ using TouhouPetsEx.Projectiles;
 
 namespace TouhouPetsEx.Enhance.Core
 {
+    /// <summary>
+    /// 增强系统的玩家侧核心状态（<see cref="ModPlayer"/>）。
+    /// <para>
+    /// 这里主要维护“玩家启用了哪些增强”（主动/被动），并在 Player 各生命周期钩子中分发增强逻辑。
+    /// </para>
+    /// </summary>
     public class EnhancePlayers : ModPlayer
     {
         public bool NewlyMadeDoll;
         public bool ABurntDoll;
-        public List<int> ActiveEnhance = [];
-        public List<int> ActivePassiveEnhance = [];
+        /// <summary>
+        /// 主动启用的增强（通常由物品右键开关写入）。
+        /// </summary>
+        public List<EnhancementId> ActiveEnhance = [];
+        /// <summary>
+        /// 被动启用的增强（例如被动能力、宠物栏/照明栏等自动生效能力）。
+        /// </summary>
+        public List<EnhancementId> ActivePassiveEnhance = [];
         public int ActiveEnhanceCount = 11037;
         /// <summary>
         /// 萝莉丝用
@@ -134,7 +146,7 @@ namespace TouhouPetsEx.Enhance.Core
         /// <para>索引决定对应的加成上限：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲、11—防御效力</para>
         /// </summary>
         public static int[] ExtraAdditionMax = [50, 50, int.MaxValue, 100, int.MaxValue, 50, 200, 10, 4, 1, 150, int.MaxValue];
-        #region 防止闭包的私有字段们
+        #region ��ֹ�հ���˽���ֶ���
         float ModifyLuck_luck;
         int GetHealLife_healValue;
         int GetHealMana_healValue;
@@ -157,14 +169,17 @@ namespace TouhouPetsEx.Enhance.Core
             if (!player.HasTouhouPetsBuff())
                 return;
 
-            foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+            // 玩家侧分发：只对当前玩家启用的增强执行。
+            foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
             {
-                action(TouhouPetsEx.GEnhanceInstances[id]);
+                if (EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                    action(enhancement);
             }
         }
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
-            foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
+            // 全局分发：对所有已注册增强执行（与具体玩家无关的 Always 钩子使用）。
+            foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
             {
                 action(enhance);
             }
@@ -177,9 +192,12 @@ namespace TouhouPetsEx.Enhance.Core
             if (priority == null)
             {
                 bool? @return = null;
-                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
                 {
-                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (!EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                        continue;
+
+                    bool? a = action(enhancement);
                     if (a != null) @return = a;
                 }
                 return @return;
@@ -187,9 +205,12 @@ namespace TouhouPetsEx.Enhance.Core
             else
             {
                 bool? @return = null;
-                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
                 {
-                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (!EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                        continue;
+
+                    bool? a = action(enhancement);
                     if (a == priority) return a;
                     else if (a != null) @return = a;
                 }
@@ -203,15 +224,19 @@ namespace TouhouPetsEx.Enhance.Core
             if (!player.HasTouhouPetsBuff())
                 return multiplier;
 
-            foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+            foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
             {
-                multiplier *= action(TouhouPetsEx.GEnhanceInstances[id]) ?? 1f;
+                if (!EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                    continue;
+
+                multiplier *= action(enhancement) ?? 1f;
             }
 
             return multiplier;
         }
         public override void Initialize()
         {
+            // Initialize：让增强有机会初始化玩家侧状态。
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerInitialize(Player));
         }
         public override void ResetEffects()
@@ -239,6 +264,7 @@ namespace TouhouPetsEx.Enhance.Core
                     bigSevenStars.Condition.Complete();
             }
 
+            // 每 tick 重建被动启用列表，确保状态与背包/宠物栏一致。
             ActivePassiveEnhance = [];
 
             FragrantAromaFillsTheAir = false;
@@ -247,8 +273,15 @@ namespace TouhouPetsEx.Enhance.Core
             {
                 foreach (Item item in Player.miscEquips)
                 {
-                    if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !Player.EnableEnhance(item.type))
-                        ActivePassiveEnhance.Add(item.type);
+                    if (item.ModItem?.Mod.Name == "TouhouPets"
+                        && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
+                        && enhance.Passive
+                        && !Player.EnableEnhance(item.type)
+                        && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                    {
+                        if (!ActivePassiveEnhance.Contains(enhanceId))
+                            ActivePassiveEnhance.Add(enhanceId);
+                    }
                 }
             }
 
@@ -256,12 +289,12 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void SaveData(TagCompound tag)
         {
-            List<string> strings = [];
-            foreach (int type in ActiveEnhance)
-            {
-                strings.Add(ItemLoader.GetItem(type).Name);
-            }
-            tag.Add("ActiveEnhanceName", strings);
+            // 存档：把 EnhancementId 序列化为 string 列表（Value 是载体）。
+            List<string> activeEnhanceIds = [];
+            for (int i = 0; i < ActiveEnhance.Count; i++)
+                activeEnhanceIds.Add(ActiveEnhance[i].Value);
+
+            tag.Add("ActiveEnhanceIds", activeEnhanceIds);
             tag.Add("EatBook", EatBook);
             tag.Add("adjTileVanilla", adjTileVanilla);
             tag.Add("adjTileMod", adjTileMod);
@@ -272,13 +305,30 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void LoadData(TagCompound tag)
         {
-            List<int> ints = [];
-            foreach (string name in tag.GetList<string>("ActiveEnhanceName"))
+            // 读档：优先读取新字段 ActiveEnhanceIds；若不存在则兼容旧字段 ActiveEnhanceName。
+            List<EnhancementId> ids = [];
+            if (tag.TryGet<List<string>>("ActiveEnhanceIds", out var loadedIds) && loadedIds != null)
             {
-                if (ModContent.TryFind("TouhouPets", name, out ModItem item))
-                    ints.Add(item.Type);
+                for (int i = 0; i < loadedIds.Count; i++)
+                {
+                    string raw = loadedIds[i];
+                    if (!string.IsNullOrWhiteSpace(raw))
+                        ids.Add(EnhancementId.From(raw));
+                }
             }
-            ActiveEnhance = ints;
+            else if (tag.TryGet<List<string>>("ActiveEnhanceName", out var legacyNames) && legacyNames != null)
+            {
+                foreach (string name in legacyNames)
+                {
+                    if (!ModContent.TryFind("TouhouPets", name, out ModItem item))
+                        continue;
+                    if (!EnhanceRegistry.TryGetEnhanceId(item.Type, out EnhancementId enhanceId))
+                        continue;
+                    ids.Add(enhanceId);
+                }
+            }
+
+            ActiveEnhance = ids;
             EatBook = tag.GetInt("EatBook");
             NewlyMadeDoll = tag.GetBool("NewlyMadeDoll");
             ABurntDoll = tag.GetBool("ABurntDoll");
@@ -473,14 +523,15 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void OnEnterWorld()
         {
-            // 免责声明
+            // ��������
             if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod mod))
             {
-                Main.NewText($"侦测到开启 {mod.DisplayName}，请注意在此情况下产生的任何问题/报错/BUG均有可能是因为该模组导致（由于该模组使用了大量破坏/不兼容性代码），请不要在 {Mod.DisplayName} 处反馈", Color.Red);
+                Main.NewText($"��⵽���� {mod.DisplayName}����ע���ڴ�����²������κ�����/����/BUG���п�������Ϊ��ģ�鵼�£����ڸ�ģ��ʹ���˴����ƻ�/�������Դ��룩���벻Ҫ�� {Mod.DisplayName} ������", Color.Red);
             }
 
             if (Player == Main.LocalPlayer && Main.netMode == NetmodeID.MultiplayerClient)
             {
+                // 客户端进世界时请求一次同步，保证本地状态与服务器一致。
                 AwardPlayerSync(Mod, -1, Main.myPlayer, true);
             }
         }
@@ -543,7 +594,7 @@ namespace TouhouPetsEx.Enhance.Core
             packet.Write(player.EatBook);
             packet.Write(player.ActiveEnhance.Count);
             for (int i = 0; i < player.ActiveEnhance.Count; i++)
-                packet.Write(player.ActiveEnhance[i]);
+                packet.Write(player.ActiveEnhance[i].Value);
             packet.Write(player.ExtraAddition.Length);
             for (int i = 0; i < player.ExtraAddition.Length; i++)
                 packet.Write(player.ExtraAddition[i]);
@@ -561,9 +612,13 @@ namespace TouhouPetsEx.Enhance.Core
             int eatBook = reader.ReadInt32();
 
             int activeEnhanceCount = reader.ReadInt32();
-            List<int> activeEnhance = [];
+            List<EnhancementId> activeEnhance = [];
             for (int i = 0; i < activeEnhanceCount; i++)
-                activeEnhance.Add(reader.ReadInt32());
+            {
+                string id = reader.ReadString();
+                if (!string.IsNullOrWhiteSpace(id))
+                    activeEnhance.Add(EnhancementId.From(id));
+            }
 
             int extraAdditionLength = reader.ReadInt32();
             int[] extraAddition = new int[extraAdditionLength];

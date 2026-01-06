@@ -16,22 +16,27 @@ using TouhouPetsEx.Buffs;
 
 namespace TouhouPetsEx.Enhance.Core
 {
-    public class GEnhanceItems : GlobalItem
+	/// <summary>
+	/// 增强相关的全局物品钩子分发。
+	/// <para>
+	/// 负责把 tML 的 Item 相关回调分发到当前启用的增强（<see cref="EnhancePlayers.ActiveEnhance"/> / <see cref="EnhancePlayers.ActivePassiveEnhance"/>）。
+	/// </para>
+	/// </summary>
+	public class GEnhanceItems : GlobalItem
     {
-        #region 防止闭包的私有字段们
-        int GrabRange_grabRange;
-        #endregion
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
-            foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+            // 全局分发：对所有已注册增强执行一次（用于与具体物品无关的全局事件）。
+            foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
             {
-                action(enhance.Value);
+                action(enhance);
             }
         }
         private static void ProcessDemonismAction(Item item, Action<BaseEnhance> action)
         {
             if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance))
             {
+                // 单物品分发：只对“该物品绑定的增强”执行。
                 action(enhance);
             }
         }
@@ -40,9 +45,11 @@ namespace TouhouPetsEx.Enhance.Core
             if (!player.HasTouhouPetsBuff())
                 return;
 
-            foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+            // 玩家分发：只对玩家当前启用的增强执行。
+            foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
             {
-                action(TouhouPetsEx.GEnhanceInstances[id]);
+                if (EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                    action(enhancement);
             }
         }
         private static bool? ProcessDemonismAction(Item item, Func<BaseEnhance, bool?> action)
@@ -50,6 +57,7 @@ namespace TouhouPetsEx.Enhance.Core
             bool? @return = null;
             if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance))
             {
+                // 对“该物品绑定的增强”执行一次，并返回其结果（可为 null）。
                 @return = action(enhance);
             }
             return @return;
@@ -65,9 +73,13 @@ namespace TouhouPetsEx.Enhance.Core
             if (priority == null)
             {
                 bool? @return = null;
-                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
                 {
-                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (!EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                        continue;
+
+                    // priority=null：返回“最后一个非 null 的结果”，用于链式覆盖。
+                    bool? a = action(enhancement);
                     if (a != null) @return = a;
                 }
                 return @return;
@@ -75,9 +87,13 @@ namespace TouhouPetsEx.Enhance.Core
             else
             {
                 bool? @return = null;
-                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
                 {
-                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (!EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                        continue;
+
+                    // priority!=null：遇到目标值直接短路返回（例如 true/false 的“强制优先”）。
+                    bool? a = action(enhancement);
                     if (a == priority) return a;
                     else if (a != null) @return = a;
                 }
@@ -92,9 +108,10 @@ namespace TouhouPetsEx.Enhance.Core
             if (priority == null)
             {
                 bool? @return = null;
-                foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+                foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
                 {
-                    bool? a = action(enhance.Value);
+                    // priority=null：返回“最后一个非 null 的结果”。
+                    bool? a = action(enhance);
                     if (a != null) @return = a;
                 }
                 return @return;
@@ -102,18 +119,19 @@ namespace TouhouPetsEx.Enhance.Core
             else
             {
                 bool? @return = null;
-                foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+                foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
                 {
-                    bool? a = action(enhance.Value);
+                    // priority!=null：优先返回目标结果。
+                    bool? a = action(enhance);
                     if (a == priority) return a;
                     else if (a != null) @return = a;
                 }
                 return @return;
             }
         }
-        public override bool InstancePerEntity => true;
         public override void SetDefaults(Item entity)
         {
+            // SetDefaults：对“该物品绑定的增强”分发一次。
             ProcessDemonismAction(entity, (enhance) => enhance.ItemSD(entity));
         }
         public override void GrabRange(Item item, Player player, ref int grabRange)
@@ -121,26 +139,42 @@ namespace TouhouPetsEx.Enhance.Core
             if (player.MBP().Throw)
                 grabRange += 1600;
 
-            GrabRange_grabRange = grabRange;
-            ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref GrabRange_grabRange));
-            grabRange = GrabRange_grabRange;
+            int grabRange2 = grabRange;
+            // grabRange 是 ref 参数：用局部变量承接，允许多增强叠加修改。
+            ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref grabRange2));
+            grabRange = grabRange2;
         }
         public override void HoldItem(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !player.EnableEnhance(item.type))
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            if (item.ModItem?.Mod.Name == "TouhouPets"
+                && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
+                && enhance.Passive
+                && !player.EnableEnhance(item.type)
+                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+            {
+                if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                    player.MP().ActivePassiveEnhance.Add(enhanceId);
+            }
 
             ProcessDemonismAction((enhance) => enhance.ItemHoldItem(item, player));
         }
         public override void UpdateInventory(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !player.EnableEnhance(item.type))
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            if (item.ModItem?.Mod.Name == "TouhouPets"
+                && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
+                && enhance.Passive
+                && !player.EnableEnhance(item.type)
+                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+            {
+                if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                    player.MP().ActivePassiveEnhance.Add(enhanceId);
+            }
 
             ProcessDemonismAction((enhance) => enhance.ItemUpdateInventory(item, player));
         }
         public override bool? UseItem(Item item, Player player)
         {
+            // UseItem：聚合多个增强的可选 bool? 结果，优先返回 false（阻止默认行为）。
             return ProcessDemonismAction(player, false, (enhance) => enhance.ItemUseItem(item, player));
         }
         public override void OnCreated(Item item, ItemCreationContext context)
@@ -173,7 +207,11 @@ namespace TouhouPetsEx.Enhance.Core
             {
                 object enhance = Activator.CreateInstance(types);
                 BaseEnhance thisEnhance = enhance as BaseEnhance;
+                // 身份层登记：允许后续用 EnhancementId 找到增强实例。
+                EnhanceRegistry.RegisterEnhancement(thisEnhance);
+                // 由增强自行声明绑定的物品 type，并建立 itemType -> EnhancementId 映射。
                 thisEnhance.ItemSSD();
+                // 性能优化：登记覆写过的钩子，避免运行期空调用。
                 EnhanceHookRegistry.Register(thisEnhance);
             }
         }
@@ -205,6 +243,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override bool AltFunctionUse(Item item, Player player)
         {
+            // 控制是否允许右键（由增强决定）。
             if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh))
                 return enh.EnableRightClick;
 
@@ -213,6 +252,7 @@ namespace TouhouPetsEx.Enhance.Core
         public override bool CanUseItem(Item item, Player player)
         {
             bool def = true;
+            // 让增强可以拦截/修改 CanUseItem，并允许修改 def。
             bool? reesult = ProcessDemonismAction(player, false, (enhance) => enhance.ItemCanUseItem(item, player, ref def));
 
             if (reesult.HasValue)
@@ -221,7 +261,11 @@ namespace TouhouPetsEx.Enhance.Core
             if (def && item.ModItem?.Mod.Name == "TouhouPets" && player.altFunctionUse == 2 && player.HasTouhouPetsBuff()
                 && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh) && enh.EnableRightClick)
             {
-                if (player.MP().ActiveEnhance.Remove(item.type))
+                // 右键：切换“该物品绑定的增强”是否启用。
+                if (!EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                    return true;
+
+                if (player.MP().ActiveEnhance.Remove(enhanceId))
                 {
                     CombatText.NewText(player.getRect(), Color.Cyan, GetText("Disable"));
                 }
@@ -230,16 +274,17 @@ namespace TouhouPetsEx.Enhance.Core
                     if (player.MP().ActiveEnhance.Count >= player.MP().ActiveEnhanceCount)
                     {
                         player.MP().ActiveEnhance.RemoveAt(0);
-                        player.MP().ActiveEnhance.Add(item.type);
+                        player.MP().ActiveEnhance.Add(enhanceId);
                     }
                     else
-                        player.MP().ActiveEnhance.Add(item.type);
+                        player.MP().ActiveEnhance.Add(enhanceId);
 
                     CombatText.NewText(player.getRect(), Color.Cyan, GetText("Enable"));
                 }
 
                 EnhancePlayers.AwardPlayerSync(Mod, -1, player.whoAmI);
 
+                // 返回 false：阻止物品原本的使用逻辑（右键用于开关增强）。
                 return false;
             }
 

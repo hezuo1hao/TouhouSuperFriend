@@ -38,7 +38,11 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (!Config.Satori || !player.EnableEnhance<SatoriSlippers>())
                     return;
 
-                player.MP().ActiveEnhance.RemoveAll(type => type == ModContent.ItemType<RinSkull>() || type == ModContent.ItemType<UtsuhoEye>() || type == ModContent.ItemType<KoishiTelephone>());
+                EnhanceRegistry.TryGetEnhanceId(ModContent.ItemType<RinSkull>(), out EnhancementId rinId);
+                EnhanceRegistry.TryGetEnhanceId(ModContent.ItemType<UtsuhoEye>(), out EnhancementId utsuhoId);
+                EnhanceRegistry.TryGetEnhanceId(ModContent.ItemType<KoishiTelephone>(), out EnhancementId koishiId);
+
+                player.MP().ActiveEnhance.RemoveAll(id => id == rinId || id == utsuhoId || id == koishiId);
 
             }
         }

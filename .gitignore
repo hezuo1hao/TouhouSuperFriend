@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Directory.Build.targets
+/Directory.Build.props
+/AGENTS.md
+/.editorconfig
+/docs/
