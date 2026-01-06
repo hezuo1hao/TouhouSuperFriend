@@ -16,20 +16,20 @@ namespace TouhouPetsEx.Enhance.Core
 	public class EnhanceSystem : ModSystem
     {
         /// <summary>
-        /// 当前世界上存在几个城镇npc，剑、玉、镜、乡buff用（上白泽慧音能力相关）
+        /// 褰撳墠涓栫晫涓婂瓨鍦ㄥ嚑涓煄闀噉pc锛屽墤銆佺帀銆侀暅銆佷埂buff鐢紙涓婄櫧娉芥収闊宠兘鍔涚浉鍏筹級
         /// </summary>
         public static int TownNPCCount;
         /// <summary>
-        /// 总共有多少个城镇npc，剑、玉、镜、乡buff用（上白泽慧音能力相关）
+        /// 鎬诲叡鏈夊灏戜釜鍩庨晣npc锛屽墤銆佺帀銆侀暅銆佷埂buff鐢紙涓婄櫧娉芥収闊宠兘鍔涚浉鍏筹級
         /// </summary>
         public static int TownNPCMax;
         /// <summary>
-        /// 记录尸块伤害（火焰猫燐能力相关）
+        /// 璁板綍灏稿潡浼ゅ锛堢伀鐒扮尗鐕愯兘鍔涚浉鍏筹級
         /// </summary>
         public static int[] GoreDamage = new int[Main.maxGore];
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
-            foreach (BaseEnhance enhance in TouhouPetsEx.GEnhanceInstances.Values)
+            foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
             {
                 action(enhance);
             }

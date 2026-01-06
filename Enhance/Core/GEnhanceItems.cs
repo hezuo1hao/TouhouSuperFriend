@@ -23,9 +23,9 @@ namespace TouhouPetsEx.Enhance.Core
         #endregion
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
-            foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+            foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
             {
-                action(enhance.Value);
+                action(enhance);
             }
         }
         private static void ProcessDemonismAction(Item item, Action<BaseEnhance> action)
@@ -40,9 +40,10 @@ namespace TouhouPetsEx.Enhance.Core
             if (!player.HasTouhouPetsBuff())
                 return;
 
-            foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+            foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
             {
-                action(TouhouPetsEx.GEnhanceInstances[id]);
+                if (EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                    action(enhancement);
             }
         }
         private static bool? ProcessDemonismAction(Item item, Func<BaseEnhance, bool?> action)
@@ -65,9 +66,12 @@ namespace TouhouPetsEx.Enhance.Core
             if (priority == null)
             {
                 bool? @return = null;
-                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
                 {
-                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (!EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                        continue;
+
+                    bool? a = action(enhancement);
                     if (a != null) @return = a;
                 }
                 return @return;
@@ -75,9 +79,12 @@ namespace TouhouPetsEx.Enhance.Core
             else
             {
                 bool? @return = null;
-                foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+                foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
                 {
-                    bool? a = action(TouhouPetsEx.GEnhanceInstances[id]);
+                    if (!EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                        continue;
+
+                    bool? a = action(enhancement);
                     if (a == priority) return a;
                     else if (a != null) @return = a;
                 }
@@ -92,9 +99,9 @@ namespace TouhouPetsEx.Enhance.Core
             if (priority == null)
             {
                 bool? @return = null;
-                foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+                foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
                 {
-                    bool? a = action(enhance.Value);
+                    bool? a = action(enhance);
                     if (a != null) @return = a;
                 }
                 return @return;
@@ -102,9 +109,9 @@ namespace TouhouPetsEx.Enhance.Core
             else
             {
                 bool? @return = null;
-                foreach (var enhance in TouhouPetsEx.GEnhanceInstances)
+                foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
                 {
-                    bool? a = action(enhance.Value);
+                    bool? a = action(enhance);
                     if (a == priority) return a;
                     else if (a != null) @return = a;
                 }
@@ -127,15 +134,29 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void HoldItem(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !player.EnableEnhance(item.type))
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            if (item.ModItem?.Mod.Name == "TouhouPets"
+                && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
+                && enhance.Passive
+                && !player.EnableEnhance(item.type)
+                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+            {
+                if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                    player.MP().ActivePassiveEnhance.Add(enhanceId);
+            }
 
             ProcessDemonismAction((enhance) => enhance.ItemHoldItem(item, player));
         }
         public override void UpdateInventory(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets" && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance) && enhance.Passive && !player.EnableEnhance(item.type))
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            if (item.ModItem?.Mod.Name == "TouhouPets"
+                && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
+                && enhance.Passive
+                && !player.EnableEnhance(item.type)
+                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+            {
+                if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                    player.MP().ActivePassiveEnhance.Add(enhanceId);
+            }
 
             ProcessDemonismAction((enhance) => enhance.ItemUpdateInventory(item, player));
         }
@@ -173,6 +194,7 @@ namespace TouhouPetsEx.Enhance.Core
             {
                 object enhance = Activator.CreateInstance(types);
                 BaseEnhance thisEnhance = enhance as BaseEnhance;
+                EnhanceRegistry.RegisterEnhancement(thisEnhance);
                 thisEnhance.ItemSSD();
                 EnhanceHookRegistry.Register(thisEnhance);
             }
@@ -221,7 +243,10 @@ namespace TouhouPetsEx.Enhance.Core
             if (def && item.ModItem?.Mod.Name == "TouhouPets" && player.altFunctionUse == 2 && player.HasTouhouPetsBuff()
                 && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enh) && enh.EnableRightClick)
             {
-                if (player.MP().ActiveEnhance.Remove(item.type))
+                if (!EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                    return true;
+
+                if (player.MP().ActiveEnhance.Remove(enhanceId))
                 {
                     CombatText.NewText(player.getRect(), Color.Cyan, GetText("Disable"));
                 }
@@ -230,10 +255,10 @@ namespace TouhouPetsEx.Enhance.Core
                     if (player.MP().ActiveEnhance.Count >= player.MP().ActiveEnhanceCount)
                     {
                         player.MP().ActiveEnhance.RemoveAt(0);
-                        player.MP().ActiveEnhance.Add(item.type);
+                        player.MP().ActiveEnhance.Add(enhanceId);
                     }
                     else
-                        player.MP().ActiveEnhance.Add(item.type);
+                        player.MP().ActiveEnhance.Add(enhanceId);
 
                     CombatText.NewText(player.getRect(), Color.Cyan, GetText("Enable"));
                 }

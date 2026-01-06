@@ -28,9 +28,10 @@ namespace TouhouPetsEx.Enhance.Core
             if (!player.HasTouhouPetsBuff())
                 return;
 
-            foreach (int id in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
+            foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
             {
-                action(TouhouPetsEx.GEnhanceInstances[id]);
+                if (EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
+                    action(enhancement);
             }
         }
         public override void ModifyBuffText(int type, ref string buffName, ref string tip, ref int rare)
@@ -50,25 +51,49 @@ namespace TouhouPetsEx.Enhance.Core
 
             if (BuffLoader.GetBuff(type)?.Mod.Name == "TouhouPets")
             {
-                List<int> allActiveEnhance = [];
+                List<EnhancementId> allActiveEnhance = [];
 
                 if (LocalConfig.Tooltip_1)
-                    allActiveEnhance.AddRange(player.MP().ActiveEnhance.Where(id => TouhouPetsEx.GEnhanceInstances[id].EnableBuffText));
+                {
+                    foreach (EnhancementId id in player.MP().ActiveEnhance)
+                    {
+                        if (EnhanceRegistry.TryGetEnhancement(id, out var enhancement) && enhancement.EnableBuffText)
+                            allActiveEnhance.Add(id);
+                    }
+                }
 
                 if (LocalConfig.Tooltip_2)
-                    allActiveEnhance.AddRange(player.MP().ActivePassiveEnhance.Where(id => TouhouPetsEx.GEnhanceInstances[id].EnableBuffText));
+                {
+                    foreach (EnhancementId id in player.MP().ActivePassiveEnhance)
+                    {
+                        if (EnhanceRegistry.TryGetEnhancement(id, out var enhancement) && enhancement.EnableBuffText)
+                            allActiveEnhance.Add(id);
+                    }
+                }
 
-                HashSet<int> allBanTootips = [];
-                allActiveEnhance.ForEach(id => allBanTootips.UnionWith(TouhouPetsEx.GEnhanceInstances[id].BanTootips));
-                allActiveEnhance.RemoveAll(allBanTootips.Contains);
+                HashSet<EnhancementId> bannedEnhanceIds = [];
+                foreach (EnhancementId id in allActiveEnhance)
+                {
+                    if (!EnhanceRegistry.TryGetEnhancement(id, out var enhancement))
+                        continue;
+
+                    foreach (int itemType in enhancement.BanTootips)
+                    {
+                        if (EnhanceRegistry.TryGetEnhanceId(itemType, out EnhancementId bannedId))
+                            bannedEnhanceIds.Add(bannedId);
+                    }
+                }
+
+                allActiveEnhance.RemoveAll(id => bannedEnhanceIds.Contains(id));
 
                 if (allActiveEnhance.Count != 0)
                     tip += "\n" + GetText("Common");
                 else return;
 
-                foreach (int id in allActiveEnhance)
+                foreach (EnhancementId id in allActiveEnhance)
                 {
-                    var enh = TouhouPetsEx.GEnhanceInstances[id];
+                    if (!EnhanceRegistry.TryGetEnhancement(id, out var enh))
+                        continue;
 
                     tip += "\n" + enh.Text;
 

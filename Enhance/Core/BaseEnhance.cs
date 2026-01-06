@@ -12,44 +12,51 @@ using Terraria.ModLoader;
 
 namespace TouhouPetsEx.Enhance.Core
 {
-    //TODO: ²¿·ÖÊµÑéĞÔÍæ·¨µÄÃèÊöĞ´³ÉÌæ»»Ô­ÃèÊöºÃÁË
+    //TODO: éƒ¨åˆ†å®éªŒæ€§ç©æ³•çš„æè¿°å†™æˆæ›¿æ¢åŸæè¿°å¥½äº†
 	public class BaseEnhance
 	{
         /// <summary>
-        /// ÃèÊö
+        /// å¢å¼ºçš„ç¨³å®šèº«ä»½ï¼ˆä¸ç‰©å“ type è§£è€¦ï¼‰ï¼Œç”¨äºå­˜æ¡£/åŒæ­¥/å»é‡ã€‚
+        /// <br>é»˜è®¤ä½¿ç”¨å…¨é™å®šç±»å‹åï¼›è‹¥æœªæ¥éœ€è¦ä¿æŒé‡å‘½åå…¼å®¹ï¼Œè¯·åœ¨å­ç±»ä¸­è¦†ç›–ä¸ºå¸¸é‡ã€‚</br>
+        /// </summary>
+        public virtual EnhancementId EnhanceId => EnhancementId.FromType(GetType());
+        /// <summary>
+        /// æè¿°
         /// </summary>
         public virtual string Text => "";
         /// <summary>
-        /// ÊµÑéĞÔÍæ·¨ÃèÊö£¬ĞèÈ·±£³¤¶ÈÓë <see cref="Experimental"/> Ò»ÖÂ
-        /// <br>Èç¹ûÄ³Ò»Ë÷ÒıÎª""Ôòµ±¶ÔÓ¦ÊµÑéĞÔÍæ·¨Æô¶¯Ê±²¢²»»áÏÔÊ¾ĞÂÃèÊö</br>
+        /// å®éªŒæ€§ç©æ³•æè¿°ï¼Œéœ€ç¡®ä¿é•¿åº¦ä¸ <see cref="Experimental"/> ä¸€è‡´
+        /// <br>å¦‚æœæŸä¸€ç´¢å¼•ä¸º""åˆ™å½“å¯¹åº”å®éªŒæ€§ç©æ³•å¯åŠ¨æ—¶å¹¶ä¸ä¼šæ˜¾ç¤ºæ–°æè¿°</br>
         /// </summary>
         public virtual string[] ExperimentalText => [];
         /// <summary>
-        /// ÊÇ·ñÆôÓÃBuffÄÜÁ¦ÃèÊö£¬Ä¬ÈÏÆôÓÃ
+        /// æ˜¯å¦å¯ç”¨Buffèƒ½åŠ›æè¿°ï¼Œé»˜è®¤å¯ç”¨
         /// </summary>
         public virtual bool EnableBuffText => true;
         /// <summary>
-        /// ÊÇ·ñÆôÓÃÓÒ¼ü£¬Ä¬ÈÏÆôÓÃ
+        /// æ˜¯å¦å¯ç”¨å³é”®ï¼Œé»˜è®¤å¯ç”¨
         /// </summary>
         public virtual bool EnableRightClick => true;
         /// <summary>
-        /// ÊÇ·ñÎª±»¶¯ÄÜÁ¦£¨Ğ¯´øÔÚ±³°ü»ò³èÎï/ÕÕÃ÷³èÎïÀ¸¼´ÉúĞ§£©£¬Ä¬ÈÏÎª·ñ
+        /// æ˜¯å¦ä¸ºè¢«åŠ¨èƒ½åŠ›ï¼ˆæºå¸¦åœ¨èƒŒåŒ…æˆ–å® ç‰©/ç…§æ˜å® ç‰©æ å³ç”Ÿæ•ˆï¼‰ï¼Œé»˜è®¤ä¸ºå¦
         /// </summary>
         public virtual bool Passive => false;
         /// <summary>
-        /// ÊÇ·ñÆôÓÃÁË¶ÔÓ¦ÄÜÁ¦µÄÊµÑéĞÔÍæ·¨£¬ĞèÈ·±£³¤¶ÈÓë <see cref="ExperimentalText"/> Ò»ÖÂ
+        /// æ˜¯å¦å¯ç”¨äº†å¯¹åº”èƒ½åŠ›çš„å®éªŒæ€§ç©æ³•ï¼Œéœ€ç¡®ä¿é•¿åº¦ä¸ <see cref="ExperimentalText"/> ä¸€è‡´
         /// </summary>
         public virtual bool[] Experimental => [];
         /// <summary>
-        /// ¹Ø±ÕËù¸øÎïÆ·µÄÔöÒæÄÜÁ¦ÃèÊö
+        /// å…³é—­æ‰€ç»™ç‰©å“çš„å¢ç›Šèƒ½åŠ›æè¿°
         /// </summary>
         public HashSet<int> BanTootips = [];
         /// <summary>
-        /// Ìí¼Ó±¾ÔöÇ¿Óë¶ÔÓ¦ÎïÆ·Ö®¼äµÄÁªÏµ
+        /// æ·»åŠ æœ¬å¢å¼ºä¸å¯¹åº”ç‰©å“ä¹‹é—´çš„è”ç³»
         /// </summary>
-        /// <param name="type">¶ÔÓ¦ÎïÆ·µÄtype</param>
+        /// <param name="type">å¯¹åº”ç‰©å“çš„type</param>
         public void AddEnhance(int type)
         {
+            // ç»‘å®šBaseEnhanceå’Œtypeçš„å…³ç³»ï¼ŒåŒå‘æ˜ å°„è¡¨
+            EnhanceRegistry.BindItemType(this, type);
             TouhouPetsEx.GEnhanceInstances[type] = this;
         }
         public void AddBanTootips(HashSet<int> ints)
@@ -182,7 +189,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public virtual void PlayerUpdateLifeRegen(Player player)
         {
-        
+
         }
         public virtual void PlayerGetHealLife(Player player, Item item, bool quickHeal, ref int healValue)
         {
@@ -202,7 +209,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public virtual void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
         {
-            
+
         }
         public virtual bool? NPCPreAI(NPC npc)
         {

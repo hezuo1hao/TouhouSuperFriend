@@ -34,12 +34,24 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override void ItemHoldItem(Item item, Player player)
         {
             if (Config.Satori && item.type == ModContent.ItemType<KoishiTelephone>() && player.EnableEnhance<SatoriSlippers>())
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            {
+                if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                {
+                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                }
+            }
         }
         public override void ItemUpdateInventory(Item item, Player player)
         {
             if (Config.Satori && item.type == ModContent.ItemType<KoishiTelephone>() && player.EnableEnhance<SatoriSlippers>())
-                player.MP().ActivePassiveEnhance.Add(item.type);
+            {
+                if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                {
+                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                }
+            }
         }
         public override void PlayerPostResetEffects(Player player)
         {
@@ -53,7 +65,11 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 if (item.type == ModContent.ItemType<KoishiTelephone>())
                 {
-                    player.MP().ActivePassiveEnhance.Add(item.type);
+                    if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                    {
+                        if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
+                            player.MP().ActivePassiveEnhance.Add(enhanceId);
+                    }
                     break;
                 }
             }
@@ -109,7 +125,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             Effect effect = TouhouPetsEx.TransformShader;
             effect.Parameters["uTime"].SetValue(Main.GlobalTimeWrappedHourly * 0.2f);
             effect.CurrentTechnique.Passes["EnchantedPass"].Apply();
-            Main.instance.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Enchanted", AssetRequestMode.ImmediateLoad).Value; // ¥´»Îµ˜…´∞Â
+            Main.instance.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("TouhouPetsEx/Extra/Enchanted", AssetRequestMode.ImmediateLoad).Value; // ‰º†ÂÖ•Ë∞ÉËâ≤Êùø
 
             sb.End();
             sb.Begin(0, sb.GraphicsDevice.BlendState, sb.GraphicsDevice.SamplerStates[0],

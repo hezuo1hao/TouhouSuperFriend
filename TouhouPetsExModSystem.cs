@@ -18,7 +18,7 @@ namespace TouhouPetsEx
         public static ModKeybind ReisenKeyBind { get; private set; }
         public static ModKeybind KoishiKeyBind { get; private set; }
         public static bool[] SakuyaStoppedNPC { get; private set; }
-        private static List<int> EnhanceCountKeysCache;
+        private static List<EnhancementId> EnhanceCountKeysCache;
 
         public override void Load()
         {
@@ -37,6 +37,7 @@ namespace TouhouPetsEx
             SakuyaStoppedNPC = null;
             EnhanceCountKeysCache = null;
             EnhanceHookRegistry.Clear();
+            EnhanceRegistry.Clear();
         }
         public override void PreUpdateTime()
         {
@@ -67,7 +68,7 @@ namespace TouhouPetsEx
         public override void PreUpdatePlayers()
         {
             if (EnhanceCountKeysCache == null || EnhanceCountKeysCache.Count != EnhanceCount.Count)
-                EnhanceCountKeysCache = new List<int>(EnhanceCount.Keys);
+                EnhanceCountKeysCache = new List<EnhancementId>(EnhanceCount.Keys);
 
             for (int i = 0; i < EnhanceCountKeysCache.Count; i++)
                 EnhanceCount[EnhanceCountKeysCache[i]] = 0;
@@ -80,14 +81,14 @@ namespace TouhouPetsEx
 
                 for (int i = 0; i < mp.ActiveEnhance.Count; i++)
                 {
-                    int type = mp.ActiveEnhance[i];
-                    EnhanceCount[type] = EnhanceCount.TryGetValue(type, out int value) ? value + 1 : 1;
+                    EnhancementId enhanceId = mp.ActiveEnhance[i];
+                    EnhanceCount[enhanceId] = EnhanceCount.TryGetValue(enhanceId, out int value) ? value + 1 : 1;
                 }
 
                 for (int i = 0; i < mp.ActivePassiveEnhance.Count; i++)
                 {
-                    int type = mp.ActivePassiveEnhance[i];
-                    EnhanceCount[type] = EnhanceCount.TryGetValue(type, out int value) ? value + 1 : 1;
+                    EnhancementId enhanceId = mp.ActivePassiveEnhance[i];
+                    EnhanceCount[enhanceId] = EnhanceCount.TryGetValue(enhanceId, out int value) ? value + 1 : 1;
                 }
             }
         }

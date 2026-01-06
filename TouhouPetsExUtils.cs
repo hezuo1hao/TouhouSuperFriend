@@ -20,16 +20,43 @@ namespace TouhouPetsEx
 	{
         public static TouhouPetsExConfigs Config;
         public static TouhouPetsExLocalConfigs LocalConfig;
-        public static Dictionary<int, int> EnhanceCount;
+        public static Dictionary<EnhancementId, int> EnhanceCount;
         public static EnhancePlayers MP(this Player player) => player.TryGetModPlayer<EnhancePlayers>(out var mp) ? mp : null;
         public static EnhanceBuffPlayers MBP(this Player player) => player.TryGetModPlayer<EnhanceBuffPlayers>(out var mbp) ? mbp : null;
         public static bool HasTouhouPetsBuff(this Player player) => player.buffType.Any(type => (Main.vanityPet[type] || Main.lightPet[type]) && BuffLoader.GetBuff(type)?.FullName.StartsWith("TouhouPets/") == true);
-        public static bool HasEnhance<T>(this Player player) where T : ModItem => player.MP()?.ActiveEnhance.Concat(player.MP()?.ActivePassiveEnhance).Contains(ModContent.ItemType<T>()) == true;
-        public static bool HasEnhance(this Player player, int type) => player.MP()?.ActiveEnhance.Concat(player.MP()?.ActivePassiveEnhance).Contains(type) == true;
-        public static bool EnableEnhance<T>(this Player player) where T : ModItem => player.HasEnhance<T>() && player.HasTouhouPetsBuff();
-        public static bool EnableEnhance(this Player player, int type) => player.HasEnhance(type) && player.HasTouhouPetsBuff();
+        public static bool HasEnhance<T>(this Player player) where T : ModItem => player.HasEnhance(ModContent.ItemType<T>());
+        public static bool HasEnhance(this Player player, int itemType)
+        {
+            EnhancePlayers mp = player.MP();
+            if (mp == null)
+                return false;
+
+            if (!EnhanceRegistry.TryGetEnhanceId(itemType, out EnhancementId enhanceId))
+                return false;
+
+            return mp.ActiveEnhance.Contains(enhanceId) || mp.ActivePassiveEnhance.Contains(enhanceId);
+        }
+        public static bool HasEnhanceId(this Player player, EnhancementId enhanceId)
+        {
+            EnhancePlayers mp = player.MP();
+            if (mp == null)
+                return false;
+
+            return mp.ActiveEnhance.Contains(enhanceId) || mp.ActivePassiveEnhance.Contains(enhanceId);
+        }
+        public static bool EnableEnhance<T>(this Player player) where T : ModItem => player.HasTouhouPetsBuff() && player.HasEnhance<T>();
+        public static bool EnableEnhance(this Player player, int itemType) => player.HasTouhouPetsBuff() && player.HasEnhance(itemType);
         public static bool EnableAllYousei(this Player player) => player.EnableEnhance<CirnoIceShard>() && player.EnableEnhance<DaiyouseiBomb>() && player.EnableEnhance<LilyOneUp>() && player.EnableEnhance<HecatiaPlanet>() && (player.EnableEnhance<LightsJewels>() || (player.EnableEnhance<SunnyMilk>() && player.EnableEnhance<LunaMoon>() && player.EnableEnhance<StarSapphire>()));
-        public static bool WorldEnableEnhance<T>() where T : ModItem => EnhanceCount.TryGetValue(ModContent.ItemType<T>(), out int value) && value > 0;
+        public static bool WorldEnableEnhance<T>() where T : ModItem
+        {
+            if (EnhanceCount == null)
+                return false;
+
+            if (!EnhanceRegistry.TryGetEnhanceId(ModContent.ItemType<T>(), out EnhancementId enhanceId))
+                return false;
+
+            return EnhanceCount.TryGetValue(enhanceId, out int value) && value > 0;
+        }
         public static int ReflectionDamage(this Player.HurtInfo info)
         {
             int damage = info.Damage;
@@ -49,18 +76,18 @@ namespace TouhouPetsEx
         public static int GetTooltipsLastIndex(this List<TooltipLine> tooltips)
         {
             return tooltips
-                .Select((t, index) => new { t.Name, Index = index }) // ±£ÁôË÷Òı
-                .Where(x => x.Name.StartsWith("Tooltip") && int.TryParse(x.Name.Substring(7), out _)) // É¸Ñ¡ÓĞĞ§×Ö·û´®
-                .OrderByDescending(x => int.Parse(x.Name.Substring(7))) // °´Êı×Ö½µĞòÅÅĞò
-                .Select(x => x.Index) // È¡Ë÷Òı
-                .FirstOrDefault(); // »ñÈ¡µÚÒ»¸ö½á¹û
+                .Select((t, index) => new { t.Name, Index = index }) // ä¿ç•™ç´¢å¼•
+                .Where(x => x.Name.StartsWith("Tooltip") && int.TryParse(x.Name.Substring(7), out _)) // ç­›é€‰æœ‰æ•ˆå­—ç¬¦ä¸²
+                .OrderByDescending(x => int.Parse(x.Name.Substring(7))) // æŒ‰æ•°å­—é™åºæ’åº
+                .Select(x => x.Index) // å–ç´¢å¼•
+                .FirstOrDefault(); // è·å–ç¬¬ä¸€ä¸ªç»“æœ
         }
         /// <summary>
-        /// ¿ÉÒÔÈÃÎÄ±¾ÓÅÏÈÔÚÆäËüÎÄ±¾Ö®ÉÏ
+        /// å¯ä»¥è®©æ–‡æœ¬ä¼˜å…ˆåœ¨å…¶å®ƒæ–‡æœ¬ä¹‹ä¸Š
         /// </summary>
         public static int NewText(Rectangle location, Color color, int amount, bool dramatic = false, bool dot = false) => NewText(location, color, amount.ToString(), dramatic, dot);
         /// <summary>
-        /// ¿ÉÒÔÈÃÎÄ±¾ÓÅÏÈÔÚÆäËüÎÄ±¾Ö®ÉÏ
+        /// å¯ä»¥è®©æ–‡æœ¬ä¼˜å…ˆåœ¨å…¶å®ƒæ–‡æœ¬ä¹‹ä¸Š
         /// </summary>
         public static int NewText(Rectangle location, Color color, string text, bool dramatic = false, bool dot = false)
         {

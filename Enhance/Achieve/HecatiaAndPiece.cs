@@ -38,16 +38,16 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (magnification == 0)
                 return;
 
-            // ×ÜÌåÉèÖÃ
-            int cycle = 60;  // ×ÜµÄÊ±¼äÎª 60 Ö¡
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            int cycle = 60;  // ï¿½Üµï¿½Ê±ï¿½ï¿½Îª 60 Ö¡
             int damage = 0;
-            int Radius = 225; // ³Ë·½ºó½á¹û£¬ÕâÑùÏÂÃæ¼ÆËã¾àÀëÊ±²»ÓÃ¿ª·½
+            int Radius = 225; // ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½
             int minTileX = (int)(npc.Center.X / 16f - Radius);
             int maxTileX = (int)(npc.Center.X / 16f + Radius);
             int minTileY = (int)(npc.Center.Y / 16f - Radius);
             int maxTileY = (int)(npc.Center.Y / 16f + Radius);
 
-            // È·±£×ø±êÔÚÓÐÐ§·¶Î§ÄÚ
+            // È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½Î§ï¿½ï¿½
             if (minTileX < 0)
             {
                 minTileX = 0;
@@ -65,29 +65,28 @@ namespace TouhouPetsEx.Enhance.Achieve
                 maxTileY = Main.maxTilesY;
             }
 
-            // ¼ÆËãÓ¦¸ÃÔÚÕâÒ»Ö¡Ö´ÐÐµÄÈÎÎñÊýÁ¿
+            // ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ö¡Ö´ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             int tilesPerFrame = ((maxTileX - minTileX + 1) * (maxTileY - minTileY + 1)) / cycle;
             int currentStep = (int)(Main.GameUpdateCount % cycle);
 
-            // Öð²½Ö´ÐÐÑ­»·
+            // ï¿½ï¿½Ö´ï¿½ï¿½Ñ­ï¿½ï¿½
             int startTileIndex = currentStep * tilesPerFrame;
             int endTileIndex = (currentStep + 1) * tilesPerFrame - 1;
 
-            // ±éÀúÖ¸¶¨ÇøÓòµÄËùÓÐ´É×©
+            // ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½×©
             int tileIndex = 0;
             for (int i = minTileX; i <= maxTileX; i++)
             {
-                // ¼ÆËãµ½ NPC µÄ¾àÀë£¨ÆäÒ»£©
-                float diffX = Math.Abs(i - npc.position.X / 16f);
                 for (int j = minTileY; j <= maxTileY; j++)
                 {
                     if (tileIndex >= startTileIndex && tileIndex <= endTileIndex)
                     {
-                        // ¼ÆËãµ½ NPC µÄ¾àÀë£¨Ê£ÏÂµÄ£©
+                        // ï¿½ï¿½ï¿½ãµ½ NPC ï¿½Ä¾ï¿½ï¿½ï¿½
+                        float diffX = Math.Abs(i - npc.position.X / 16f);
                         float diffY = Math.Abs(j - npc.position.Y / 16f);
                         double distanceToTile = diffX * diffX + diffY * diffY;
 
-                        // ÅÐ¶ÏÊÇ·ñÔÚ·¶Î§ÄÚÇÒÊÇ»ð°ÑÀàÐÍµÄ×©¿é
+                        // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½Ú·ï¿½Î§ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½×©ï¿½ï¿½
                         if (distanceToTile < Radius && TileID.Sets.Torch[Framing.GetTileSafely(i, j).TileType])
                         {
                             damage++;
