@@ -25,116 +25,128 @@ using TouhouPetsEx.Projectiles;
 
 namespace TouhouPetsEx.Enhance.Core
 {
+    /// <summary>
+    /// ÔöÇ¿ÏµÍ³µÄÍæ¼Ò²àºËĞÄ×´Ì¬£¨<see cref="ModPlayer"/>£©¡£
+    /// <para>
+    /// ÕâÀïÖ÷ÒªÎ¬»¤¡°Íæ¼ÒÆôÓÃÁËÄÄĞ©ÔöÇ¿¡±£¨Ö÷¶¯/±»¶¯£©£¬²¢ÔÚ Player ¸÷ÉúÃüÖÜÆÚ¹³×ÓÖĞ·Ö·¢ÔöÇ¿Âß¼­¡£
+    /// </para>
+    /// </summary>
     public class EnhancePlayers : ModPlayer
     {
         public bool NewlyMadeDoll;
         public bool ABurntDoll;
+        /// <summary>
+        /// Ö÷¶¯ÆôÓÃµÄÔöÇ¿£¨Í¨³£ÓÉÎïÆ·ÓÒ¼ü¿ª¹ØĞ´Èë£©¡£
+        /// </summary>
         public List<EnhancementId> ActiveEnhance = [];
+        /// <summary>
+        /// ±»¶¯ÆôÓÃµÄÔöÇ¿£¨ÀıÈç±»¶¯ÄÜÁ¦¡¢³èÎïÀ¸/ÕÕÃ÷À¸µÈ×Ô¶¯ÉúĞ§ÄÜÁ¦£©¡£
+        /// </summary>
         public List<EnhancementId> ActivePassiveEnhance = [];
         public int ActiveEnhanceCount = 11037;
         /// <summary>
-        /// èè‰ä¸ç”¨
+        /// ÂÜÀòË¿ÓÃ
         /// </summary>
         public int EatBook = 0;
         /// <summary>
-        /// å¤§å¦–ç²¾ç”¨
+        /// ´óÑı¾«ÓÃ
         /// </summary>
         public int DaiyouseiCD = 0;
         /// <summary>
-        /// å’²å¤œç”¨ï¼Œç”¨äºåœ¨å…³é—­æ—¶å°†è·³å¸§ç±»å‹é‡ç½®å›å»
+        /// †DÒ¹ÓÃ£¬ÓÃÓÚÔÚ¹Ø±ÕÊ±½«ÌøÖ¡ÀàĞÍÖØÖÃ»ØÈ¥
         /// </summary>
         public Terraria.Enums.FrameSkipMode? frameSkipMode = null;
         /// <summary>
-        /// å’²å¤œç”¨
+        /// †DÒ¹ÓÃ
         /// </summary>
         public int SakuyaCD;
         /// <summary>
-        /// è‰è‰ç™½ç”¨
+        /// ÀòÀò°×ÓÃ
         /// </summary>
         public int LilyCD = 0;
         /// <summary>
-        /// å¹½é¦™å››æº¢Buffç”¨ï¼ˆé£è§å¹½é¦™èƒ½åŠ›ç›¸å…³ï¼‰
+        /// ÓÄÏãËÄÒçBuffÓÃ£¨·ç¼ûÓÄÏãÄÜÁ¦Ïà¹Ø£©
         /// </summary>
         public bool FragrantAromaFillsTheAir = false;
         /// <summary>
-        /// é£è§å¹½é¦™ç”¨
+        /// ·ç¼ûÓÄÏãÓÃ
         /// </summary>
         public int FragrantAromaFillsTheAirCD = 0;
         /// <summary>
-        /// é£è§å¹½é¦™-å‘é˜³èŠ±ç”°ç”¨
+        /// ·ç¼ûÓÄÏã-ÏòÑô»¨ÌïÓÃ
         /// </summary>
         public int YukaCD = 0;
         /// <summary>
-        /// è•¾è’‚ç”¨
+        /// ÀÙµÙÓÃ
         /// </summary>
         public int LettyCD = 0;
         /// <summary>
-        /// è‰è‰å¡ç”¨
+        /// ÀòÀò¿¨ÓÃ
         /// </summary>
         public int LyricaCD = 0;
         /// <summary>
-        /// å…«äº‘ç´«ç”¨
+        /// °ËÔÆ×ÏÓÃ
         /// </summary>
         public int YukariCD = 0;
         /// <summary>
-        /// è‰æ ¼éœ²ç”¨
+        /// Àò¸ñÂ¶ÓÃ
         /// </summary>
         public int WriggleCD = 0;
         /// <summary>
-        /// ç±³æ–¯è’‚å¨…ç”¨
+        /// Ã×Ë¹µÙæ«ÓÃ
         /// </summary>
         public int MystiaCD = 0;
         /// <summary>
-        /// ä¸Šç™½æ³½æ…§éŸ³ç”¨ï¼Œç´¢å¼•1è®°å½•çš„æ˜¯ä¸Šä¸€ä¸ªbuffçš„type
+        /// ÉÏ°×Ôó»ÛÒôÓÃ£¬Ë÷Òı1¼ÇÂ¼µÄÊÇÉÏÒ»¸öbuffµÄtype
         /// </summary>
         public int[] KeineCD = [0, -1];
         /// <summary>
-        /// é“ƒä»™ç”¨ï¼Œè®°å½•é—ªé¿
+        /// ÁåÏÉÓÃ£¬¼ÇÂ¼ÉÁ±Ü
         /// </summary>
         public bool ReisenDodge;
         /// <summary>
-        /// è“¬è±å±±è¾‰å¤œç”¨
+        /// ÅîÀ³É½»ÔÒ¹ÓÃ
         /// </summary>
         public int[] OldBuff;
         /// <summary>
-        /// æ²³åŸè·å–ç”¨ï¼Œè®°å½•åŸç‰ˆåˆæˆç«™
+        /// ºÓ³ÇºÉÈ¡ÓÃ£¬¼ÇÂ¼Ô­°æºÏ³ÉÕ¾
         /// </summary>
         public bool[] adjTileVanilla;
         /// <summary>
-        /// æ²³åŸè·å–ç”¨ï¼Œè®°å½•æ¨¡ç»„åˆæˆç«™
+        /// ºÓ³ÇºÉÈ¡ÓÃ£¬¼ÇÂ¼Ä£×éºÏ³ÉÕ¾
         /// </summary>
         public List<string> adjTileMod;
         /// <summary>
-        /// æ²³åŸè·å–ç”¨ï¼Œè®°å½•å…¨éƒ¨åˆæˆç«™
+        /// ºÓ³ÇºÉÈ¡ÓÃ£¬¼ÇÂ¼È«²¿ºÏ³ÉÕ¾
         /// </summary>
         public bool[] adjTile;
         /// <summary>
-        /// æ²³åŸè·å–ç”¨ï¼Œè®°å½•æ°´ã€èœ‚èœœã€å²©æµ†ã€å¾®å…‰ã€ç‚¼è¯æ¡Œ
+        /// ºÓ³ÇºÉÈ¡ÓÃ£¬¼ÇÂ¼Ë®¡¢·äÃÛ¡¢ÑÒ½¬¡¢Î¢¹â¡¢Á¶Ò©×À
         /// </summary>
         public bool[] adjOther;
         /// <summary>
-        /// ä¸œé£è°·æ—©è‹—ç”¨
+        /// ¶«·ç¹ÈÔçÃçÓÃ
         /// </summary>
         public int SanaeCD;
         /// <summary>
-        /// ç«ç„°çŒ«ç‡ç”¨
+        /// »ğÑæÃ¨ŸûÓÃ
         /// </summary>
         public int RinCD;
         /// <summary>
-        /// å¤æ˜åœ°æ‹ç”¨ï¼Œäººæ°”å€¼
+        /// ¹ÅÃ÷µØÁµÓÃ£¬ÈËÆøÖµ
         /// </summary>
         public float Popularity;
         /// <summary>
-        /// å§¬è™«ç™¾ç™¾ä¸–ç”¨
-        /// <para>ç´¢å¼•å†³å®šå¯¹åº”çš„åŠ æˆï¼š0â€”ç§»åŠ¨é€Ÿåº¦ã€1â€”æŒ–çŸ¿é€Ÿåº¦ã€2â€”æœ€å¤§æ°§æ°”å€¼ã€3â€”æœ€å¤§ç”Ÿå‘½å€¼ã€4â€”å²©æµ†å…ç–«æ—¶é—´ã€5â€”ä¼¤å®³å‡å…ã€6â€”æš´å‡»ä¼¤å®³ã€7/8/9â€”è¿æ°”ã€10â€”ç™¾åˆ†æ¯”ç©¿ç”²ã€11â€”é˜²å¾¡æ•ˆåŠ›</para>
+        /// ¼§³æ°Ù°ÙÊÀÓÃ
+        /// <para>Ë÷Òı¾ö¶¨¶ÔÓ¦µÄ¼Ó³É£º0¡ªÒÆ¶¯ËÙ¶È¡¢1¡ªÍÚ¿óËÙ¶È¡¢2¡ª×î´óÑõÆøÖµ¡¢3¡ª×î´óÉúÃüÖµ¡¢4¡ªÑÒ½¬ÃâÒßÊ±¼ä¡¢5¡ªÉËº¦¼õÃâ¡¢6¡ª±©»÷ÉËº¦¡¢7/8/9¡ªÔËÆø¡¢10¡ª°Ù·Ö±È´©¼×¡¢11¡ª·ÀÓùĞ§Á¦</para>
         /// </summary>
         public int[] ExtraAddition = new int[12];
         /// <summary>
-        /// å§¬è™«ç™¾ç™¾ä¸–ç”¨
-        /// <para>ç´¢å¼•å†³å®šå¯¹åº”çš„åŠ æˆä¸Šé™ï¼š0â€”ç§»åŠ¨é€Ÿåº¦ã€1â€”æŒ–çŸ¿é€Ÿåº¦ã€2â€”æœ€å¤§æ°§æ°”å€¼ã€3â€”æœ€å¤§ç”Ÿå‘½å€¼ã€4â€”å²©æµ†å…ç–«æ—¶é—´ã€5â€”ä¼¤å®³å‡å…ã€6â€”æš´å‡»ä¼¤å®³ã€7/8/9â€”è¿æ°”ã€10â€”ç™¾åˆ†æ¯”ç©¿ç”²ã€11â€”é˜²å¾¡æ•ˆåŠ›</para>
+        /// ¼§³æ°Ù°ÙÊÀÓÃ
+        /// <para>Ë÷Òı¾ö¶¨¶ÔÓ¦µÄ¼Ó³ÉÉÏÏŞ£º0¡ªÒÆ¶¯ËÙ¶È¡¢1¡ªÍÚ¿óËÙ¶È¡¢2¡ª×î´óÑõÆøÖµ¡¢3¡ª×î´óÉúÃüÖµ¡¢4¡ªÑÒ½¬ÃâÒßÊ±¼ä¡¢5¡ªÉËº¦¼õÃâ¡¢6¡ª±©»÷ÉËº¦¡¢7/8/9¡ªÔËÆø¡¢10¡ª°Ù·Ö±È´©¼×¡¢11¡ª·ÀÓùĞ§Á¦</para>
         /// </summary>
         public static int[] ExtraAdditionMax = [50, 50, int.MaxValue, 100, int.MaxValue, 50, 200, 10, 4, 1, 150, int.MaxValue];
-        #region ·ÀÖ¹±Õ°üµÄË½ÓĞ×Ö¶ÎÃÇ
+        #region „1¤7„1¤70ö9„1¤70ï6„1¤7„1¤7„1¤70¼3„1¤7„1¤7„1¤70ö6„1¤7„1¤7„1¤7
         float ModifyLuck_luck;
         int GetHealLife_healValue;
         int GetHealMana_healValue;
@@ -157,6 +169,7 @@ namespace TouhouPetsEx.Enhance.Core
             if (!player.HasTouhouPetsBuff())
                 return;
 
+            // Íæ¼Ò²à·Ö·¢£ºÖ»¶Ôµ±Ç°Íæ¼ÒÆôÓÃµÄÔöÇ¿Ö´ĞĞ¡£
             foreach (EnhancementId enhanceId in player.MP().ActiveEnhance.Concat(player.MP().ActivePassiveEnhance))
             {
                 if (EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
@@ -165,6 +178,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
+            // È«¾Ö·Ö·¢£º¶ÔËùÓĞÒÑ×¢²áÔöÇ¿Ö´ĞĞ£¨Óë¾ßÌåÍæ¼ÒÎŞ¹ØµÄ Always ¹³×ÓÊ¹ÓÃ£©¡£
             foreach (BaseEnhance enhance in EnhanceRegistry.AllEnhancements)
             {
                 action(enhance);
@@ -222,6 +236,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void Initialize()
         {
+            // Initialize£ºÈÃÔöÇ¿ÓĞ»ú»á³õÊ¼»¯Íæ¼Ò²à×´Ì¬¡£
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerInitialize(Player));
         }
         public override void ResetEffects()
@@ -249,6 +264,7 @@ namespace TouhouPetsEx.Enhance.Core
                     bigSevenStars.Condition.Complete();
             }
 
+            // Ã¿ tick ÖØ½¨±»¶¯ÆôÓÃÁĞ±í£¬È·±£×´Ì¬Óë±³°ü/³èÎïÀ¸Ò»ÖÂ¡£
             ActivePassiveEnhance = [];
 
             FragrantAromaFillsTheAir = false;
@@ -273,6 +289,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void SaveData(TagCompound tag)
         {
+            // ´æµµ£º°Ñ EnhancementId ĞòÁĞ»¯Îª string ÁĞ±í£¨Value ÊÇÔØÌå£©¡£
             List<string> activeEnhanceIds = [];
             for (int i = 0; i < ActiveEnhance.Count; i++)
                 activeEnhanceIds.Add(ActiveEnhance[i].Value);
@@ -288,6 +305,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void LoadData(TagCompound tag)
         {
+            // ¶Áµµ£ºÓÅÏÈ¶ÁÈ¡ĞÂ×Ö¶Î ActiveEnhanceIds£»Èô²»´æÔÚÔò¼æÈİ¾É×Ö¶Î ActiveEnhanceName¡£
             List<EnhancementId> ids = [];
             if (tag.TryGet<List<string>>("ActiveEnhanceIds", out var loadedIds) && loadedIds != null)
             {
@@ -505,14 +523,15 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void OnEnterWorld()
         {
-            // ÃâÔğÉùÃ÷
+            // „1¤7„1¤7„1¤7„1¤7„1¤7„1¤7„1¤7„1¤7
             if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod mod))
             {
-                Main.NewText($"Õì²âµ½¿ªÆô {mod.DisplayName}£¬Çë×¢ÒâÔÚ´ËÇé¿öÏÂ²úÉúµÄÈÎºÎÎÊÌâ/±¨´í/BUG¾ùÓĞ¿ÉÄÜÊÇÒòÎª¸ÃÄ£×éµ¼ÖÂ£¨ÓÉÓÚ¸ÃÄ£×éÊ¹ÓÃÁË´óÁ¿ÆÆ»µ/²»¼æÈİĞÔ´úÂë£©£¬Çë²»ÒªÔÚ {Mod.DisplayName} ´¦·´À¡", Color.Red);
+                Main.NewText($"„1¤7„1¤78ã9„1¤7„1¤7„1¤7„1¤7 {mod.DisplayName}„1¤7„1¤7„1¤7„1¤70û0„1¤7„1¤7„1¤71’0„1¤7„1¤7„1¤7„1¤7„1¤70…5„1¤7„1¤7„1¤7„1¤7„1¤7„1¤7¦Ê„1¤7„1¤7„1¤7„1¤7„1¤7/„1¤7„1¤7„1¤7„1¤7/BUG„1¤7„1¤7„1¤7§á„1¤7„1¤7„1¤7„1¤7„1¤7„1¤7„1¤70Ë2„1¤7„1¤700„1¤7ùy„1¤70„5„1¤7„1¤7„1¤7„1¤71’4„1¤700„1¤7„1¤70¶0„1¤7„1¤7„1¤70»4„1¤7„1¤7„1¤7„1¤707„1¤7/„1¤7„1¤7„1¤7„1¤7„1¤7„1¤7„1¤70é6„1¤7„1¤7ƒ0 0„1¤7„1¤7„1¤7ƒ1ƒ80Û8„1¤7„1¤7 {Mod.DisplayName} „1¤7„1¤7„1¤7„1¤7„1¤7„1¤7", Color.Red);
             }
 
             if (Player == Main.LocalPlayer && Main.netMode == NetmodeID.MultiplayerClient)
             {
+                // ¿Í»§¶Ë½øÊÀ½çÊ±ÇëÇóÒ»´ÎÍ¬²½£¬±£Ö¤±¾µØ×´Ì¬Óë·şÎñÆ÷Ò»ÖÂ¡£
                 AwardPlayerSync(Mod, -1, Main.myPlayer, true);
             }
         }
@@ -581,7 +600,7 @@ namespace TouhouPetsEx.Enhance.Core
                 packet.Write(player.ExtraAddition[i]);
             packet.Send(toWho, fromWho);
 
-            //Main.NewText("å‘");
+            //Main.NewText("·¢");
         }
         public static void ReceivePlayerSync(BinaryReader reader, int whoAmI, bool award)
         {
@@ -618,7 +637,7 @@ namespace TouhouPetsEx.Enhance.Core
             if (award)
                 AwardPlayerSync(TouhouPetsEx.Instance, whoAmI, Main.myPlayer);
 
-            //Main.NewText("æ”¶");
+            //Main.NewText("ÊÕ");
         }
         public static void YukariTp(Player player, Vector2 newPos)
         {

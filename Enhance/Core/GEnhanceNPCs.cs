@@ -17,6 +17,12 @@ using static TouhouPetsEx.TouhouPetsEx;
 
 namespace TouhouPetsEx.Enhance.Core
 {
+    /// <summary>
+    /// 增强相关的全局 NPC 钩子分发与状态承载（按实体实例化）。
+    /// <para>
+    /// 一部分增强需要在 NPC 上挂载临时状态（例如多种 debuff 标记、超级暴击标记等），这里统一存放。
+    /// </para>
+    /// </summary>
     public class GEnhanceNPCs : GlobalNPC
     {
         /// <summary>
@@ -47,9 +53,13 @@ namespace TouhouPetsEx.Enhance.Core
         /// 熔化debuff，灵乌路空用
         /// </summary>
         public bool Melt;
+        /// <summary>
+        /// 每个 NPC 实例拥有独立的 <see cref="GlobalNPC"/> 数据。
+        /// </summary>
         public override bool InstancePerEntity => true;
         public override void ResetEffects(NPC npc)
         {
+            // 每 tick 重置“瞬时状态”标记，避免跨 tick 残留。
             Earth = false;
             MoonMist = false;
             Depression = false;
@@ -58,10 +68,12 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override bool PreAI(NPC npc)
         {
+            // 成就：同时满足多种 debuff 且带雷蛰 buff。
             if (Earth && MoonMist && Depression && Restless && Melt && npc.HasBuff(ModContent.BuffType<LeiZhe>()) && Main.netMode != NetmodeID.Server)
                 ModContent.GetInstance<SufferingFromVariousIllnesses>().Condition.Complete();
 
             bool? reesult = null;
+            // 只遍历覆写了 NPCPreAI 的增强，减少空调用。
             foreach (BaseEnhance enhance in EnhanceHookRegistry.NPCPreAI)
             {
                 bool? a = enhance.NPCPreAI(npc);
@@ -75,23 +87,27 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void AI(NPC npc)
         {
+            // AI 为 void：不需要聚合返回值，直接分发即可。
             foreach (BaseEnhance enhance in EnhanceHookRegistry.NPCAI)
                 enhance.NPCAI(npc);
         }
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
+            // 小五：混乱目标额外掉血（世界存在该增强才生效）。
             if (npc.HasBuff(BuffID.Confused) && WorldEnableEnhance<SatoriSlippers>())
             {
                 npc.lifeRegen -= 12;
                 if (damage < 5) damage = 5;
             }
 
+            // 熔化：最低 DoT 伤害底线。
             if (Melt && damage < 6)
                 damage = 6;
         }
         public override bool CanHitNPC(NPC npc, NPC target)
         {
             bool? reesult = null;
+            // 只遍历覆写了 NPCCanHitNPC 的增强，并按“false 优先短路”的策略聚合。
             foreach (BaseEnhance enhance in EnhanceHookRegistry.NPCCanHitNPC)
             {
                 bool? a = enhance.NPCCanHitNPC(npc, target);
@@ -105,6 +121,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
+            // 多种 debuff 对伤害/防御的调整集中在这里。
             if (Earth)
                 modifiers.Defense /= 2f;
 
@@ -119,16 +136,19 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void ModifyHitNPC(NPC npc, NPC target, ref NPC.HitModifiers modifiers)
         {
+            // 忧郁：降低输出伤害。
             if (Depression)
                 modifiers.FinalDamage *= 0.9f;
         }
         public override void ModifyHitPlayer(NPC npc, Player target, ref Player.HurtModifiers modifiers)
         {
+            // 忧郁：降低输出伤害（打玩家同样生效）。
             if (Depression)
                 modifiers.FinalDamage *= 0.9f;
         }
         public override bool CheckDead(NPC npc)
         {
+            // 熔化击杀统计（阿空相关成就）。
             if (Melt && Main.LocalPlayer.EnableEnhance<UtsuhoEye>())
             {
                 var meltdown = ModContent.GetInstance<Meltdown>();

@@ -15,7 +15,6 @@ using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.GameContent.Events;
-using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -32,25 +31,20 @@ using static Terraria.Localization.NetworkText;
 
 namespace TouhouPetsEx.Enhance.Core
 {
+    /// <summary>
+    /// ä½¿ç”¨ tML çš„ On/IL/MonoModHooks æ–¹å¼æ³¨å…¥å¢å¼ºé€»è¾‘ï¼ˆ<see cref="ModSystem"/>ï¼‰ã€‚
+    /// <para>
+    /// è¿™ä¸ªç±»ä¸»è¦è´Ÿè´£æŠŠéƒ¨åˆ†â€œæ— æ³•é€šè¿‡å¸¸è§„ Global/ModPlayer é’©å­è¦†ç›–â€çš„è¡Œä¸ºï¼ŒæŒ‚åˆ° Terraria çš„åŸæ–¹æ³•ä¸Šã€‚
+    /// </para>
+    /// </summary>
 	public class EnhanceOn : ModSystem
     {
         /// <summary>
-        /// ÓÃÓÚ»æÖÆÌØ¶¨µ¯Ä»ÌØĞ§
+        /// æ³¨å†Œæ‰€æœ‰ On/IL/MonoModHooks é’©å­ã€‚
         /// </summary>
-        static RenderTarget2D Render;
-        public override void Unload()
-        {
-            Main.RunOnMainThread(() => Render?.Dispose());
-        }
         public override void Load()
         {
-            if (Main.netMode != NetmodeID.Server)
-                Main.RunOnMainThread(() =>
-                {
-                    Render = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
-                    Main.OnResolutionChanged += Main_OnResolutionChanged;
-                });
-            On_FilterManager.EndCapture += On_FilterManager_EndCapture;
+            // ç©å®¶å±æ€§ç›¸å…³ï¼ˆä¼¤å®³/æ”»é€Ÿ/æš´å‡»/ç©¿ç”²ç­‰ï¼‰ã€‚
             On_Player.GetDamage += On_Player_GetDamage;
             On_Player.GetCritChance += On_Player_GetCritChance;
             On_Player.GetAttackSpeed += On_Player_GetAttackSpeed;
@@ -58,11 +52,13 @@ namespace TouhouPetsEx.Enhance.Core
             On_Player.GetArmorPenetration += On_Player_GetArmorPenetration;
             On_Player.VanillaBaseDefenseEffectiveness += On_Player_VanillaBaseDefenseEffectiveness;
             On_Player.GetPickaxeDamage += On_Player_GetPickaxeDamage;
+            // è¿æ°”ç›¸å…³ï¼šå¤šä¸ªæ¥æºä¼šç”¨åˆ°åŒä¸€å¥—åŠ æˆé€»è¾‘ã€‚
             On_Player.RollLuck += LuckUp;
             On_NPC.HitModifiers.GetDamage += ExCrit;
             On_NPC.getGoodAdjustments += On_NPC_getGoodAdjustments;
             On_NPC.StrikeNPC_HitInfo_bool_bool += SuperCrit;
             On_NPC.NPCLoot_DropMoney += LuckUp;
+            // åœ°å›¾ä¸ä¸–ç•Œäº‹ä»¶ã€‚
             Main.OnPostFullscreenMapDraw += TeleportFromMap;
             On_Main.DamageVar_float_int_float += LuckUp;
             On_WorldGen.ShakeTree += On_WorldGen_ShakeTree;
@@ -72,147 +68,42 @@ namespace TouhouPetsEx.Enhance.Core
             On_ShopHelper.LimitAndRoundMultiplier += On_ShopHelper_LimitAndRoundMultiplier;
             On_ShopHelper.ProcessMood += On_ShopHelper_ProcessMood;
             On_Gore.NewGore_IEntitySource_Vector2_Vector2_int_float += On_Gore_NewGore_IEntitySource_Vector2_Vector2_int_float;
+            // IL æ³¨å…¥ï¼šå¯¹åŸç‰ˆ AdjTiles åšæ‰©å±•ï¼ˆæ²³åŸè·å–ç›¸å…³ï¼‰ã€‚
             IL_Player.AdjTiles += IL_Player_AdjTiles;
+            // å¯¹ TouhouPets çš„éƒ¨åˆ†è¡Œä¸ºåšè¡¥ä¸ã€‚
             MonoModHooks.Add(typeof(Koishi).GetMethod("ShouldKillPlayer", BindingFlags.Instance | BindingFlags.NonPublic), On_ShouldKillPlayer);
             MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("MoveToPoint", BindingFlags.Instance | BindingFlags.NonPublic), On_MoveToPoint);
             MonoModHooks.Add(typeof(BasicTouhouPet).GetMethod("ChangeDir", BindingFlags.Instance | BindingFlags.NonPublic), On_ChangeDir);
             MonoModHooks.Add(typeof(Koishi).GetMethod("RegularDialogText", BindingFlags.Instance | BindingFlags.Public), On_RegularDialogText);
             MonoModHooks.Add(typeof(ChatRoomHelper).GetMethod("SetChat_Inner", BindingFlags.Static | BindingFlags.NonPublic), On_SetChat_Inner);
 
-            // ´¸×ÓÇÃ±³¾°Ç½ÓĞÌØÊâ´¦Àí£¬ÒªÓÃOn²ÅÄÜÓ¦ÓÃ¹¤¾ßËÙ¶ÈÌáÉı
+            // é”¤å­æ•²èƒŒæ™¯å¢™æœ‰ç‰¹æ®Šå¤„ç†ï¼Œè¦ç”¨Onæ‰èƒ½åº”ç”¨å·¥å…·é€Ÿåº¦æå‡
             On_Player.ItemCheck_UseMiningTools_TryHittingWall += (orig, player, item, x, y) =>
             {
                 orig.Invoke(player, item, x, y);
 
-                // ¼ì²âÄÇÒ»¶ÑifÅĞ¶Ï³ÉÃ»³É
+                // æ£€æµ‹é‚£ä¸€å †ifåˆ¤æ–­æˆæ²¡æˆ
                 if (player.itemTime == item.useTime / 2 && player.EnableEnhance<FlandrePudding>())
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
         }
-
-        private void On_FilterManager_EndCapture(On_FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
-        {
-            bool perfectMaid = false;
-            bool reisenEffect = false;
-            int perfectMaidType = ModContent.ProjectileType<PerfectMaid>();
-            int reisenEffectType = ModContent.ProjectileType<ReisenEffect>();
-            foreach (Projectile proj in Main.ActiveProjectiles)
-            {
-                if (proj.type == perfectMaidType)
-                    perfectMaid = true;
-
-                if (proj.type == reisenEffectType && proj.ai[1] != 1)
-                    reisenEffect = true;
-            }
-
-            bool draw = perfectMaid || reisenEffect;
-
-            if (!draw)
-            {
-                orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
-                return;
-            }
-
-            var spriteBatch = Main.spriteBatch;
-            var graphicsDevice = Main.instance.GraphicsDevice;
-            var screenTarget = screenTarget1;
-            var screenTargetSwap = screenTarget2;
-
-            if (perfectMaid)
-            {
-                var shader = TouhouPetsEx.GrayishWhiteShader;
-
-                graphicsDevice.SetRenderTarget(screenTargetSwap);
-                graphicsDevice.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
-                spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
-                spriteBatch.End();
-
-                graphicsDevice.SetRenderTarget(Render);
-                graphicsDevice.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-                TouhouPetsEx.RingShader.Parameters["width"].SetValue(0);
-                TouhouPetsEx.RingShader.CurrentTechnique.Passes[0].Apply();
-
-                foreach (Projectile proj in Main.ActiveProjectiles)
-                {
-                    if (proj.type == perfectMaidType)
-                    {
-                        var dPosition = proj.Center - Main.screenPosition;
-
-                        spriteBatch.Draw(TextureAssets.MagicPixel.Value, dPosition, null, Color.White * ((255 - proj.alpha) / 255f), 0, TextureAssets.MagicPixel.Size() / 2f, new Vector2(proj.width, proj.width * 0.001f), SpriteEffects.None, 0);
-                    }
-                }
-
-                spriteBatch.End();
-                graphicsDevice.SetRenderTarget(screenTarget);
-                graphicsDevice.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
-                Main.instance.GraphicsDevice.Textures[1] = Render;
-                shader.CurrentTechnique.Passes[0].Apply();
-                spriteBatch.Draw(screenTargetSwap, Vector2.Zero, Color.White);
-                spriteBatch.End();
-            }
-
-            if (reisenEffect)
-            {
-                var shader = TouhouPetsEx.DistortShader;
-                var tex = TextureAssets.Projectile[reisenEffectType].Value;
-
-                graphicsDevice.SetRenderTarget(screenTargetSwap);
-                graphicsDevice.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
-                spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
-                spriteBatch.End();
-
-                graphicsDevice.SetRenderTarget(Render);
-                graphicsDevice.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-
-                foreach (Projectile proj in Main.ActiveProjectiles)
-                {
-                    if (proj.type == reisenEffectType)
-                    {
-                        var dPosition = proj.Center - Main.screenPosition;
-
-                        spriteBatch.Draw(tex, dPosition, null, Color.White * ((255 - proj.alpha) / 255f), 0, tex.Size() / 2f, proj.ai[0] * proj.ai[0] / 300f, SpriteEffects.None, 0);
-                    }
-                }
-
-                spriteBatch.End();
-                graphicsDevice.SetRenderTarget(screenTarget);
-                graphicsDevice.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
-                shader.Parameters["tex0"].SetValue(Render);
-                shader.Parameters["mult"].SetValue(0.02f);
-                shader.CurrentTechnique.Passes[0].Apply();
-                spriteBatch.Draw(screenTargetSwap, Vector2.Zero, Color.White);
-
-                spriteBatch.End();
-            }
-
-            orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
-        }
-
-        private void Main_OnResolutionChanged(Vector2 obj)
-        {
-            Render?.Dispose();
-            Render = new(Main.graphics.GraphicsDevice, (int)obj.X, (int)obj.Y);
-        }
-
         static bool delicacy;
         private delegate void SetChat_InnerDelegate(Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely);
+        /// <summary>
+        /// èŠå¤©å®¤æ–‡æœ¬è®¾ç½®é’©å­ï¼šç”¨äºå¯¹ç‰¹å®šå°è¯è§¦å‘é¢å¤–éŸ³æ•ˆ/æˆ˜æ–—æ–‡å­—ï¼ˆæ‹/é­”ç†æ²™ç­‰å½©è›‹ï¼‰ã€‚
+        /// </summary>
         private static void On_SetChat_Inner(SetChat_InnerDelegate orig, Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely)
         {
+            // å…ˆæ‰§è¡ŒåŸé€»è¾‘ï¼Œç¡®ä¿èŠå¤©æ–‡æœ¬å…ˆè¢«å†™å…¥ã€‚
             orig(projectile, config, lag, text, forcely);
 
-            //Èô±»ÉèÖÃ¶ÔÏó²¢·Ç¶«·½³èÎï£¬Ôò²»ÔÙÖ´ĞĞºóĞø
+            //è‹¥è¢«è®¾ç½®å¯¹è±¡å¹¶éä¸œæ–¹å® ç‰©ï¼Œåˆ™ä¸å†æ‰§è¡Œåç»­
             if (!projectile.IsATouhouPet())
                 return;
 
             BasicTouhouPet pet = projectile.AsTouhouPet();
 
-            //Èô³èÎï·ÇÍæ¼Ò±¾ÈËÕÙ»½£¬Ôò²»ÔÙÖ´ĞĞºóĞø
+            //è‹¥å® ç‰©éç©å®¶æœ¬äººå¬å”¤ï¼Œåˆ™ä¸å†æ‰§è¡Œåç»­
             if (projectile.owner != Main.myPlayer)
                 return;
 
@@ -248,12 +139,12 @@ namespace TouhouPetsEx.Enhance.Core
         {
             var rand = orig(self);
 
-            // Ğ¡Îå
+            // å°äº”
             if (ModCallSystem.HasPets(ModContent.ProjectileType<Satori>()))
             {
                 double weight = 0.333;
 
-                // Ã»ÓĞÄ§ÀíÉ³
+                // æ²¡æœ‰é­”ç†æ²™
                 if (!LocalConfig.MarisaKoishi || ModCallSystem.NotHasPets(ModContent.ProjectileType<Marisa>()))
                 {
                     weight = 0.25;
@@ -264,10 +155,10 @@ namespace TouhouPetsEx.Enhance.Core
                 rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_20"), weight);
                 rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_49"), weight);
 
-                // µØÁéµîÒ»¼Ò
+                // åœ°çµæ®¿ä¸€å®¶
                 if (ModCallSystem.HasPets(ModContent.ProjectileType<Utsuho>(), ModContent.ProjectileType<Rin>()))
                 {
-                    // Ö»ÓĞµØÁéµîÒ»¼Ò
+                    // åªæœ‰åœ°çµæ®¿ä¸€å®¶
                     if (ModCallSystem.NotHasPets(ModContent.ProjectileType<Marisa>(), ModContent.ProjectileType<Kokoro>()))
                     {
                         weight = 0.5;
@@ -277,10 +168,10 @@ namespace TouhouPetsEx.Enhance.Core
                 }
             }
 
-            // Ã»ÓĞĞ¡Îå
+            // æ²¡æœ‰å°äº”
             if (ModCallSystem.NotHasPets(ModContent.ProjectileType<Satori>()))
             {
-                // ÇØĞÄ
+                // ç§¦å¿ƒ
                 if (ModCallSystem.HasPets(ModContent.ProjectileType<Kokoro>()))
                 {
                     double weight = 0.5;
@@ -293,7 +184,7 @@ namespace TouhouPetsEx.Enhance.Core
                     rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_39"), weight);
                 }
 
-                // Ä§ÀíÉ³
+                // é­”ç†æ²™
                 if (LocalConfig.MarisaKoishi && ModCallSystem.HasPets(ModContent.ProjectileType<Marisa>()))
                 {
                     double weight = 0.333;
@@ -302,7 +193,7 @@ namespace TouhouPetsEx.Enhance.Core
                     rand.Add(Language.GetText("Mods.TouhouPetsEx.TouhouPets.Koishi_44"), weight);
                 }
 
-                // °¢¿Õ
+                // é˜¿ç©º
                 if (ModCallSystem.HasPets(ModContent.ProjectileType<Utsuho>()))
                 {
                     double weight = 0.5;
@@ -434,32 +325,32 @@ namespace TouhouPetsEx.Enhance.Core
         {
             var c = new ILCursor(il);
 
-            // ²éÕÒ¾ßÌåµÄÄ£Ê½£ºif (!Main.playerInventory) return;
-            // ¶ÔÓ¦µÄ IL ¿ÉÄÜÊÇ£º
+            // æŸ¥æ‰¾å…·ä½“çš„æ¨¡å¼ï¼šif (!Main.playerInventory) return;
+            // å¯¹åº”çš„ IL å¯èƒ½æ˜¯ï¼š
             // IL_XXXX: ldsfld     bool Terraria.Main::playerInventory
-            // IL_XXXX: brtrue.s   IL_XXXX  // Èç¹ûÎª true£¬Ìø×ªµ½ if ¿éÖ®ºó
-            // IL_XXXX: ret                  // return Óï¾ä
+            // IL_XXXX: brtrue.s   IL_XXXX  // å¦‚æœä¸º trueï¼Œè·³è½¬åˆ° if å—ä¹‹å
+            // IL_XXXX: ret                  // return è¯­å¥
 
-            // ²éÕÒ ldsfld + brtrue + ret µÄÄ£Ê½
+            // æŸ¥æ‰¾ ldsfld + brtrue + ret çš„æ¨¡å¼
             if (!c.TryGotoNext(MoveType.Before,
                 i => i.MatchLdsfld(typeof(Main), "playerInventory"),
-                i => i.MatchBrtrue(out _),      // Æ¥Åä brtrue »ò brtrue.s
-                i => i.MatchRet()))             // Æ¥Åä ret
+                i => i.MatchBrtrue(out _),      // åŒ¹é… brtrue æˆ– brtrue.s
+                i => i.MatchRet()))             // åŒ¹é… ret
             {
-                // ³¢ÊÔÆäËû¿ÉÄÜµÄÄ£Ê½
+                // å°è¯•å…¶ä»–å¯èƒ½çš„æ¨¡å¼
                 c.Index = 0;
                 if (!c.TryGotoNext(MoveType.Before,
                     i => i.MatchLdsfld<Main>("playerInventory")))
                 {
-                    throw new Exception("ÎŞ·¨¶¨Î»µ½ if (!Main.playerInventory) return; Óï¾ä");
+                    throw new Exception("æ— æ³•å®šä½åˆ° if (!Main.playerInventory) return; è¯­å¥");
                 }
             }
 
-            // ÏÖÔÚ c Ö¸Ïò ldsfld Main.playerInventory
-            // ÎÒÃÇÒªÔÚÕâ¸öÓï¾äÖ®Ç°²åÈë´úÂë
+            // ç°åœ¨ c æŒ‡å‘ ldsfld Main.playerInventory
+            // æˆ‘ä»¬è¦åœ¨è¿™ä¸ªè¯­å¥ä¹‹å‰æ’å…¥ä»£ç 
 
-            // ²åÈëÎÒÃÇµÄ×Ô¶¨ÒåÂß¼­
-            c.Emit(OpCodes.Ldarg_0);  // ¼ÓÔØ this (Player)
+            // æ’å…¥æˆ‘ä»¬çš„è‡ªå®šä¹‰é€»è¾‘
+            c.Emit(OpCodes.Ldarg_0);  // åŠ è½½ this (Player)
             c.EmitDelegate<Action<Player>>(player =>
             {
                 if (player.EnableEnhance<NitoriCucumber>())
@@ -497,7 +388,7 @@ namespace TouhouPetsEx.Enhance.Core
                     if (player.alchemyTable)
                         mp.adjOther[4] = true;
 
-                    // ³É¾ÍµÄ´¥·¢
+                    // æˆå°±çš„è§¦å‘
                     int count = mp.adjTile.Concat(mp.adjOther).Where(a => a).Count();
                     var improveGame = ModContent.GetInstance<ImproveGame>();
 
@@ -527,7 +418,7 @@ namespace TouhouPetsEx.Enhance.Core
 
             for (int l = 0; ;l++)
             {
-                // ÔÚorigÇ°»ñÈ¡Ê÷ÊÇ·ñ±»Ò¡¹ı£¬ÒòÎªorig»áĞŞ¸ÄWorldGen.treeShakeX,YµÄÖµ£¬±ê¼ÇÎª±»Ò¡¹ı
+                // åœ¨origå‰è·å–æ ‘æ˜¯å¦è¢«æ‘‡è¿‡ï¼Œå› ä¸ºorigä¼šä¿®æ”¹WorldGen.treeShakeX,Yçš„å€¼ï¼Œæ ‡è®°ä¸ºè¢«æ‘‡è¿‡
                 bool treeShaken = false;
 
                 WorldGen.GetTreeBottom(i, j, out var x, out var y);
@@ -635,7 +526,7 @@ namespace TouhouPetsEx.Enhance.Core
                     text.rotation *= 2;
                     hit.HideCombatText = true;
                 }
-                gnpc.SuperCrit = false;
+                self.GetGlobalNPC<GEnhanceNPCs>().SuperCrit = false;
             }
 
             return orig(self, hit, fromNet, noPlayerInteraction);

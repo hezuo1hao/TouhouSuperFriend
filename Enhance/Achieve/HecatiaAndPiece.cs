@@ -33,21 +33,27 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (Main.netMode == NetmodeID.MultiplayerClient || npc.dontTakeDamage || npc.friendly || NPCID.Sets.CountsAsCritter[npc.type])
                 return;
 
-            EnhanceCount.TryGetValue(ModContent.ItemType<HecatiaPlanet>(), out int magnification);
+            if (EnhanceCount == null)
+                return;
+
+            if (!EnhanceRegistry.TryGetEnhanceId(ModContent.ItemType<HecatiaPlanet>(), out EnhancementId enhanceId))
+                return;
+
+            EnhanceCount.TryGetValue(enhanceId, out int magnification);
 
             if (magnification == 0)
                 return;
 
-            // ��������
-            int cycle = 60;  // �ܵ�ʱ��Ϊ 60 ֡
+            // 火把伤害：分摊扫描，避免每帧全量遍历
+            int cycle = 60;  // 总周期：60 帧
             int damage = 0;
-            int Radius = 225; // �˷���������������������ʱ���ÿ���
+            int Radius = 225; // 扫描半径（单位：tile）
             int minTileX = (int)(npc.Center.X / 16f - Radius);
             int maxTileX = (int)(npc.Center.X / 16f + Radius);
             int minTileY = (int)(npc.Center.Y / 16f - Radius);
             int maxTileY = (int)(npc.Center.Y / 16f + Radius);
 
-            // ȷ����������Ч��Χ��
+            // 确保范围在世界边界内
             if (minTileX < 0)
             {
                 minTileX = 0;
@@ -65,15 +71,15 @@ namespace TouhouPetsEx.Enhance.Achieve
                 maxTileY = Main.maxTilesY;
             }
 
-            // ����Ӧ������һִ֡�е���������
+            // 将扫描分摊到每一帧
             int tilesPerFrame = ((maxTileX - minTileX + 1) * (maxTileY - minTileY + 1)) / cycle;
             int currentStep = (int)(Main.GameUpdateCount % cycle);
 
-            // ��ִ��ѭ��
+            // 本帧扫描的索引区间
             int startTileIndex = currentStep * tilesPerFrame;
             int endTileIndex = (currentStep + 1) * tilesPerFrame - 1;
 
-            // ����ָ����������д�ש
+            // 遍历指定范围内的 tile（仅处理本帧分配到的部分）
             int tileIndex = 0;
             for (int i = minTileX; i <= maxTileX; i++)
             {
@@ -81,12 +87,12 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     if (tileIndex >= startTileIndex && tileIndex <= endTileIndex)
                     {
-                        // ���㵽 NPC �ľ���
+                        // 计算 tile 到 NPC 的距离平方（以 tile 为单位）
                         float diffX = Math.Abs(i - npc.position.X / 16f);
                         float diffY = Math.Abs(j - npc.position.Y / 16f);
                         double distanceToTile = diffX * diffX + diffY * diffY;
 
-                        // �ж��Ƿ��ڷ�Χ�����ǻ�����͵�ש��
+                        // 范围内且为火把 tile 则计数
                         if (distanceToTile < Radius && TileID.Sets.Torch[Framing.GetTileSafely(i, j).TileType])
                         {
                             damage++;

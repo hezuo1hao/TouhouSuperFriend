@@ -13,6 +13,15 @@ using Terraria.ModLoader;
 namespace TouhouPetsEx.Enhance.Core
 {
     //TODO: 部分实验性玩法的描述写成替换原描述好了
+    /// <summary>
+    /// 增强的基类（能力模块）。
+    /// <para>
+    /// 这个类型提供大量可选的 tML 钩子入口，子类按需覆写；默认实现大多为 no-op（不做任何事）。
+    /// </para>
+    /// <para>
+    /// 注意：增强“身份”使用 <see cref="EnhancementId"/>（与 <c>item.type</c> 解耦），映射由 <see cref="EnhanceRegistry"/> 维护。
+    /// </para>
+    /// </summary>
 	public class BaseEnhance
 	{
         /// <summary>
@@ -59,8 +68,13 @@ namespace TouhouPetsEx.Enhance.Core
             EnhanceRegistry.BindItemType(this, type);
             TouhouPetsEx.GEnhanceInstances[type] = this;
         }
+        /// <summary>
+        /// 设置“需要屏蔽提示文本”的物品 type 集合（用于 Buff tooltip 合并时排除部分增强/物品）。
+        /// </summary>
+        /// <param name="ints">物品 type 集合。</param>
         public void AddBanTootips(HashSet<int> ints)
         {
+            // 直接替换集合引用，调用方应传入最终集合（避免频繁增删造成分配）。
             BanTootips = ints;
         }
         public virtual void ItemSSD()

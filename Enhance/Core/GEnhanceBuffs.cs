@@ -15,14 +15,15 @@ using Terraria.ModLoader;
 
 namespace TouhouPetsEx.Enhance.Core
 {
+	/// <summary>
+	/// 增强相关的全局 Buff 钩子分发。
+	/// <para>
+	/// 主要用于：修改 Buff 文本、在 Buff Update 阶段分发增强逻辑、以及绘制额外提示信息。
+	/// </para>
+	/// </summary>
 	public class GEnhanceBuffs : GlobalBuff
     {
         private static bool alreadyDrawn;
-        #region ��ֹ�հ���˽���ֶ���
-        string ModifyBuffText_buffName;
-        string ModifyBuffText_tip;
-        int ModifyBuffText_rare;
-        #endregion
         private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
         {
             if (!player.HasTouhouPetsBuff())
@@ -38,19 +39,21 @@ namespace TouhouPetsEx.Enhance.Core
         {
             Player player = Main.LocalPlayer;
 
-            ModifyBuffText_buffName = buffName;
-            ModifyBuffText_tip = tip;
-            ModifyBuffText_rare = rare;
-            ProcessDemonismAction(player, (enhance) => enhance.ModifyBuffText(player, type, ref ModifyBuffText_buffName, ref ModifyBuffText_tip, ref ModifyBuffText_rare));
-            buffName = ModifyBuffText_buffName;
-            tip = ModifyBuffText_tip;
-            rare = ModifyBuffText_rare;
+            // 允许增强修改 Buff 名称/描述/稀有度：通过局部变量承接 ref 参数，避免闭包限制。
+            string buffName2 = buffName;
+            string tip2 = tip;
+            int rare2 = rare;
+            ProcessDemonismAction(player, (enhance) => enhance.ModifyBuffText(player, type, ref buffName2, ref tip2, ref rare2));
+            buffName = buffName2;
+            tip = tip2;
+            rare = rare2;
 
             if (!LocalConfig.Tooltip_1 && !LocalConfig.Tooltip_2)
                 return;
 
             if (BuffLoader.GetBuff(type)?.Mod.Name == "TouhouPets")
             {
+                // 汇总当前玩家启用的增强（主动/被动），并拼接到 Buff 描述末尾。
                 List<EnhancementId> allActiveEnhance = [];
 
                 if (LocalConfig.Tooltip_1)
@@ -95,6 +98,7 @@ namespace TouhouPetsEx.Enhance.Core
                     if (!EnhanceRegistry.TryGetEnhancement(id, out var enh))
                         continue;
 
+                    // 每个增强的基础描述。
                     tip += "\n" + enh.Text;
 
                     for (int i = 0; i < enh.Experimental.Length; i++)
@@ -111,15 +115,18 @@ namespace TouhouPetsEx.Enhance.Core
         {
             if (!alreadyDrawn && LocalConfig.Tooltip_3 && BuffLoader.GetBuff(type)?.Mod.Name == "TouhouPets")
             {
+                // 只绘制一次“当前已启用增强数量/上限”，避免多 Buff 重复绘制。
                 alreadyDrawn = true;
                 Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, Main.LocalPlayer.MP().ActiveEnhance.Count + " / " + Main.LocalPlayer.MP().ActiveEnhanceCount, drawParams.Position.X, drawParams.Position.Y + 32, Color.AliceBlue, Color.Black, Vector2.Zero, 0.8f);
             }
         }
         public override void Update(int type, Player player, ref int buffIndex)
         {
+            // 每帧重置绘制标志，让 PostDraw 在下一帧能继续工作。
             alreadyDrawn = false;
 
             int buffIndex2 = buffIndex;
+            // 让增强有机会在 Buff Update 阶段影响 buffIndex（例如移除/替换）。
             ProcessDemonismAction(player, (enhance) => enhance.BuffUpdate(type, player, ref buffIndex2));
             buffIndex = buffIndex2;
         }
