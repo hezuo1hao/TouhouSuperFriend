@@ -87,7 +87,23 @@ namespace TouhouPetsEx.Enhance.Core
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
         }
+        public override void PostSetupContent()
+        {
+            // 怎么还有跳脸的，我真没辙了
+            if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod m))
+            {
+                MonoModHooks.Add(m.Code.GetTypes().First(t => t.Name == "Disclaimer").GetMethod("OnEnterWorld", BindingFlags.Instance | BindingFlags.Public), On_OnEnterWorld);
+            }
+        }
         static bool delicacy;
+        private delegate void OnEnterWorldDelegate(object mp);
+        private void On_OnEnterWorld(OnEnterWorldDelegate orig, object mp)
+        {
+            string a = ModLoader.GetMod("TouhouPetsExOptimization").DisplayName;
+            Main.NewText($"侦测到开启 {a}，请注意在此情况下产生的任何问题/报错/BUG均有可能是因为该模组导致（由于该模组使用了大量破坏/不兼容性代码），请不要在 {Mod.DisplayName} 处反馈\n" +
+                $"注：由于 {Mod.DisplayName} 的底层代码变动与底层优化，实质上 {a} 所提供的优化已失效，但由于对面刻意编写了恶意代码——旧版模拟，所以可能在同时加载两个模组时游戏体验被劣化\n" +
+                $"注：由于 {a} 使用了头痛砍头的优化方案与编写的恶意代码共同影响下，本模组的不少功能会受到其影响无法使用", Color.Red);
+        }
         private delegate void SetChat_InnerDelegate(Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely);
         /// <summary>
         /// 聊天室文本设置钩子：用于对特定台词触发额外音效/战斗文字（恋/魔理沙等彩蛋）。

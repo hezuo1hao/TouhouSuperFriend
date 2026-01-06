@@ -523,12 +523,6 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void OnEnterWorld()
         {
-            // 免责声明
-            if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod mod))
-            {
-                Main.NewText($"侦测到开启 {mod.DisplayName}，请注意在此情况下产生的任何问题/报错/BUG均有可能是因为该模组导致（由于该模组使用了大量破坏/不兼容性代码），请不要在 {Mod.DisplayName} 处反馈", Color.Red);
-            }
-
             if (Player == Main.LocalPlayer && Main.netMode == NetmodeID.MultiplayerClient)
             {
                 // 客户端进世界时请求一次同步，保证本地状态与服务器一致。
