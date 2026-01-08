@@ -89,6 +89,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public int YukariCD = 0;
         /// <summary>
+        /// 灵梦-梦想天生用
+        /// </summary>
+        public bool ReimuCD = false;
+        /// <summary>
         /// 莉格露用
         /// </summary>
         public int WriggleCD = 0;
@@ -146,7 +150,7 @@ namespace TouhouPetsEx.Enhance.Core
         /// <para>索引决定对应的加成上限：0—移动速度、1—挖矿速度、2—最大氧气值、3—最大生命值、4—岩浆免疫时间、5—伤害减免、6—暴击伤害、7/8/9—运气、10—百分比穿甲、11—防御效力</para>
         /// </summary>
         public static int[] ExtraAdditionMax = [50, 50, int.MaxValue, 100, int.MaxValue, 50, 200, 10, 4, 1, 150, int.MaxValue];
-        #region ????????????????????????????????
+        #region 防止闭包的私有字段们
         float ModifyLuck_luck;
         int GetHealLife_healValue;
         int GetHealMana_healValue;
