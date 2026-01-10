@@ -39,6 +39,9 @@ namespace TouhouPetsEx
         public bool Yukari;
 
         [DefaultValue(false)]
+        public bool Reimu;
+
+        [DefaultValue(false)]
         public bool Marisa;
 
         [DefaultValue(false)]

@@ -55,6 +55,7 @@ Reimu:
 	飞行时间翻倍
 	当你成功证明自身的强大时，天空将无极限
 	'''
+Reimu_1: 「梦想天生」
 Marisa: 给予魔法就是火力程度的增强
 Marisa_0: "[c/3BDA55:东方小祖宗：][c/FFF014:抑制无意识的活动]"
 Marisa_1: 魔力充盈 【极】
@@ -276,6 +277,15 @@ Configs: {
 				'''
 				无兼容性问题
 				在世界上存在Boss时可传送
+				'''
+		}
+
+		Reimu: {
+			Label: 灵梦-梦想天生
+			Tooltip:
+				'''
+				无兼容性问题
+				每日限一次，在空中一分钟后开启半分钟的无敌
 				'''
 		}
 
@@ -620,6 +630,7 @@ Projectiles: {
 	PlayerHead.DisplayName: 玩家的头
 	PerfectMaid.DisplayName: 真是完完又美美
 	FlyingKnife.DisplayName: 飞刀
+	DreamsAreBorn.DisplayName: 梦想天生
 }
 
 Buffs: {
