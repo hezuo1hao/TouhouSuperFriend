@@ -9,9 +9,14 @@ namespace TouhouPetsEx
         public override void OnLoaded() => Config = this;
         public override ConfigScope Mode => ConfigScope.ServerSide;
 
+        [Header("Vanilla")]
         [DefaultValue(true)]
         public bool PetInv;
 
+        [DefaultValue(true)]
+        public bool Piece_V;
+
+        [Header("Experimental")]
         [DefaultValue(false)]
         public bool AliceOld;
 
@@ -19,13 +24,16 @@ namespace TouhouPetsEx
         public bool Rumia;
 
         [DefaultValue(false)]
+        public bool Cirno;
+
+        [DefaultValue(false)]
+        public bool Meirin;
+
+        [DefaultValue(false)]
         public bool Sakuya;
 
         [DefaultValue(false)]
         public bool Lily;
-
-        [DefaultValue(false)]
-        public bool Cirno;
 
         [DefaultValue(false)]
         public bool Letty;
@@ -53,7 +61,13 @@ namespace TouhouPetsEx
         public bool Eirin;
 
         [DefaultValue(false)]
+        public bool Aya;
+
+        [DefaultValue(false)]
         public bool Yuka;
+
+        [DefaultValue(false)]
+        public bool Yuka_2;
 
         [DefaultValue(false)]
         public bool Sanae;
@@ -96,6 +110,9 @@ namespace TouhouPetsEx
 
         [DefaultValue(false)]
         public bool Hecatia;
+
+        [DefaultValue(false)]
+        public bool Piece;
     }
     public class TouhouPetsExLocalConfigs : ModConfig
     {
@@ -127,6 +144,10 @@ namespace TouhouPetsEx
         [DrawTicks]
         public YuyukoEffect Yuyuko;
 
+        [DefaultValue(YukaEffect.All)]
+        [DrawTicks]
+        public YukaEffect Yuka;
+
         [DefaultValue(true)]
         public bool Raiko;
     }
@@ -135,6 +156,13 @@ namespace TouhouPetsEx
         Disabled,
         Butterfly,
         Die,
+        All
+    }
+    public enum YukaEffect
+    {
+        Disabled,
+        NoSound,
+        NoVisual,
         All
     }
 }

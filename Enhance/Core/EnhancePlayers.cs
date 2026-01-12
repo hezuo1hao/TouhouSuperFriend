@@ -53,6 +53,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public int DaiyouseiCD = 0;
         /// <summary>
+        /// 红美铃用，用于检测是否在落地时造成地震
+        /// </summary>
+        public bool Earthquake = false;
+        /// <summary>
         /// 咲夜用，用于在关闭时将跳帧类型重置回去
         /// </summary>
         public Terraria.Enums.FrameSkipMode? frameSkipMode = null;
@@ -69,13 +73,13 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public bool FragrantAromaFillsTheAir = false;
         /// <summary>
-        /// 风见幽香用
-        /// </summary>
-        public int FragrantAromaFillsTheAirCD = 0;
-        /// <summary>
         /// 风见幽香-向阳花田用
         /// </summary>
         public int YukaCD = 0;
+        /// <summary>
+        /// 风见幽香-大南方丛林植物用
+        /// </summary>
+        public int SporeEruptionCD = 0;
         /// <summary>
         /// 蕾蒂用
         /// </summary>
@@ -407,6 +411,10 @@ namespace TouhouPetsEx.Enhance.Core
         public override void PostUpdateEquips()
         {
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostUpdateEquips(Player));
+        }
+        public override void PostUpdateRunSpeeds()
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostUpdateRunSpeeds(Player));
         }
         public override void PostUpdate()
         {

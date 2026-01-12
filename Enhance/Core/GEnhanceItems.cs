@@ -24,6 +24,12 @@ namespace TouhouPetsEx.Enhance.Core
 	/// </summary>
 	public class GEnhanceItems : GlobalItem
     {
+        #region 防止闭包的私有字段们
+        int GrabRange_grabRange;
+        float HorizontalWingSpeeds_speed;
+        float HorizontalWingSpeeds_acceleration;
+
+        #endregion
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
             // 全局分发：对所有已注册增强执行一次（用于与具体物品无关的全局事件）。
@@ -129,20 +135,21 @@ namespace TouhouPetsEx.Enhance.Core
                 return @return;
             }
         }
+        public override bool InstancePerEntity => true;
         public override void SetDefaults(Item entity)
         {
             // SetDefaults：对“该物品绑定的增强”分发一次。
             ProcessDemonismAction(entity, (enhance) => enhance.ItemSD(entity));
         }
+
         public override void GrabRange(Item item, Player player, ref int grabRange)
         {
             if (player.MBP().Throw)
                 grabRange += 1600;
 
-            int grabRange2 = grabRange;
-            // grabRange 是 ref 参数：用局部变量承接，允许多增强叠加修改。
-            ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref grabRange2));
-            grabRange = grabRange2;
+            GrabRange_grabRange = grabRange;
+            ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref GrabRange_grabRange));
+            grabRange = GrabRange_grabRange;
         }
         public override void HoldItem(Item item, Player player)
         {
@@ -289,6 +296,14 @@ namespace TouhouPetsEx.Enhance.Core
             }
 
             return true;
+        }
+        public override void HorizontalWingSpeeds(Item item, Player player, ref float speed, ref float acceleration)
+        {
+            HorizontalWingSpeeds_speed = speed;
+            HorizontalWingSpeeds_acceleration = acceleration;
+            ProcessDemonismAction(player, (enhance) => enhance.ItemHorizontalWingSpeeds(item, player, ref HorizontalWingSpeeds_speed, ref HorizontalWingSpeeds_acceleration));
+            speed = HorizontalWingSpeeds_speed;
+            acceleration = HorizontalWingSpeeds_acceleration;
         }
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {

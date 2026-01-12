@@ -22,10 +22,11 @@ namespace TouhouPetsEx.Projectiles
         }
         public override void AI()
         {
+            bool noSound = LocalConfig.Yuka is YukaEffect.Disabled or YukaEffect.NoSound;
             Player player = Main.player[Projectile.owner];
             Projectile.Center = player.MountedCenter.Floor() + new Vector2(0, player.gfxOffY);
 
-            if (Projectile.ai[0] == 0)
+            if (Projectile.ai[0] == 0 && !noSound)
                 Projectile.localAI[0] = SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/sun"), Projectile.Center).ToFloat();
 
             if (Projectile.ai[0] > 240)
@@ -34,7 +35,7 @@ namespace TouhouPetsEx.Projectiles
             if (Projectile.ai[0] > 270)
                 Projectile.Kill();
 
-            if (SoundEngine.TryGetActiveSound(SlotId.FromFloat(Projectile.localAI[0]), out ActiveSound activeSound))
+            if (!noSound && SoundEngine.TryGetActiveSound(SlotId.FromFloat(Projectile.localAI[0]), out ActiveSound activeSound))
             {
                 activeSound.Position = Projectile.Center;
             }
@@ -43,6 +44,9 @@ namespace TouhouPetsEx.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
+            if (LocalConfig.Yuka is YukaEffect.Disabled or YukaEffect.NoVisual)
+                return false;
+
             var spriteBatch = Main.spriteBatch;
             var tex = TextureAssets.Projectile[Type].Value;
 

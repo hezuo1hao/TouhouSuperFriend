@@ -5,9 +5,11 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
@@ -15,6 +17,8 @@ using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.GameContent.Events;
+using Terraria.GameContent.UI.Chat;
+using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -27,7 +31,6 @@ using TouhouPets.Content.Items.PetItems;
 using TouhouPets.Content.Projectiles.Pets;
 using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Projectiles;
-using static Terraria.Localization.NetworkText;
 
 namespace TouhouPetsEx.Enhance.Core
 {
@@ -39,11 +42,27 @@ namespace TouhouPetsEx.Enhance.Core
     /// </summary>
 	public class EnhanceOn : ModSystem
     {
+        static IDictionary<string, Mod> modsByName = new Dictionary<string, Mod>(StringComparer.OrdinalIgnoreCase);
+        /// <summary>
+        /// 用于绘制特定弹幕特效
+        /// </summary>
+        static RenderTarget2D Render;
+        public override void Unload()
+        {
+            Main.RunOnMainThread(() => Render?.Dispose());
+        }
         /// <summary>
         /// 注册所有 On/IL/MonoModHooks 钩子。
         /// </summary>
         public override void Load()
         {
+            if (Main.netMode != NetmodeID.Server)
+                Main.RunOnMainThread(() =>
+                {
+                    Render = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
+                    Main.OnResolutionChanged += Main_OnResolutionChanged;
+                });
+            On_FilterManager.EndCapture += On_FilterManager_EndCapture;
             // 玩家属性相关（伤害/攻速/暴击/穿甲等）。
             On_Player.GetDamage += On_Player_GetDamage;
             On_Player.GetCritChance += On_Player_GetCritChance;
@@ -68,6 +87,15 @@ namespace TouhouPetsEx.Enhance.Core
             On_ShopHelper.LimitAndRoundMultiplier += On_ShopHelper_LimitAndRoundMultiplier;
             On_ShopHelper.ProcessMood += On_ShopHelper_ProcessMood;
             On_Gore.NewGore_IEntitySource_Vector2_Vector2_int_float += On_Gore_NewGore_IEntitySource_Vector2_Vector2_int_float;
+            // 叠叠叠叠叠叠到厌倦~
+            if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod m))
+            {
+                On_RemadeChatMonitor.AddNewMessage += On_RemadeChatMonitor_AddNewMessage;
+                MonoModHooks.Add(typeof(ModLoader).GetMethod("get_Mods", BindingFlags.Static | BindingFlags.Public), On_SetMods);
+                MonoModHooks.Add(typeof(ModLoader).GetMethod("GetMod", BindingFlags.Static | BindingFlags.Public), On_GetMod);
+                MonoModHooks.Add(typeof(ModLoader).GetMethod("TryGetMod", BindingFlags.Static | BindingFlags.Public), On_TryGetMod);
+                MonoModHooks.Add(typeof(ModLoader).GetMethod("HasMod", BindingFlags.Static | BindingFlags.Public), On_HasMod);
+            }
             // IL 注入：对原版 AdjTiles 做扩展（河城荷取相关）。
             IL_Player.AdjTiles += IL_Player_AdjTiles;
             // 对 TouhouPets 的部分行为做补丁。
@@ -87,23 +115,373 @@ namespace TouhouPetsEx.Enhance.Core
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
         }
-        public override void PostSetupContent()
+        (Vector2, float)[] speedLine = new(Vector2, float)[30];
+        private void On_FilterManager_EndCapture(On_FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
         {
-            // 怎么还有跳脸的，我真没辙了
-            if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod m))
+            var spriteBatch = Main.spriteBatch;
+            var player = Main.LocalPlayer;
+
+            if (Config.Aya && player.EnableEnhance<AyaCamera>())
             {
-                MonoModHooks.Add(m.Code.GetTypes().First(t => t.Name == "Disclaimer").GetMethod("OnEnterWorld", BindingFlags.Instance | BindingFlags.Public), On_OnEnterWorld);
+                var tex = TextureAssets.MagicPixel.Value;
+                bool left = player.velocity.X < 0;
+                bool newLine = !Main.gamePaused && Math.Abs(player.velocity.X) > 3 && player.velocity.Y != 0 && Main.GameUpdateCount % 3 == 0 && Main.rand.NextBool(2);
+
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+
+                for (int i = 0; i < speedLine.Length; i++)
+                {
+                    ref var line = ref speedLine[i];
+                    float length = line.Item2 * 5;
+                    Vector2 pos = line.Item1 - Main.screenPosition;
+
+                    if (!Main.gamePaused)
+                        line.Item1.X += line.Item2;
+
+                    if ((pos.X < length && !left) || (pos.X > Main.screenWidth + length && left) || pos.Y < 0 || pos.Y > Main.screenHeight)
+                    {
+                        line.Item1 = Vector2.Zero;
+                        line.Item2 = 0;
+                    }
+
+                    if (newLine && line.Item1 == Vector2.Zero)
+                    {
+                        line.Item2 = Main.rand.NextFloat(16.00f, 32.00f) * (left ? 1 : -1);
+                        line.Item1 = Main.screenPosition + (new Vector2(left ? 0 : Main.screenWidth, 50 + Main.rand.NextFloat(Main.screenHeight - 100.00f))) + Vector2.UnitX * line.Item2 * -3;
+                        newLine = false;
+                    }
+
+                    if (line.Item1 != Vector2.Zero)
+                        spriteBatch.Draw(tex, pos, null, Color.White, 1.57f, tex.Size() / 2f, new Vector2(4, line.Item2 / 200f), SpriteEffects.None, 0);
+                }
+
+                spriteBatch.End();
             }
+
+            bool perfectMaid = false;
+            bool reisenEffect = false;
+            int perfectMaidType = ModContent.ProjectileType<PerfectMaid>();
+            int reisenEffectType = ModContent.ProjectileType<ReisenEffect>();
+            foreach (Projectile proj in Main.ActiveProjectiles)
+            {
+                if (proj.type == perfectMaidType)
+                    perfectMaid = true;
+
+                if (proj.type == reisenEffectType && proj.ai[1] != 1)
+                    reisenEffect = true;
+            }
+
+            bool draw = perfectMaid || reisenEffect;
+
+            if (!draw)
+            {
+                orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
+                return;
+            }
+            var graphicsDevice = Main.instance.GraphicsDevice;
+            var screenTarget = screenTarget1;
+            var screenTargetSwap = screenTarget2;
+
+            if (perfectMaid)
+            {
+                var shader = TouhouPetsEx.GrayishWhiteShader;
+
+                graphicsDevice.SetRenderTarget(screenTargetSwap);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
+                spriteBatch.End();
+
+                graphicsDevice.SetRenderTarget(Render);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                TouhouPetsEx.RingShader.Parameters["width"].SetValue(0);
+                TouhouPetsEx.RingShader.CurrentTechnique.Passes[0].Apply();
+
+                foreach (Projectile proj in Main.ActiveProjectiles)
+                {
+                    if (proj.type == perfectMaidType)
+                    {
+                        var dPosition = proj.Center - Main.screenPosition;
+
+                        spriteBatch.Draw(TextureAssets.MagicPixel.Value, dPosition, null, Color.White * ((255 - proj.alpha) / 255f), 0, TextureAssets.MagicPixel.Size() / 2f, new Vector2(proj.width, proj.width * 0.001f), SpriteEffects.None, 0);
+                    }
+                }
+
+                spriteBatch.End();
+                graphicsDevice.SetRenderTarget(screenTarget);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                Main.instance.GraphicsDevice.Textures[1] = Render;
+                shader.CurrentTechnique.Passes[0].Apply();
+                spriteBatch.Draw(screenTargetSwap, Vector2.Zero, Color.White);
+                spriteBatch.End();
+            }
+
+            if (reisenEffect)
+            {
+                var shader = TouhouPetsEx.DistortShader;
+                var tex = TextureAssets.Projectile[reisenEffectType].Value;
+
+                graphicsDevice.SetRenderTarget(screenTargetSwap);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
+                spriteBatch.End();
+
+                graphicsDevice.SetRenderTarget(Render);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+                foreach (Projectile proj in Main.ActiveProjectiles)
+                {
+                    if (proj.type == reisenEffectType)
+                    {
+                        var dPosition = proj.Center - Main.screenPosition;
+
+                        spriteBatch.Draw(tex, dPosition, null, Color.White * ((255 - proj.alpha) / 255f), 0, tex.Size() / 2f, proj.ai[0] * proj.ai[0] / 300f, SpriteEffects.None, 0);
+                    }
+                }
+
+                spriteBatch.End();
+                graphicsDevice.SetRenderTarget(screenTarget);
+                graphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+                shader.Parameters["tex0"].SetValue(Render);
+                shader.Parameters["mult"].SetValue(0.02f);
+                shader.CurrentTechnique.Passes[0].Apply();
+                spriteBatch.Draw(screenTargetSwap, Vector2.Zero, Color.White);
+
+                spriteBatch.End();
+            }
+
+            orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
+        }
+
+        private void Main_OnResolutionChanged(Vector2 obj)
+        {
+            Render?.Dispose();
+            Render = new(Main.graphics.GraphicsDevice, (int)obj.X, (int)obj.Y);
+        }
+        bool gggggg;
+        private void On_RemadeChatMonitor_AddNewMessage(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
+        {
+            StackTrace stackTrace = new StackTrace();
+            bool isCalledByTargetMod = false;
+            string callingMethodInfo = "";
+
+            // 遍历调用堆栈，检查是否来自目标模组
+            for (int i = 2; i < stackTrace.FrameCount; i++)
+            {
+                StackFrame frame = stackTrace.GetFrame(i);
+                MethodBase method = frame?.GetMethod();
+
+                if (method == null) continue;
+
+                // 跳过当前方法和On框架方法
+                if (method.Name.Contains("On_Main_NewText") ||
+                    method.DeclaringType?.FullName?.Contains("On.Terraria") == true)
+                    continue;
+
+                string typeName = method.DeclaringType?.FullName ?? "";
+                string methodName = method.Name;
+
+                // 检查是否来自目标模组
+                if (typeName.Contains("TouhouPetsExOptimization"))
+                {
+                    isCalledByTargetMod = true;
+                    callingMethodInfo = $"{typeName}.{methodName}";
+                    break;
+                }
+            }
+
+            if (isCalledByTargetMod)
+            {
+                if (!gggggg)
+                {
+                    string a = ModLoader.GetMod("TouhouPetsExOptimization").DisplayName;
+                    text = $"侦测到开启 {a}，请注意在此情况下产生的任何问题/报错/BUG均有可能是因为该模组导致（由于该模组使用了大量破坏/不兼容性代码），请不要在 {Mod.DisplayName} 处反馈\n" +
+                        $"注：由于 {Mod.DisplayName} 的底层代码变动与底层优化，实质上 {a} 所提供的优化已失效，但由于对面刻意编写了恶意代码——旧版模拟，所以可能在同时加载两个模组时游戏体验被劣化\n" +
+                        $"注：由于 {a} 使用了头痛砍头的优化方案与编写的恶意代码共同影响下，本模组的不少功能会受到其影响无法使用";
+                    color = Color.Red;
+                    gggggg = true;
+                }
+                else return;
+            }
+
+            orig(self, text, color, widthLimitInPixels);
+        }
+
+        private delegate Mod[] SetModsDelegate();
+        private Mod[] On_SetMods(SetModsDelegate orig)
+        {
+            StackTrace stackTrace = new StackTrace();
+            bool isCalledByTargetMod = false;
+            string callingMethodInfo = "";
+
+            // 遍历调用堆栈，检查是否来自目标模组
+            for (int i = 2; i < stackTrace.FrameCount; i++)
+            {
+                StackFrame frame = stackTrace.GetFrame(i);
+                MethodBase method = frame?.GetMethod();
+
+                if (method == null) continue;
+
+                // 跳过当前方法和On框架方法
+                if (method.Name.Contains("On_Main_NewText") ||
+                    method.DeclaringType?.FullName?.Contains("On.Terraria") == true)
+                    continue;
+
+                string typeName = method.DeclaringType?.FullName ?? "";
+                string methodName = method.Name;
+
+                // 检查是否来自目标模组
+                if (typeName.Contains("TouhouPetsExOptimization"))
+                {
+                    isCalledByTargetMod = true;
+                    callingMethodInfo = $"{typeName}.{methodName}";
+                    break;
+                }
+            }
+
+            if (isCalledByTargetMod)
+                return [];
+
+            return orig();
+        }
+        private delegate bool HasModDelegate(string name);
+        private bool On_HasMod(HasModDelegate orig, string name)
+        {
+            if (modsByName.Count == 0)
+            {
+                modsByName = new Dictionary<string, Mod>(ModLoader.modsByName);
+                ModLoader.modsByName.Clear();
+            }
+
+            StackTrace stackTrace = new StackTrace();
+            bool isCalledByTargetMod = false;
+            string callingMethodInfo = "";
+
+            // 遍历调用堆栈，检查是否来自目标模组
+            for (int i = 2; i < stackTrace.FrameCount; i++)
+            {
+                StackFrame frame = stackTrace.GetFrame(i);
+                MethodBase method = frame?.GetMethod();
+
+                if (method == null) continue;
+
+                // 跳过当前方法和On框架方法
+                if (method.Name.Contains("On_Main_NewText") ||
+                    method.DeclaringType?.FullName?.Contains("On.Terraria") == true)
+                    continue;
+
+                string typeName = method.DeclaringType?.FullName ?? "";
+                string methodName = method.Name;
+
+                // 检查是否来自目标模组
+                if (typeName.Contains("TouhouPetsExOptimization"))
+                {
+                    isCalledByTargetMod = true;
+                    callingMethodInfo = $"{typeName}.{methodName}";
+                    break;
+                }
+            }
+
+            if (isCalledByTargetMod && name == Mod.Name)
+                return false;
+
+            return modsByName.ContainsKey(name);
+        }
+        private delegate Mod GetModDelegate(string name);
+        private Mod On_GetMod(GetModDelegate orig, string name)
+        {
+            if (modsByName.Count == 0)
+            {
+                modsByName = new Dictionary<string, Mod>(ModLoader.modsByName);
+                ModLoader.modsByName.Clear();
+            }
+
+            StackTrace stackTrace = new StackTrace();
+            bool isCalledByTargetMod = false;
+            string callingMethodInfo = "";
+
+            // 遍历调用堆栈，检查是否来自目标模组
+            for (int i = 2; i < stackTrace.FrameCount; i++)
+            {
+                StackFrame frame = stackTrace.GetFrame(i);
+                MethodBase method = frame?.GetMethod();
+
+                if (method == null) continue;
+
+                // 跳过当前方法和On框架方法
+                if (method.Name.Contains("On_Main_NewText") ||
+                    method.DeclaringType?.FullName?.Contains("On.Terraria") == true)
+                    continue;
+
+                string typeName = method.DeclaringType?.FullName ?? "";
+                string methodName = method.Name;
+
+                // 检查是否来自目标模组
+                if (typeName.Contains("TouhouPetsExOptimization"))
+                {
+                    isCalledByTargetMod = true;
+                    callingMethodInfo = $"{typeName}.{methodName}";
+                    break;
+                }
+            }
+
+            if (isCalledByTargetMod && name == Mod.Name)
+                return null;
+
+            return modsByName[name];
+        }
+        private delegate bool TryGetModDelegate(string name, out Mod result);
+        private bool On_TryGetMod(TryGetModDelegate orig, string name, out Mod result)
+        {
+            if (modsByName.Count == 0)
+            {
+                modsByName = new Dictionary<string, Mod>(ModLoader.modsByName);
+                ModLoader.modsByName.Clear();
+            }
+
+            StackTrace stackTrace = new StackTrace();
+            bool isCalledByTargetMod = false;
+            string callingMethodInfo = "";
+
+            // 遍历调用堆栈，检查是否来自目标模组
+            for (int i = 2; i < stackTrace.FrameCount; i++)
+            {
+                StackFrame frame = stackTrace.GetFrame(i);
+                MethodBase method = frame?.GetMethod();
+
+                if (method == null) continue;
+
+                // 跳过当前方法和On框架方法
+                if (method.Name.Contains("On_Main_NewText") ||
+                    method.DeclaringType?.FullName?.Contains("On.Terraria") == true)
+                    continue;
+
+                string typeName = method.DeclaringType?.FullName ?? "";
+                string methodName = method.Name;
+
+                // 检查是否来自目标模组
+                if (typeName.Contains("TouhouPetsExOptimization"))
+                {
+                    isCalledByTargetMod = true;
+                    callingMethodInfo = $"{typeName}.{methodName}";
+                    break;
+                }
+            }
+
+            if (isCalledByTargetMod && name == Mod.Name)
+            {
+                result = null;
+                return false;
+            }
+
+            return modsByName.TryGetValue(name, out result);
         }
         static bool delicacy;
-        private delegate void OnEnterWorldDelegate(object mp);
-        private void On_OnEnterWorld(OnEnterWorldDelegate orig, object mp)
-        {
-            string a = ModLoader.GetMod("TouhouPetsExOptimization").DisplayName;
-            Main.NewText($"侦测到开启 {a}，请注意在此情况下产生的任何问题/报错/BUG均有可能是因为该模组导致（由于该模组使用了大量破坏/不兼容性代码），请不要在 {Mod.DisplayName} 处反馈\n" +
-                $"注：由于 {Mod.DisplayName} 的底层代码变动与底层优化，实质上 {a} 所提供的优化已失效，但由于对面刻意编写了恶意代码——旧版模拟，所以可能在同时加载两个模组时游戏体验被劣化\n" +
-                $"注：由于 {a} 使用了头痛砍头的优化方案与编写的恶意代码共同影响下，本模组的不少功能会受到其影响无法使用", Color.Red);
-        }
         private delegate void SetChat_InnerDelegate(Projectile projectile, ChatSettingConfig config, int lag, LocalizedText text, bool forcely);
         /// <summary>
         /// 聊天室文本设置钩子：用于对特定台词触发额外音效/战斗文字（恋/魔理沙等彩蛋）。
@@ -542,7 +920,7 @@ namespace TouhouPetsEx.Enhance.Core
                     text.rotation *= 2;
                     hit.HideCombatText = true;
                 }
-                self.GetGlobalNPC<GEnhanceNPCs>().SuperCrit = false;
+                gnpc.SuperCrit = false;
             }
 
             return orig(self, hit, fromNet, noPlayerInteraction);

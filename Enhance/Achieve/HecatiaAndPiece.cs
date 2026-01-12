@@ -12,9 +12,9 @@ namespace TouhouPetsEx.Enhance.Achieve
         private const int TorchScanIntervalTicks = 25;
         private const int TorchScanRadiusTiles = 15; // 方形范围：左右/上下各 15 格
 
-        public override string Text => GetText("HecatiaAndPiece");
-        public override string[] ExperimentalText => [GetText("HecatiaAndPiece_1")];
-        public override bool[] Experimental => [Config.Hecatia];
+        public override string Text => Config.Piece_V ? GetText("HecatiaAndPiece") : GetText("Hecatia");
+        public override string[] ExperimentalText => [GetText("HecatiaAndPiece_1"), GetText("Piece_1")];
+        public override bool[] Experimental => [Config.Hecatia, Config.Piece];
         public override bool EnableRightClick => false;
         public override bool Passive => true;
 
@@ -34,6 +34,8 @@ namespace TouhouPetsEx.Enhance.Achieve
 
         public override void NPCAI(NPC npc)
         {
+            if (Config.Piece_V)
+
             if (Main.netMode == NetmodeID.MultiplayerClient || npc.dontTakeDamage || npc.friendly ||
                 NPCID.Sets.CountsAsCritter[npc.type])
                 return;
@@ -51,10 +53,23 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (Main.GameUpdateCount % 30 != 17 || gNpc.TorchDamage <= 0)
                 return;
 
-            npc.SimpleStrikeNPC(gNpc.TorchDamage, 0);
+            npc.SimpleStrikeNPC(gNpc.TorchDamage, 0, CrazyGod() && Main.rand.NextBool(25));
             gNpc.TorchDamage = 0;
         }
 
+        private static bool CrazyGod()
+        {
+            if (!Config.Piece)
+                return false;
+
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (player.unlockedBiomeTorches)
+                    return true;
+            }
+
+            return false;
+        }
         private static void _touchDmg(NPC npc, GEnhanceNPCs gNpc, int magnification)
         {
             // 每隔 15 tick 进行一次“完整扫描”，并用 whoAmI 分桶，把不同 NPC 的扫描摊到不同 tick 上，允许部分 NPC 的扫描延后。

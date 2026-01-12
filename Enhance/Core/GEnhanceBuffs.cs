@@ -24,6 +24,11 @@ namespace TouhouPetsEx.Enhance.Core
 	public class GEnhanceBuffs : GlobalBuff
     {
         private static bool alreadyDrawn;
+        #region 防止闭包的私有字段们
+        string ModifyBuffText_buffName;
+        string ModifyBuffText_tip;
+        int ModifyBuffText_rare;
+        #endregion
         private static void ProcessDemonismAction(Player player, Action<BaseEnhance> action)
         {
             if (!player.HasTouhouPetsBuff())
@@ -39,14 +44,13 @@ namespace TouhouPetsEx.Enhance.Core
         {
             Player player = Main.LocalPlayer;
 
-            // 允许增强修改 Buff 名称/描述/稀有度：通过局部变量承接 ref 参数，避免闭包限制。
-            string buffName2 = buffName;
-            string tip2 = tip;
-            int rare2 = rare;
-            ProcessDemonismAction(player, (enhance) => enhance.ModifyBuffText(player, type, ref buffName2, ref tip2, ref rare2));
-            buffName = buffName2;
-            tip = tip2;
-            rare = rare2;
+            ModifyBuffText_buffName = buffName;
+            ModifyBuffText_tip = tip;
+            ModifyBuffText_rare = rare;
+            ProcessDemonismAction(player, (enhance) => enhance.ModifyBuffText(player, type, ref ModifyBuffText_buffName, ref ModifyBuffText_tip, ref ModifyBuffText_rare));
+            buffName = ModifyBuffText_buffName;
+            tip = ModifyBuffText_tip;
+            rare = ModifyBuffText_rare;
 
             if (!LocalConfig.Tooltip_1 && !LocalConfig.Tooltip_2)
                 return;

@@ -74,6 +74,9 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (DelegateMethods.tileCutIgnore[Main.tile[x, y].type])
                 return true;
 
+            if (Main.tile[x, y].type == TileID.Larva)
+                return true;
+
             if (WorldGen.CanCutTile(x, y, DelegateMethods.tilecut_0) || TileID.Sets.CrackedBricks[Main.tile[x, y].type])
             {
                 WorldGen.KillTile(x, y);

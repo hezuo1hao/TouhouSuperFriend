@@ -17,7 +17,11 @@ namespace TouhouPetsEx
 	{
         public override bool IsHidden()
         {
-            return !(Config.Hecatia && Player.EnableEnhance<HecatiaPlanet>());
+            return !(Config.Hecatia && Player.EnableEnhance<HecatiaPlanet>()) && IsEmpty;
+        }
+        public override bool IsEnabled()
+        {
+            return Config.Hecatia && Player.EnableEnhance<HecatiaPlanet>();
         }
         public override bool CanAcceptItem(Item checkItem, AccessorySlotType context)
         {
@@ -28,7 +32,11 @@ namespace TouhouPetsEx
     {
         public override bool IsHidden()
         {
-            return !(Config.Hecatia && Main.hardMode && Player.EnableEnhance<HecatiaPlanet>());
+            return !(Config.Hecatia && Main.hardMode && Player.EnableEnhance<HecatiaPlanet>()) && IsEmpty;
+        }
+        public override bool IsEnabled()
+        {
+            return Config.Hecatia && Main.hardMode && Player.EnableEnhance<HecatiaPlanet>();
         }
         public override bool CanAcceptItem(Item checkItem, AccessorySlotType context)
         {
@@ -39,7 +47,11 @@ namespace TouhouPetsEx
     {
         public override bool IsHidden()
         {
-            return !(Config.Hecatia && NPC.downedMoonlord && Player.EnableEnhance<HecatiaPlanet>());
+            return !(Config.Hecatia && NPC.downedMoonlord && Player.EnableEnhance<HecatiaPlanet>()) && IsEmpty;
+        }
+        public override bool IsEnabled()
+        {
+            return Config.Hecatia && NPC.downedMoonlord && Player.EnableEnhance<HecatiaPlanet>();
         }
         public override bool CanAcceptItem(Item checkItem, AccessorySlotType context)
         {

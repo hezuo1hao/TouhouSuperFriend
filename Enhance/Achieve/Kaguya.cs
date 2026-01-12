@@ -29,6 +29,9 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void BuffUpdate(int type, Player player, ref int buffIndex)
         {
+            if (type == BuffID.BrainOfConfusionBuff)
+                return;
+
             var mp = player.MP();
             if (mp?.OldBuff == null || (uint)buffIndex >= (uint)mp.OldBuff.Length)
                 return;

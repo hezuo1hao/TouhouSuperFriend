@@ -113,6 +113,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void ItemHorizontalWingSpeeds(Item item, Player player, ref float speed, ref float acceleration)
+        {
+
+        }
         public virtual bool? ItemPreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             return null;
@@ -154,6 +158,10 @@ namespace TouhouPetsEx.Enhance.Core
 
         }
         public virtual void PlayerPostUpdateEquips(Player player)
+        {
+
+        }
+        public virtual void PlayerPostUpdateRunSpeeds(Player player)
         {
 
         }

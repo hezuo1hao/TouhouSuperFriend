@@ -16,13 +16,16 @@ namespace TouhouPetsEx
         public override float GetDurationMultiplier(Player player)
         {
             // 额外跳跃持续时间
+            if (player.jumpBoost)
+                return 1.25f;
+
             return 1f;
         }
 
         public override void UpdateHorizontalSpeeds(Player player)
         {
             // 额外跳跃最大速度和加速度
-            player.runAcceleration *= 2f;
+            player.runAcceleration *= (2f + player.jumpSpeedBoost / 4f);
             player.maxRunSpeed *= 1.25f;
         }
 

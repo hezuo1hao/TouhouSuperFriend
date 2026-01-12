@@ -8,6 +8,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Dusts;
 using TouhouPetsEx.Enhance.Achieve;
 
@@ -46,7 +47,7 @@ namespace TouhouPetsEx.Projectiles
                 }
             }
 
-            if (Projectile.ai[0] > 5460 || (player.velocity.Y == 0 && Projectile.ai[0] < 3600))
+            if (Projectile.ai[0] > 5460 || ((player.velocity.Y == 0 || !player.EnableEnhance<ReimuYinyangOrb>()) && Projectile.ai[0] < 3600))
                 Projectile.Kill();
         }
         public override bool PreDraw(ref Color lightColor)

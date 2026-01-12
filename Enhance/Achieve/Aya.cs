@@ -12,6 +12,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Aya : BaseEnhance
     {
         public override string Text => GetText("Aya");
+        public override string[] ExperimentalText => [GetText("Aya_1")];
+        public override bool[] Experimental => [Config.Aya];
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<AyaCamera>());
@@ -28,6 +30,16 @@ namespace TouhouPetsEx.Enhance.Achieve
                 player.maxRunSpeed += 2.5f * Math.Abs(Main.windSpeedCurrent);
                 player.accRunSpeed += 2.5f * Math.Abs(Main.windSpeedCurrent);
             }
+        }
+        public override void ItemHorizontalWingSpeeds(Item item, Player player, ref float speed, ref float acceleration)
+        {
+            if (Config.Aya && player.velocity.Y != 0)
+                player.maxRunSpeed *= 2;
+        }
+        public override void PlayerPostUpdateRunSpeeds(Player player)
+        {
+            if (Config.Aya && player.velocity.Y != 0)
+                player.maxRunSpeed *= 2;
         }
         public override void PlayerPostUpdate(Player player)
         {

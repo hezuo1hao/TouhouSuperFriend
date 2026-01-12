@@ -13,6 +13,7 @@ Daiyousei: 每隔一段时间，可以触发一次决死效果
 Cirno: 制造冰，并可以作为武器使用
 Cirno_1: 冰块不再遵守现实规则
 Meirin: 给予额外跳跃
+Meirin_1: 成为耐摔王
 Koakuma:
 	'''
 	增加火力
@@ -72,8 +73,10 @@ Aya:
 	无视狂风
 	乘风而行
 	'''
+Aya_1: 无！双！风！神！
 Yuka: 接触向日葵会为你带来增益
 Yuka_1: 周围的向日葵会从事生产
+Yuka_2: 会有孢子在你身上爆发四散
 Sizuha: 你摇起树来更加得心应手
 Minoriko: 食物更好吃
 Hina: 减小伤害浮动的负面效果，并净化负面前缀
@@ -135,14 +138,16 @@ Junko: 不残不会玩
 Junko_1: 加成不再有职业之分（即便看上去好像有）
 HecatiaAndPiece:
 	'''
-	当你成功证明自身的强大时，增加能力携带上限
+	{$Mods.TouhouPetsEx.Hecatia}
 	火把会使敌人疯狂自残
 	'''
+Hecatia: 当你成功证明自身的强大时，增加能力携带上限
 HecatiaAndPiece_1:
 	'''
 	饰品栏+1
 	当你成功证明自身的强大时，继续增加饰品栏上限
 	'''
+Piece_1: 当你获得火炬之神的恩宠时，你亦会获得疯狂之神的恩宠
 Momoyo:
 	'''
 	可以吃各种宝石来增强自身
@@ -190,11 +195,21 @@ Give: {
 
 Configs: {
 	TouhouPetsExConfigs: {
-		DisplayName: 实验性玩法
+		DisplayName: 模组玩法
+
+		Headers: {
+			Vanilla: 原版玩法调整
+			Experimental: 实验性玩法
+		}
 
 		PetInv: {
 			Label: 被动能力在宠物栏生效
 			Tooltip: 禁用后，将带有被动能力的宠物放入宠物栏或照明宠物栏时，其被动能力不再生效
+		}
+
+		Piece_V: {
+			Label: 皮丝
+			Tooltip: 禁用后，火把将不再使敌人自残
 		}
 
 		AliceOld: {
@@ -239,6 +254,15 @@ Configs: {
 				'''
 				无兼容性问题
 				冰块在反弹之后速度会略大于反弹之前
+				'''
+		}
+
+		Meirin: {
+			Label: 红美铃-超高纯度的卸力
+			Tooltip:
+				'''
+				可能有兼容性问题
+				免疫摔落，如已经免疫摔落（幸运马掌）则落地时触发特殊卸力效果
 				'''
 		}
 
@@ -330,12 +354,30 @@ Configs: {
 				'''
 		}
 
+		Aya: {
+			Label: 文-无双风神
+			Tooltip:
+				'''
+				无兼容性问题
+				在空中时最大速度翻倍
+				'''
+		}
+
 		Yuka: {
 			Label: 幽香-向阳花田
 			Tooltip:
 				'''
 				无兼容性问题
 				周围的向日葵会周期性的爆金币
+				'''
+		}
+
+		Yuka_2: {
+			Label: 幽香-大南方丛林植物
+			Tooltip:
+				'''
+				无兼容性问题
+				随时间喷发可以伤害敌人的孢子
 				'''
 		}
 
@@ -467,6 +509,15 @@ Configs: {
 				根据时期，额外增加饰品栏上限
 				'''
 		}
+
+		Piece: {
+			Label: 皮丝-狂气之神
+			Tooltip:
+				'''
+				无兼容性问题
+				击败火把神后，火把可能会暴击
+				'''
+		}
 	}
 
 	TouhouPetsExLocalConfigs: {
@@ -539,6 +590,28 @@ Configs: {
 				'''
 		}
 
+		Yuka: {
+			Label: 幽香-向阳特效
+			Tooltip:
+				'''
+				可以修改自身接触向日葵时所释放的特效
+
+				有四种可选的范围：
+				1. {$Mods.TouhouPetsEx.Configs.YukaEffect.Disabled.Label}
+				  - 自身不会释放特效
+				  - 不会显示任何人的特效
+				2. {$Mods.TouhouPetsEx.Configs.YukaEffect.NoSound.Label}
+				  - 自身所释放的特效将会没有音效
+				  - 其他人的特效也会没有音效
+				3. {$Mods.TouhouPetsEx.Configs.YukaEffect.NoVisual.Label}
+				  - 自身所释放的特效将会没有视效
+				  - 其他人的特效也会没有视效
+				4. {$Mods.TouhouPetsEx.Configs.YukaEffect.All.Label}
+				  - 自身所释放的特效将会是完整的特效
+				  - 其他人的特效也是如此
+				'''
+		}
+
 		Raiko: {
 			Label: 雷鼓-震屏特效
 			Tooltip: 禁用后将不再显示闪电劈下时的震屏特效
@@ -563,6 +636,30 @@ Configs: {
 
 		All: {
 			Label: 我全都要
+			Tooltip: ""
+		}
+
+		Tooltip: ""
+	}
+
+	YukaEffect: {
+		Disabled: {
+			Label: 视听禁止
+			Tooltip: ""
+		}
+
+		NoSound: {
+			Label: 不听
+			Tooltip: ""
+		}
+
+		NoVisual: {
+			Label: 不看
+			Tooltip: ""
+		}
+
+		All: {
+			Label: 音效要听、视效要看，这样才叫健全
 			Tooltip: ""
 		}
 
@@ -631,6 +728,7 @@ Projectiles: {
 	PerfectMaid.DisplayName: 真是完完又美美
 	FlyingKnife.DisplayName: 飞刀
 	DreamsAreBorn.DisplayName: 梦想天生
+	YukaSpore.DisplayName: 孢子
 }
 
 Buffs: {
@@ -925,5 +1023,10 @@ Achievements: {
 	FlyMyWings: {
 		FriendlyName: Fly,My Wings（飞吧，我的翅膀）
 		Description: 在击败光之女皇后，装备翅膀并启用博丽灵梦能力起飞
+	}
+
+	SporeStage: {
+		FriendlyName: 孢子舞台
+		Description: 在狂风与雷雨中，与最高难度的蘑菇们一起跳舞吧？
 	}
 }
