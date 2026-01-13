@@ -568,6 +568,11 @@ Configs: {
 			Tooltip: 禁用后就算启用咲夜能力，时间也会正常流逝
 		}
 
+		Aya: {
+			Label: 文-无双风神特效
+			Tooltip: 禁用后将不再在高速飞行时显示速度线
+		}
+
 		Yuyuko: {
 			Label: 幽幽子-即死特效
 			Tooltip:

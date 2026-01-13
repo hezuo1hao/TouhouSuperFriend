@@ -140,6 +140,9 @@ namespace TouhouPetsEx
         [DefaultValue(true)]
         public bool Sakuya;
 
+        [DefaultValue(true)]
+        public bool Aya;
+
         [DefaultValue(YuyukoEffect.All)]
         [DrawTicks]
         public YuyukoEffect Yuyuko;

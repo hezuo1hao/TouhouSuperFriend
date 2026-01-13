@@ -121,11 +121,11 @@ namespace TouhouPetsEx.Enhance.Core
             var spriteBatch = Main.spriteBatch;
             var player = Main.LocalPlayer;
 
-            if (Config.Aya && player.EnableEnhance<AyaCamera>())
+            if (LocalConfig.Aya)
             {
                 var tex = TextureAssets.MagicPixel.Value;
                 bool left = player.velocity.X < 0;
-                bool newLine = !Main.gamePaused && Math.Abs(player.velocity.X) > 3 && player.velocity.Y != 0 && Main.GameUpdateCount % 3 == 0 && Main.rand.NextBool(2);
+                bool newLine = !Main.gamePaused && Math.Abs(player.velocity.X) > 6 && Config.Aya && player.EnableEnhance<AyaCamera>() && player.velocity.Y != 0 && Main.GameUpdateCount % 3 == 0 && Main.rand.NextBool(2);
 
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
 

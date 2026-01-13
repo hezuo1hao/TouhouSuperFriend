@@ -17,7 +17,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override bool? NPCCanHitNPC(NPC npc, NPC target)
         {
-            if ((target.friendly || NPCID.Sets.CountsAsCritter[target.type]) && (WorldEnableEnhance<LunaMoon>() || WorldEnableEnhance<LightsJewels>()))
+            if (target.type != NPCID.DD2EterniaCrystal && (target.friendly || NPCID.Sets.CountsAsCritter[target.type]) && (WorldEnableEnhance<LunaMoon>() || WorldEnableEnhance<LightsJewels>()))
                 return false;
 
             return null;
