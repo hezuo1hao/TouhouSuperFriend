@@ -982,7 +982,7 @@ namespace TouhouPetsEx.Enhance.Core
 
                 if (Config.Tenshi)
                 {
-                    float defense = self.Defense.ApplyTo(0);
+                    float defense = Math.Max(self.Defense.ApplyTo(0), 0);
                     float effectiveScaling = Math.Max(self.ScalingArmorPenetration.Value, 0);
                     float totalPenetration = effectiveScaling * defense + self.ArmorPenetration.Value;
 
