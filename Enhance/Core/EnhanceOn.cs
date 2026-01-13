@@ -984,10 +984,7 @@ namespace TouhouPetsEx.Enhance.Core
                 {
                     float defense = Math.Max(self.Defense.ApplyTo(0), 0);
                     float effectiveScaling = Math.Max(self.ScalingArmorPenetration.Value, 0);
-                    float totalPenetration = effectiveScaling * defense + self.ArmorPenetration.Value;
-
-                    if (effectiveScaling > 1)
-                        totalPenetration = effectiveScaling * self.ArmorPenetration.Value;
+                    float totalPenetration = Math.Min(effectiveScaling, 1) * defense + self.ArmorPenetration.Value * Math.Max(effectiveScaling, 1);
 
                     baseDamage += Math.Max(totalPenetration - defense, 0);
                 }

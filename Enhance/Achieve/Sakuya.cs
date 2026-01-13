@@ -13,6 +13,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Sakuya : BaseEnhance
     {
         public override string Text => GetText("Sakuya");
+        public override string[] ExperimentalText => [GetText("Sakuya")];
+        public override bool[] Experimental => [Config.Sakuya];
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SakuyaWatch>());
