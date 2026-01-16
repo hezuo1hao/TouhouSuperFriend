@@ -10,6 +10,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using TouhouPetsEx.Buffs;
 
 namespace TouhouPetsEx.Enhance.Core
 {
@@ -52,6 +53,15 @@ namespace TouhouPetsEx.Enhance.Core
         {
             // 预计算城镇 NPC 总量（后续某些增强/BUFF 会用到）。
             TownNPCMax = ContentSamples.NpcsByNetId.Values.Count(npc => npc.townNPC);
+
+            GEnhanceBuffs.FireDebuff = [BuffID.OnFire, BuffID.OnFire3, BuffID.Frostburn, BuffID.Frostburn2, BuffID.CursedInferno, BuffID.ShadowFlame];
+            for (int i = 0; i < BuffID.Sets.GrantImmunityWith.Length; i++)
+            {
+                var buffsToInherit = BuffID.Sets.GrantImmunityWith[i];
+
+                if (buffsToInherit?.Any(GEnhanceBuffs.FireDebuff.Contains) == true)
+                    GEnhanceBuffs.FireDebuff.UnionWith(buffsToInherit);
+            }
 
             ProcessDemonismAction((enhance) => enhance.SystemPostSetupContent());
         }

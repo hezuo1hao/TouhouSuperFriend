@@ -53,7 +53,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (Main.GameUpdateCount % 30 != 17 || gNpc.TorchDamage <= 0)
                 return;
 
-            npc.SimpleStrikeNPC(gNpc.TorchDamage, 0, CrazyGod() && Main.rand.NextBool(25));
+            npc.SimpleStrikeNPC(gNpc.TorchDamage, 0, CrazyGod());
             gNpc.TorchDamage = 0;
         }
 
@@ -62,13 +62,15 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (!Config.Piece)
                 return false;
 
+            int numerator = 0;
+
             foreach (Player player in Main.ActivePlayers)
             {
                 if (player.unlockedBiomeTorches)
-                    return true;
+                    numerator += 4;
             }
 
-            return false;
+            return Main.rand.Next(100) < numerator;
         }
         private static void _touchDmg(NPC npc, GEnhanceNPCs gNpc, int magnification)
         {

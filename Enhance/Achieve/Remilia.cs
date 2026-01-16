@@ -15,7 +15,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPostUpdate(Player player)
         {
-            if (player.lifeSteal > -60)
+            if (player.lifeSteal < -60)
                 player.lifeSteal = -60;
 
             player.lifeSteal += 0.2f;

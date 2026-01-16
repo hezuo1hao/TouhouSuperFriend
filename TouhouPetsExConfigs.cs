@@ -82,10 +82,16 @@ namespace TouhouPetsEx
         public bool Satori_2;
 
         [DefaultValue(false)]
+        public bool Satori_3;
+
+        [DefaultValue(false)]
         public bool Rin;
 
         [DefaultValue(false)]
         public bool Rin_2;
+
+        [DefaultValue(false)]
+        public bool Rin_3;
 
         [DefaultValue(false)]
         public bool Utsuho;
@@ -94,10 +100,16 @@ namespace TouhouPetsEx
         public bool Utsuho_2;
 
         [DefaultValue(false)]
+        public bool Utsuho_3;
+
+        [DefaultValue(false)]
         public bool Koishi;
 
         [DefaultValue(false)]
         public bool Koishi_2;
+
+        [DefaultValue(false)]
+        public bool Koishi_3;
 
         [DefaultValue(false)]
         public bool Wakasagihime;

@@ -50,6 +50,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public bool SuperCrit;
         /// <summary>
+        /// 是否为灵，阿燐-灵者杀手用
+        /// </summary>
+        public static HashSet<int> Spirit = [NPCID.Ghost, NPCID.DungeonSpirit, NPCID.FloatyGross, NPCID.Wraith, NPCID.ShadowFlameApparition, NPCID.PirateGhost, NPCID.Poltergeist];
+        /// <summary>
         /// 熔化debuff，灵乌路空用
         /// </summary>
         public bool Melt;
@@ -57,6 +61,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// 每个 NPC 实例拥有独立的 <see cref="GlobalNPC"/> 数据。
         /// </summary>
         public override bool InstancePerEntity => true;
+        public override void Unload()
+        {
+            Spirit = null;
+        }
         public override void ResetEffects(NPC npc)
         {
             // 每 tick 重置“瞬时状态”标记，避免跨 tick 残留。

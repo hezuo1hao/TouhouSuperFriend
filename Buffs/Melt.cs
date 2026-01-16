@@ -34,6 +34,9 @@ namespace TouhouPetsEx.Buffs
             npc.buffType[buffIndex] = 0;
             for (int i = 0; i < NPC.maxBuffs - 1; i++)
             {
+                if (Config.Utsuho_3 && GEnhanceBuffs.FireDebuff.Contains(npc.buffType[i]))
+                    npc.lifeRegen -= 9;
+
                 if (npc.buffTime[i] == 0 || npc.buffType[i] == 0)
                 {
                     for (int j = i + 1; j < NPC.maxBuffs; j++)

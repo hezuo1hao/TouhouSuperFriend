@@ -13,8 +13,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Utsuho : BaseEnhance
     {
         public override string Text => GetText("Utsuho");
-        public override string[] ExperimentalText => [GetText("Utsuho_1"), GetText("Utsuho_2")];
-        public override bool[] Experimental => [Config.Utsuho, Config.Utsuho_2];
+        public override string[] ExperimentalText => [GetText("Utsuho_1"), GetText("Utsuho_2"), GetText("Utsuho_3")];
+        public override bool[] Experimental => [Config.Utsuho, Config.Utsuho_2, Config.Utsuho_3];
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<UtsuhoEye>());
@@ -72,6 +72,9 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 if (npc.dontTakeDamage || npc.friendly || (npc.aiStyle == 112 && !(npc.ai[2] <= 1f)) || !player.CanNPCBeHitByPlayerOrPlayerProjectile(npc))
                     continue;
+
+                if (Config.Utsuho_3 && player == Main.LocalPlayer && TouhouPetsExModSystem.SynchronousTime % 120 == 67 && Main.rand.NextBool(6))
+                    npc.AddBuff(Main.rand.Next([.. GEnhanceBuffs.FireDebuff]), 300);
 
                 int disMax = 1000;
 

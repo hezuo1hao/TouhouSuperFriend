@@ -23,6 +23,7 @@ namespace TouhouPetsEx.Enhance.Core
 	/// </summary>
 	public class GEnhanceBuffs : GlobalBuff
     {
+        public static HashSet<int> FireDebuff;
         private static bool alreadyDrawn;
         #region 防止闭包的私有字段们
         string ModifyBuffText_buffName;
@@ -39,6 +40,10 @@ namespace TouhouPetsEx.Enhance.Core
                 if (EnhanceRegistry.TryGetEnhancement(enhanceId, out var enhancement))
                     action(enhancement);
             }
+        }
+        public override void Unload()
+        {
+            FireDebuff = null;
         }
         public override void ModifyBuffText(int type, ref string buffName, ref string tip, ref int rare)
         {

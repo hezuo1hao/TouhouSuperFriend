@@ -3,6 +3,7 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TouhouPets.Content.Items.PetItems;
 namespace TouhouPetsEx.Buffs
 {
     public class PopularityExplosion : ModBuff
@@ -15,6 +16,9 @@ namespace TouhouPetsEx.Buffs
         }
         public override void Update(Player player, ref int buffIndex)
         {
+            if (!player.EnableEnhance<KoishiTelephone>())
+                player.DelBuff(buffIndex);
+
             float multiplier = 1;
 
             if (Config.Koishi)

@@ -8,6 +8,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPets.Content.Projectiles.Pets;
 using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
@@ -18,8 +19,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Koishi : BaseEnhance
     {
         public override string Text => GetText("Koishi");
-        public override string[] ExperimentalText => [GetText("Koishi_1"), GetText("Koishi_2")];
-        public override bool[] Experimental => [Config.Koishi, Config.Koishi_2];
+        public override string[] ExperimentalText => [GetText("Koishi_1"), GetText("Koishi_2"), GetText("Koishi_3")];
+        public override bool[] Experimental => [Config.Koishi, Config.Koishi_2, Config.Koishi_3];
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<KoishiTelephone>());
@@ -86,10 +87,15 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (player == Main.LocalPlayer && player.armor[0].type == ItemID.HallowedHood)
                     ModContent.GetInstance<TheBlueGuy>().Condition.Complete();
             }
-        }
-        public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
-        {
-            player.MP().Popularity += damageDone / 10f;
+
+            if (Config.Koishi_3 && player == Main.LocalPlayer && TouhouPetsExModSystem.SynchronousTime % 60 == 41)
+            {
+                foreach (NPC npc in Main.ActiveNPCs)
+                {
+                    if (npc.Distance(player.Center) < 1000)
+                        player.MP().Popularity += npc.lifeMax / 2500f;
+                }
+            }
 
             if (player.MP().Popularity >= 100)
             {
@@ -99,9 +105,13 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     player.MP().Popularity = 0;
                     player.AddBuff(ModContent.BuffType<PopularityExplosion>(), 900);
-                    Projectile.NewProjectile(player.GetSource_OnHit(target), player.Center, Vector2.Zero, ModContent.ProjectileType<PopularityExplosionEffect>(), 0, 0, player.whoAmI);
+                    Projectile.NewProjectile(player.GetSource_FromAI(), player.Center, Vector2.Zero, ModContent.ProjectileType<PopularityExplosionEffect>(), 0, 0, player.whoAmI);
                 }
             }
+        }
+        public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            player.MP().Popularity += damageDone / 10f;
         }
         public override void PlayerPostHurt(Player player, Player.HurtInfo info)
         {

@@ -15,7 +15,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerUpdateLifeRegen(Player player)
         {
-            if (TouhouPetsExModSystem.SynchronousTime % 30 == 0)
+            if ((TouhouPetsExModSystem.SynchronousTime % 30 == 0 && !player.pStone) || (TouhouPetsExModSystem.SynchronousTime % 24 == 0 && player.pStone))
                 player.lifeRegenCount += player.lifeRegenCount < 0 ? 125 - player.lifeRegenCount : 125;
         }
         public override void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)

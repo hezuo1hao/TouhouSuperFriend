@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
@@ -11,11 +12,28 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Rin : BaseEnhance
     {
         public override string Text => GetText("Rin");
-        public override string[] ExperimentalText => [GetText("Rin_1"), GetText("Rin_2")];
-        public override bool[] Experimental => [Config.Rin, Config.Rin_2];
+        public override string[] ExperimentalText => [GetText("Rin_1"), GetText("Rin_2"), GetText("Rin_3")];
+        public override bool[] Experimental => [Config.Rin, Config.Rin_2, Config.Rin_3];
+        int vengefulSpiritType = -1;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<RinSkull>());
+        }
+        public override void SystemPostSetupContent()
+        {
+            if (ModLoader.TryGetMod("Gensokyo", out var mod))
+                vengefulSpiritType = mod.Find<ModNPC>("VengefulSpirit").Type;
+        }
+        public override void PlayerModifyHitNPC(Player player, NPC target, ref NPC.HitModifiers modifiers)
+        {
+            if (Config.Rin_3)
+            {
+                if (GEnhanceNPCs.Spirit.Contains(target.type))
+                    modifiers.FinalDamage *= 2;
+
+                if (target.type == vengefulSpiritType)
+                    modifiers.FinalDamage *= 5;
+            }
         }
         public override bool? ItemCanUseItem(Item item, Player player, ref bool def)
         {

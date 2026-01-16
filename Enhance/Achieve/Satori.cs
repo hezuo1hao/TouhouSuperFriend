@@ -10,8 +10,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Satori : BaseEnhance
     {
         public override string Text => GetText("Satori");
-        public override string[] ExperimentalText => [GetText("Satori_1"), GetText("Satori_2")];
-        public override bool[] Experimental => [Config.Satori, Config.Satori_2];
+        public override string[] ExperimentalText => [GetText("Satori_1"), GetText("Satori_2"), GetText("Satori_3")];
+        public override bool[] Experimental => [Config.Satori, Config.Satori_2, Config.Satori_3];
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SatoriSlippers>());

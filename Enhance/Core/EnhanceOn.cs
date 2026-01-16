@@ -989,7 +989,29 @@ namespace TouhouPetsEx.Enhance.Core
                     baseDamage += Math.Max(totalPenetration - defense, 0);
                 }
             }
+
+            if (Config.Satori_3 && Main.LocalPlayer.EnableEnhance<SatoriSlippers>())
+            {
+                NoDamageReduction(ref self.CritDamage);
+                NoDamageReduction(ref self.FinalDamage);
+                NoDamageReduction(ref self.NonCritDamage);
+                NoDamageReduction(ref self.SourceDamage);
+            }
             return orig(ref self, baseDamage, crit, damageVariation, luck);
+        }
+        void NoDamageReduction(ref StatModifier modifier)
+        {
+            if (modifier.Base < 0)
+                modifier.Base = 0;
+
+            if (modifier.Flat < 0)
+                modifier.Flat = 0;
+
+            if (modifier.Multiplicative < 1)
+                modifier.Multiplicative = 1;
+
+            if (modifier.Additive < 1)
+                modifier.Additive = 1;
         }
         private int On_Player_GetPickaxeDamage(On_Player.orig_GetPickaxeDamage orig, Player self, int x, int y, int pickPower, int hitBufferIndex, Tile tileTarget)
         {
