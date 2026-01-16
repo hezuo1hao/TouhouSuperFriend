@@ -34,6 +34,9 @@ namespace TouhouPetsEx.Enhance.Core
         /// 记录尸块伤害（火焰猫燐能力相关）
         /// </summary>
         public static int[] GoreDamage = new int[Main.maxGore];
+        #region 防止闭包的私有字段们
+        float ModifyLightingBrightness_scale;
+        #endregion
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
             // 系统级钩子默认对“已注册的全部增强”分发（不基于某个玩家启用列表）。
@@ -44,10 +47,9 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void ModifyLightingBrightness(ref float scale)
         {
-            // 把 ref 参数先拷贝到局部变量，避免闭包捕获 ref 的限制。
-            float scale2 = scale;
-            ProcessDemonismAction((enhance) => enhance.SystemModifyLightingBrightness(ref scale2));
-            scale = scale2;
+            ModifyLightingBrightness_scale = scale;
+            ProcessDemonismAction((enhance) => enhance.SystemModifyLightingBrightness(ref ModifyLightingBrightness_scale));
+            scale = ModifyLightingBrightness_scale;
         }
         public override void PostSetupContent()
         {
