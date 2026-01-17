@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.Localization;
@@ -73,6 +74,11 @@ namespace TouhouPetsEx.Enhance.Core
             Depression = false;
             Restless = false;
             Melt = false;
+        }
+        public override void OnSpawn(NPC npc, IEntitySource source)
+        {
+            foreach (BaseEnhance enhance in EnhanceHookRegistry.NPCOnSpawn)
+                enhance.NPCOnSpawn(npc, source);
         }
         public override bool PreAI(NPC npc)
         {

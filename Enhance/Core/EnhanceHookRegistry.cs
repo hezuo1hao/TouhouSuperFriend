@@ -13,25 +13,30 @@ namespace TouhouPetsEx.Enhance.Core
 		/// <summary>
 		/// 防止重复登记同一种增强类型（每个派生类型只登记一次）。
 		/// </summary>
-		private static readonly HashSet<Type> RegisteredTypes = new();
+		private static readonly HashSet<Type> RegisteredTypes = [];
 
 		/// <summary>实现了 <see cref="BaseEnhance.TileDrawEffects"/> 的增强列表。</summary>
-		public static readonly List<BaseEnhance> TileDrawEffects = new();
+		public static readonly List<BaseEnhance> TileDrawEffects = [];
 		/// <summary>实现了 <see cref="BaseEnhance.TileRandomUpdate"/> 的增强列表。</summary>
-		public static readonly List<BaseEnhance> TileRandomUpdate = new();
+		public static readonly List<BaseEnhance> TileRandomUpdate = [];
 
-		/// <summary>实现了 <see cref="BaseEnhance.NPCPreAI"/> 的增强列表。</summary>
-		public static readonly List<BaseEnhance> NPCPreAI = new();
+        /// <summary>实现了 <see cref="BaseEnhance.NPCOnSpawn"/> 的增强列表。</summary>
+        public static readonly List<BaseEnhance> NPCOnSpawn = [];
+        /// <summary>实现了 <see cref="BaseEnhance.NPCPreAI"/> 的增强列表。</summary>
+        public static readonly List<BaseEnhance> NPCPreAI = [];
 		/// <summary>实现了 <see cref="BaseEnhance.NPCAI"/> 的增强列表。</summary>
-		public static readonly List<BaseEnhance> NPCAI = new();
+		public static readonly List<BaseEnhance> NPCAI = [];
 		/// <summary>实现了 <see cref="BaseEnhance.NPCCanHitNPC"/> 的增强列表。</summary>
-		public static readonly List<BaseEnhance> NPCCanHitNPC = new();
+		public static readonly List<BaseEnhance> NPCCanHitNPC = [];
 
-		/// <summary>
-		/// 注册一个增强实例：识别其覆写的钩子并加入对应列表。
-		/// </summary>
-		/// <param name="enhance">增强实例。</param>
-		public static void Register(BaseEnhance enhance)
+        /// <summary>实现了 <see cref="BaseEnhance.ProjectileOnSpawn"/> 的增强列表。</summary>
+        public static readonly List<BaseEnhance> ProjectileOnSpawn = [];
+
+        /// <summary>
+        /// 注册一个增强实例：识别其覆写的钩子并加入对应列表。
+        /// </summary>
+        /// <param name="enhance">增强实例。</param>
+        public static void Register(BaseEnhance enhance)
 		{
 			// 传入为空时直接忽略，避免 NRE。
 			if (enhance == null)
@@ -48,13 +53,18 @@ namespace TouhouPetsEx.Enhance.Core
 			if (IsOverridden(type, nameof(BaseEnhance.TileRandomUpdate)))
 				TileRandomUpdate.Add(enhance);
 
-			if (IsOverridden(type, nameof(BaseEnhance.NPCPreAI)))
+            if (IsOverridden(type, nameof(BaseEnhance.NPCOnSpawn)))
+                NPCOnSpawn.Add(enhance);
+            if (IsOverridden(type, nameof(BaseEnhance.NPCPreAI)))
 				NPCPreAI.Add(enhance);
 			if (IsOverridden(type, nameof(BaseEnhance.NPCAI)))
 				NPCAI.Add(enhance);
 			if (IsOverridden(type, nameof(BaseEnhance.NPCCanHitNPC)))
 				NPCCanHitNPC.Add(enhance);
-		}
+
+            if (IsOverridden(type, nameof(BaseEnhance.ProjectileOnSpawn)))
+                ProjectileOnSpawn.Add(enhance);
+        }
 
 		/// <summary>
 		/// 清空所有注册信息（通常在 Mod 卸载时调用）。
@@ -66,10 +76,13 @@ namespace TouhouPetsEx.Enhance.Core
 			// 清空每个钩子列表，避免卸载后残留引用导致潜在泄漏/重复调用。
 			TileDrawEffects.Clear();
 			TileRandomUpdate.Clear();
+			NPCOnSpawn.Clear();
 			NPCPreAI.Clear();
 			NPCAI.Clear();
 			NPCCanHitNPC.Clear();
-		}
+            ProjectileOnSpawn.Clear();
+
+        }
 
 		/// <summary>
 		/// 判断某个增强类型是否覆写了指定方法。

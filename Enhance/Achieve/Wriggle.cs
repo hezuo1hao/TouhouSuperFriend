@@ -30,7 +30,9 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (!player.EnableEnhance<WriggleInAJar>())
                     continue;
 
-                NPC.goldCritterChance = 200;
+                NPC.goldCritterChance /= 2;
+                if (NPC.goldCritterChance <= 0)
+                    NPC.goldCritterChance = 1;
 
                 if (player.MP().WriggleCD > 0 || !Main.rand.NextBool(60))
                     continue;

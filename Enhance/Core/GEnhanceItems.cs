@@ -151,6 +151,18 @@ namespace TouhouPetsEx.Enhance.Core
             ProcessDemonismAction(player, (enhance) => enhance.ItemGrabRange(item, player, ref GrabRange_grabRange));
             grabRange = GrabRange_grabRange;
         }
+        public override bool GrabStyle(Item item, Player player)
+        {
+            if (player.MBP().Throw)
+            {
+                player.PullItem_Pickup(item, 24f, 5);
+                return true;
+            }
+
+            bool? reesult = ProcessDemonismAction(player, true, (enhance) => enhance.ItemGrabStyle(item, player));
+
+            return reesult ?? base.GrabStyle(item, player);
+        }
         public override void HoldItem(Item item, Player player)
         {
             if (item.ModItem?.Mod.Name == "TouhouPets"
@@ -197,7 +209,7 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void SetStaticDefaults()
         {
-            List<Type> subclasses = new List<Type>();
+            List<Type> subclasses = [];
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             Type[] allTypes = assembly.GetTypes();

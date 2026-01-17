@@ -13,9 +13,9 @@ namespace TouhouPetsEx.Enhance.Core
     /// </summary>
     public static class EnhanceRegistry
     {
-        private static readonly Dictionary<EnhancementId, BaseEnhance> EnhanceById = new();
-        private static readonly Dictionary<int, EnhancementId> EnhanceIdByItemType = new();
-        private static readonly Dictionary<EnhancementId, HashSet<int>> ItemTypesByEnhanceId = new();
+        private static readonly Dictionary<EnhancementId, BaseEnhance> EnhanceById = [];
+        private static readonly Dictionary<int, EnhancementId> EnhanceIdByItemType = [];
+        private static readonly Dictionary<EnhancementId, HashSet<int>> ItemTypesByEnhanceId = [];
 
         /// <summary>
         /// 当前已注册的全部增强实例（按增强身份去重）。
@@ -55,7 +55,7 @@ namespace TouhouPetsEx.Enhance.Core
             // 反向查询：enhanceId -> {itemTypes...}，用于“一增强多物品”的统计/调试/功能扩展。
             if (!ItemTypesByEnhanceId.TryGetValue(id, out var itemTypes))
             {
-                itemTypes = new HashSet<int>();
+                itemTypes = [];
                 ItemTypesByEnhanceId.Add(id, itemTypes);
             }
 

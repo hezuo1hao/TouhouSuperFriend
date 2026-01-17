@@ -10,6 +10,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Sekibanki : BaseEnhance
     {
         public override string Text => GetText("Sekibanki");
+        public override string[] ExperimentalText => [GetText("Sekibanki_1")];
+        public override bool[] Experimental => [Config.Sekibanki];
         public override bool Passive => true;
         public override bool EnableBuffText => false;
         public override void ItemSSD()

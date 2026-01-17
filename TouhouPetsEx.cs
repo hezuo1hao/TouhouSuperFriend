@@ -22,7 +22,7 @@ namespace TouhouPetsEx
         public static int[] WhitelistBlock = [2, 3, 3086, 3081, 169, 3271, 3272, 133, 176, 172, 593, 664, 9, 620, 619, 911, 2503, 2504, 1727, 4564, 586, 591, 1872];
         public static int[] ColdProjVanilla = [118, 119, 120, 166, 172, 253, 309, 337, 344, 359, 520, 979];
         public static List<int> ColdProjAll = [];
-        public static int[] VanillaBug = [355, 356, 357, 358, 359, 360, 377, 484, 485, 486, 487, 595, 596, 597, 598, 599, 600, 604, 606, 612, 653, 654, 655, 669];
+        public static int[] VanillaBug = [355, 356, 357, 358, 377, 484, 485, 486, 487, 595, 596, 597, 598, 599, 600, 604, 606, 612, 653, 654, 669];
         public static int[] VanillaGoldBug = [444, 446, 448, 601, 605, 613];
         public static HashSet<int> OceanEnemy = [];
         public static Dictionary<int, BaseEnhance> GEnhanceInstances = [];

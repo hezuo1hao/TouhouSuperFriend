@@ -136,6 +136,7 @@ Wakasagihime: 在水里更强，可以化身海栖种
 Wakasagihime_1: 进化出了在极地生存的能力
 Wakasagihime_2: ⚡水精之力充满全身⚡
 Sekibanki: 可以右键把头飞出去玩
+Sekibanki_1: 和邪仙学了一手
 Raiko: 会让在雷雨天装的敌怪遭受制裁
 Doremy: 睡觉有概率美梦成真
 Junko: 不残不会玩
@@ -532,6 +533,15 @@ Configs: {
 				'''
 		}
 
+		Sekibanki: {
+			Label: 赤蛮奇-邪仙技法
+			Tooltip:
+				'''
+				无兼容性问题
+				飞出去的头可以穿墙
+				'''
+		}
+
 		Junko: {
 			Label: 纯狐-纯化加成
 			Tooltip:
@@ -657,6 +667,22 @@ Configs: {
 				'''
 		}
 
+		Sekibanki: {
+			Label: 赤蛮奇-飞头特效
+			Tooltip:
+				'''
+				可以修改飞头时特效
+
+				有两种可选的范围：
+				1. {$Mods.TouhouPetsEx.Configs.SekibankiEffect.Normal.Label}
+				  - 显示符合常规认知的特效
+				  - 其他人的特效也是如此
+				2. {$Mods.TouhouPetsEx.Configs.SekibankiEffect.QOT.Label}
+				  - 显示像是用给无人机的特效
+				  - 其他人的特效也是如此
+				'''
+		}
+
 		Raiko: {
 			Label: 雷鼓-震屏特效
 			Tooltip: 禁用后将不再显示闪电劈下时的震屏特效
@@ -705,6 +731,20 @@ Configs: {
 
 		All: {
 			Label: 音效要听、视效要看，这样才叫健全
+			Tooltip: ""
+		}
+
+		Tooltip: ""
+	}
+
+	SekibankiEffect: {
+		Normal: {
+			Label: 常规
+			Tooltip: ""
+		}
+
+		QOT: {
+			Label: 无人机？！
 			Tooltip: ""
 		}
 

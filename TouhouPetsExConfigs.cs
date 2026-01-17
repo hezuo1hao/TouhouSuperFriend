@@ -118,6 +118,9 @@ namespace TouhouPetsEx
         public bool Wakasagihime_2;
 
         [DefaultValue(false)]
+        public bool Sekibanki;
+
+        [DefaultValue(false)]
         public bool Junko;
 
         [DefaultValue(false)]
@@ -163,6 +166,10 @@ namespace TouhouPetsEx
         [DrawTicks]
         public YukaEffect Yuka;
 
+        [DefaultValue(SekibankiEffect.Normal)]
+        [DrawTicks]
+        public SekibankiEffect Sekibanki;
+
         [DefaultValue(true)]
         public bool Raiko;
     }
@@ -179,5 +186,11 @@ namespace TouhouPetsEx
         NoSound,
         NoVisual,
         All
+    }
+
+    public enum SekibankiEffect
+    {
+        Normal,
+        QOT
     }
 }

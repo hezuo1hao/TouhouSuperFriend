@@ -69,6 +69,8 @@ public class PlayerHead : ModProjectile
                 return;
             }
 
+            Projectile.tileCollide = !Config.Sekibanki;
+
             if (player.HeldItem.type != ModContent.ItemType<SekibankiBow>())
                 homing++;
 
@@ -141,6 +143,15 @@ public class PlayerHead : ModProjectile
         if (Main.LocalPlayer == player && ((player.Center.X < 6400 && Projectile.Center.X > Main.maxTilesX * 16 - 6400) || (Projectile.Center.X < 6400 && player.Center.X > Main.maxTilesX * 16 - 6400)))
             ModContent.GetInstance<Teleportation>().Condition.Complete();
 
+        if (LocalConfig.Sekibanki == SekibankiEffect.Normal)
+        {
+            int num876 = Dust.NewDust(Projectile.Center - Vector2.UnitX * 12, 14, 2, DustID.DungeonSpirit);
+            Dust dust = Main.dust[num876];
+            dust.velocity *= 0.1f;
+            Main.dust[num876].scale = 1.3f;
+            Main.dust[num876].noGravity = true;
+        }
+
         time++;
     }
 
@@ -164,31 +175,41 @@ public class PlayerHead : ModProjectile
     {
         Projectile.localAI[0] += 1f;
 
-        float pitchFactor = 0; // 声音的声调程度
-        if (!onLand)
-            pitchFactor = 50;
-
-        if (speedDirection.Length() > 0.5f)
-            pitchFactor = MathHelper.Lerp(0f, 100f, speedDirection.Length());
-
-        Projectile.localAI[1] = MathHelper.Lerp(Projectile.localAI[1], pitchFactor, 0.2f);
-        float num3 = Utils.Remap(Projectile.localAI[0], 0f, 5f, 0f, 1f) *
-                     Utils.Remap(Projectile.localAI[0], 5f, 15f, 1f, 0f);
-        float volume = Utils.Clamp(MathHelper.Max(Utils.Remap(Projectile.localAI[1], 0f, 100f, 0f, 25f), num3 * 12f),
-            0f, 100f) * 2f;
-        SoundEngine.TryGetActiveSound(SlotId.FromFloat(Projectile.localAI[2]), out ActiveSound activeSound);
-        if (activeSound == null && volume != 0f)
+        switch (LocalConfig.Sekibanki)
         {
-            Projectile.localAI[2] = SoundEngine.PlayTrackedLoopedSound(SoundID.JimsDrone, Projectile.Center,
-                new ProjectileAudioTracker(Projectile).IsActiveAndInGame).ToFloat();
-            SoundEngine.TryGetActiveSound(SlotId.FromFloat(Projectile.localAI[2]), out activeSound);
-        }
+            case SekibankiEffect.Normal:
+                if (Projectile.localAI[0] % 15 == 0)
+                    SoundEngine.PlaySound(SoundID.Item24, Projectile.Center);
+                break;
 
-        if (activeSound != null)
-        {
-            activeSound.Volume = volume;
-            activeSound.Position = Projectile.Center;
-            activeSound.Pitch = Utils.Clamp(Utils.Remap(Projectile.localAI[1], 0f, 100f, -1f, 1f) + num3, -1f, 1f);
+            case SekibankiEffect.QOT:
+                float pitchFactor = 0; // 声音的声调程度
+                if (!onLand)
+                    pitchFactor = 50;
+
+                if (speedDirection.Length() > 0.5f)
+                    pitchFactor = MathHelper.Lerp(0f, 100f, speedDirection.Length());
+
+                Projectile.localAI[1] = MathHelper.Lerp(Projectile.localAI[1], pitchFactor, 0.2f);
+                float num3 = Utils.Remap(Projectile.localAI[0], 0f, 5f, 0f, 1f) *
+                             Utils.Remap(Projectile.localAI[0], 5f, 15f, 1f, 0f);
+                float volume = Utils.Clamp(MathHelper.Max(Utils.Remap(Projectile.localAI[1], 0f, 100f, 0f, 25f), num3 * 12f),
+                    0f, 100f) * 2f;
+                SoundEngine.TryGetActiveSound(SlotId.FromFloat(Projectile.localAI[2]), out ActiveSound activeSound);
+                if (activeSound == null && volume != 0f)
+                {
+                    Projectile.localAI[2] = SoundEngine.PlayTrackedLoopedSound(SoundID.JimsDrone, Projectile.Center,
+                        new ProjectileAudioTracker(Projectile).IsActiveAndInGame).ToFloat();
+                    SoundEngine.TryGetActiveSound(SlotId.FromFloat(Projectile.localAI[2]), out activeSound);
+                }
+
+                if (activeSound != null)
+                {
+                    activeSound.Volume = volume;
+                    activeSound.Position = Projectile.Center;
+                    activeSound.Pitch = Utils.Clamp(Utils.Remap(Projectile.localAI[1], 0f, 100f, -1f, 1f) + num3, -1f, 1f);
+                }
+                break;
         }
     }
 
@@ -203,10 +224,13 @@ public class PlayerHead : ModProjectile
         player.direction = Projectile.direction;
         Main.PlayerRenderer.DrawPlayerHead(Main.Camera, Main.player[Projectile.owner], Projectile.position - Main.screenPosition);
 
-        if (player.direction == -1)
-            Main.DrawTrail(Projectile, new Vector2(10f, 2f), new Color(59, 217, 180, 100));
-        else
-            Main.DrawTrail(Projectile, new Vector2(-10f, 2f), new Color(59, 217, 180, 100));
+        if (LocalConfig.Sekibanki == SekibankiEffect.QOT)
+        {
+            if (player.direction == -1)
+                Main.DrawTrail(Projectile, new Vector2(10f, 2f), new Color(59, 217, 180, 100));
+            else
+                Main.DrawTrail(Projectile, new Vector2(-10f, 2f), new Color(59, 217, 180, 100));
+        }
 
         player.direction = dir;
         player.head = TouhouPetsEx.TransparentHead;

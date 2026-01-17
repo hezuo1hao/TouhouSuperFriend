@@ -34,6 +34,9 @@ namespace TouhouPetsEx.Enhance.Core
             // 只对“由子弹类弹药发射”的投射物打标记，用于后续本地逻辑（如 Reisen 的转向）。
             if (source is EntitySource_ItemUse_WithAmmo s && s.AmmoItemIdUsed > 0 && ContentSamples.ItemsByType[s.AmmoItemIdUsed].ammo == ItemID.MusketBall)
                 Bullet = true;
+
+            foreach (BaseEnhance enhance in EnhanceHookRegistry.ProjectileOnSpawn)
+                enhance.ProjectileOnSpawn(projectile, source);
         }
     }
 }

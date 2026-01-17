@@ -89,6 +89,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual bool? ItemGrabStyle(Item item, Player player)
+        {
+            return null;
+        }
         public virtual void ItemHoldItem(Item item, Player player)
         {
 
@@ -233,6 +237,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void NPCOnSpawn(NPC npc, IEntitySource source)
+        {
+
+        }
         public virtual bool? NPCPreAI(NPC npc)
         {
             return null;
@@ -244,6 +252,10 @@ namespace TouhouPetsEx.Enhance.Core
         public virtual bool? NPCCanHitNPC(NPC npc, NPC target)
         {
             return null;
+        }
+        public virtual void ProjectileOnSpawn(Projectile projectile, IEntitySource source)
+        {
+
         }
         public virtual void TileDrawEffects(int i, int j, int type, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
