@@ -33,7 +33,6 @@ namespace TouhouPetsEx.Projectiles
 
             Projectile.ai[0]++;
         }
-        RenderTarget2D render = null;
         public override bool PreDraw(ref Color lightColor)
         {
             return false;

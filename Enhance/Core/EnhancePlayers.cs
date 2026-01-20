@@ -281,15 +281,21 @@ namespace TouhouPetsEx.Enhance.Core
             {
                 foreach (Item item in Player.miscEquips)
                 {
-                    if (item.ModItem?.Mod.Name == "TouhouPets"
-                        && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
-                        && enhance.Passive
-                        && !Player.EnableEnhance(item.type)
-                        && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
-                    {
-                        if (!ActivePassiveEnhance.Contains(enhanceId))
-                            ActivePassiveEnhance.Add(enhanceId);
-                    }
+                    Player.AddActivePassiveEnhance(item);
+                }
+            }
+
+            ProcessItems(Player, Player.bank.item);
+            ProcessItems(Player, Player.bank2.item);
+            ProcessItems(Player, Player.bank3.item);
+
+            static void ProcessItems(Player player, Item[] items)
+            {
+                Span<Item> span = items;
+                for (int i = 0; i < span.Length; i++)
+                {
+                    ref Item item = ref span[i];
+                    player.AddActivePassiveEnhance(item);
                 }
             }
 

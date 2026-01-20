@@ -57,6 +57,15 @@ namespace TouhouPetsEx
 
             return EnhanceCount.TryGetValue(enhanceId, out int value) && value > 0;
         }
+        public static void AddActivePassiveEnhance(this Player player, Item item)
+        {
+            if (item.ModItem?.Mod.Name == "TouhouPets"
+                && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
+                && enhance.Passive
+                && !player.EnableEnhance(item.type)
+                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
+                    player.MP().ActivePassiveEnhance.Add(enhanceId);
+        }
         public static int ReflectionDamage(this Player.HurtInfo info)
         {
             int damage = info.Damage;

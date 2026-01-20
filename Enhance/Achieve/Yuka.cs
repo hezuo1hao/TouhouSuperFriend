@@ -52,7 +52,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPostUpdate(Player player)
         {
-            if (Main.netMode != NetmodeID.Server && Config.Yuka_2 && player.ZoneOverworldHeight && player.ZoneGlowshroom && player.sporeSac && Main.masterMode && Main.getGoodWorld && Main.IsItStorming)
+            if (Main.netMode != NetmodeID.Server && Config.Yuka_2 && player.ZoneOverworldHeight && player.ZoneGlowshroom && player.sporeSac && Main.ActiveWorldFileData.GameMode == 3 && Main.getGoodWorld && Main.IsItStorming)
                 ModContent.GetInstance<SporeStage>().Condition.Complete();
 
             if (!Config.Yuka || player.MP().YukaCD > 0)

@@ -165,29 +165,13 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void HoldItem(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets"
-                && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
-                && enhance.Passive
-                && !player.EnableEnhance(item.type)
-                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
-            {
-                if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                    player.MP().ActivePassiveEnhance.Add(enhanceId);
-            }
+            player.AddActivePassiveEnhance(item);
 
             ProcessDemonismAction((enhance) => enhance.ItemHoldItem(item, player));
         }
         public override void UpdateInventory(Item item, Player player)
         {
-            if (item.ModItem?.Mod.Name == "TouhouPets"
-                && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
-                && enhance.Passive
-                && !player.EnableEnhance(item.type)
-                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
-            {
-                if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                    player.MP().ActivePassiveEnhance.Add(enhanceId);
-            }
+            player.AddActivePassiveEnhance(item);
 
             ProcessDemonismAction((enhance) => enhance.ItemUpdateInventory(item, player));
         }
