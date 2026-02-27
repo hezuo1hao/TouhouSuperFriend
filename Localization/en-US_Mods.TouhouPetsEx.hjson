@@ -213,12 +213,12 @@ Configs: {
 		}
 
 		Piece_V: {
-			Label: 皮丝
+			Label: "[i:TouhouPets/HecatiaPlanet] 皮丝"
 			Tooltip: 禁用后，火把将不再使敌人自残
 		}
 
 		AliceOld: {
-			Label: 萝莉丝-魔力优势学说
+			Label: "[i:TouhouPets/AliceOldDoll] 萝莉丝-魔力优势学说"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -227,7 +227,7 @@ Configs: {
 		}
 
 		Rumia: {
-			Label: 露米娅-夜幕降临
+			Label: "[i:TouhouPets/RumiaRibbon] 露米娅-夜幕降临"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -236,7 +236,7 @@ Configs: {
 		}
 
 		Sakuya: {
-			Label: 咲夜-完美女仆
+			Label: "[i:TouhouPets/SakuyaWatch] 咲夜-完美女仆"
 			Tooltip:
 				'''
 				可能有兼容性问题
@@ -245,7 +245,7 @@ Configs: {
 		}
 
 		Lily: {
-			Label: 莉莉白-增加最大血量
+			Label: "[i:TouhouPets/LilyOneUp] 莉莉白-增加最大血量"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -254,7 +254,7 @@ Configs: {
 		}
 
 		Cirno: {
-			Label: 琪露诺-反牛顿冰块
+			Label: "[i:TouhouPets/CirnoIceShard] 琪露诺-反牛顿冰块"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -263,7 +263,7 @@ Configs: {
 		}
 
 		Meirin: {
-			Label: 红美铃-超高纯度的卸力
+			Label: "[i:TouhouPets/MeirinPanda] 红美铃-超高纯度的卸力"
 			Tooltip:
 				'''
 				可能有兼容性问题
@@ -272,7 +272,7 @@ Configs: {
 		}
 
 		Letty: {
-			Label: 蕾蒂-增强寒冷系弹幕
+			Label: "[i:TouhouPets/LettyGlobe] 蕾蒂-增强寒冷系弹幕"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -281,7 +281,7 @@ Configs: {
 		}
 
 		Letty_2: {
-			Label: 蕾蒂-可发射模组寒冷系弹幕
+			Label: "[i:TouhouPets/LettyGlobe] 蕾蒂-可发射模组寒冷系弹幕"
 			Tooltip:
 				'''
 				无法兼容特殊寒冷系弹幕，可使用下方的黑名单自行屏蔽无法兼容的弹幕
@@ -290,7 +290,7 @@ Configs: {
 		}
 
 		Letty_2_1: {
-			Label: 蕾蒂-模组寒冷系弹幕黑名单
+			Label: "[i:TouhouPets/LettyGlobe] 蕾蒂-模组寒冷系弹幕黑名单"
 			Tooltip:
 				'''
 				用于自主屏蔽不兼容的弹幕
@@ -301,7 +301,7 @@ Configs: {
 		}
 
 		Yukari: {
-			Label: 八云紫-隙间传送无限制
+			Label: "[i:TouhouPets/YukarisItem] 八云紫-隙间传送无限制"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -310,7 +310,7 @@ Configs: {
 		}
 
 		Reimu: {
-			Label: 灵梦-梦想天生
+			Label: "[i:TouhouPets/ReimuYinyangOrb] 灵梦-梦想天生"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -319,7 +319,7 @@ Configs: {
 		}
 
 		Marisa: {
-			Label: 魔理沙-魔力充盈
+			Label: "[i:TouhouPets/MarisaHakkero] 魔理沙-魔力充盈"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -329,7 +329,7 @@ Configs: {
 		}
 
 		Reisen: {
-			Label: 铃仙-子弹偏转
+			Label: "[i:TouhouPets/ReisenGun] 铃仙-子弹偏转"
 			Tooltip:
 				'''
 				无法兼容特殊子弹弹幕，可使用下方的黑名单自行屏蔽无法兼容的弹幕
@@ -339,7 +339,7 @@ Configs: {
 		}
 
 		Reisen_1: {
-			Label: 铃仙-子弹偏转黑名单
+			Label: "[i:TouhouPets/ReisenGun] 铃仙-子弹偏转黑名单"
 			Tooltip:
 				'''
 				用于自主屏蔽不兼容的弹幕
@@ -351,7 +351,7 @@ Configs: {
 		}
 
 		Eirin: {
-			Label: 永琳-增强恢复系药水效果
+			Label: "[i:TouhouPets/EirinBow] 永琳-增强恢复系药水效果"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -360,7 +360,7 @@ Configs: {
 		}
 
 		Aya: {
-			Label: 文-无双风神
+			Label: "[i:TouhouPets/AyaCamera] 文-无双风神"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -369,7 +369,7 @@ Configs: {
 		}
 
 		Yuka: {
-			Label: 幽香-向阳花田
+			Label: "[i:TouhouPets/YukaSunflower] 幽香-向阳花田"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -378,7 +378,7 @@ Configs: {
 		}
 
 		Yuka_2: {
-			Label: 幽香-大南方丛林植物
+			Label: "[i:TouhouPets/YukaSunflower] 幽香-大南方丛林植物"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -387,7 +387,7 @@ Configs: {
 		}
 
 		Sanae: {
-			Label: 早苗-奇迹「白昼的客星」
+			Label: "[i:TouhouPets/SanaeCoin] 早苗-奇迹「白昼的客星」"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -397,7 +397,7 @@ Configs: {
 		}
 
 		Tenshi: {
-			Label: 天子-破甲伤害也是伤害
+			Label: "[i:TouhouPets/TenshiKeyStone] 天子-破甲伤害也是伤害"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -406,16 +406,16 @@ Configs: {
 		}
 
 		Satori: {
-			Label: 地灵殿的君主 古明地觉
+			Label: "[i:TouhouPets/SatoriSlippers] 地灵殿的君主 古明地觉"
 			Tooltip:
 				'''
 				无兼容性问题
-				火焰猫燐、灵乌路空、古明地恋的能力会转为被动能力
+				[i:TouhouPets/RinSkull]火焰猫燐、[i:TouhouPets/UtsuhoEye]灵乌路空、[i:TouhouPets/KoishiTelephone]古明地恋的能力会转为被动能力
 				'''
 		}
 
 		Satori_2: {
-			Label: 小五-反方向的廉价把戏
+			Label: "[i:TouhouPets/SatoriSlippers] 小五-反方向的廉价把戏"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -424,7 +424,7 @@ Configs: {
 		}
 
 		Satori_3: {
-			Label: 古明地觉-游戏般的心理咨询
+			Label: "[i:TouhouPets/SatoriSlippers] 古明地觉-游戏般的心理咨询"
 			Tooltip:
 				'''
 				可能有兼容性问题
@@ -433,7 +433,7 @@ Configs: {
 		}
 
 		Rin: {
-			Label: 灼热地狱的怨灵们-魁首 火焰猫燐
+			Label: "[i:TouhouPets/RinSkull] 灼热地狱的怨灵们-魁首 火焰猫燐"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -442,7 +442,7 @@ Configs: {
 		}
 
 		Rin_2: {
-			Label: 阿燐-尸爆术
+			Label: "[i:TouhouPets/RinSkull] 阿燐-尸爆术"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -451,7 +451,7 @@ Configs: {
 		}
 
 		Rin_3: {
-			Label: 阿燐-灵者杀手
+			Label: "[i:TouhouPets/RinSkull] 阿燐-灵者杀手"
 			Tooltip:
 				'''
 				只对原版、幻想乡模组生效
@@ -460,7 +460,7 @@ Configs: {
 		}
 
 		Utsuho: {
-			Label: 地灵殿 核反应炉主理人 灵乌路空
+			Label: "[i:TouhouPets/UtsuhoEye] 地灵殿 核反应炉主理人 灵乌路空"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -469,7 +469,7 @@ Configs: {
 		}
 
 		Utsuho_2: {
-			Label: 阿空-温度叠加
+			Label: "[i:TouhouPets/UtsuhoEye] 阿空-温度叠加"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -478,7 +478,7 @@ Configs: {
 		}
 
 		Utsuho_3: {
-			Label: 阿空-Armageddon
+			Label: "[i:TouhouPets/UtsuhoEye] 阿空-Armageddon"
 			Tooltip:
 				'''
 				应该无兼容性问题
@@ -487,7 +487,7 @@ Configs: {
 		}
 
 		Koishi: {
-			Label: 绽放E.G.O::重新睁开的恋之瞳 古明地恋
+			Label: "[i:TouhouPets/KoishiTelephone] 绽放E.G.O::重新睁开的恋之瞳 古明地恋"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -498,7 +498,7 @@ Configs: {
 		}
 
 		Koishi_2: {
-			Label: 恋恋-钢制帽子先生
+			Label: "[i:TouhouPets/KoishiTelephone] 恋恋-钢制帽子先生"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -507,7 +507,7 @@ Configs: {
 		}
 
 		Koishi_3: {
-			Label: 恋恋-蔷薇偶像
+			Label: "[i:TouhouPets/KoishiTelephone] 恋恋-蔷薇偶像"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -516,7 +516,7 @@ Configs: {
 		}
 
 		Wakasagihime: {
-			Label: 若鹭姬-冰点之下
+			Label: "[i:TouhouPets/WakasagihimeFishingRod] 若鹭姬-冰点之下"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -525,7 +525,7 @@ Configs: {
 		}
 
 		Wakasagihime_2: {
-			Label: 若鹭姬-水精共振
+			Label: "[i:TouhouPets/WakasagihimeFishingRod] 若鹭姬-水精共振"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -534,7 +534,7 @@ Configs: {
 		}
 
 		Sekibanki: {
-			Label: 赤蛮奇-邪仙技法
+			Label: "[i:TouhouPets/SekibankiBow] 赤蛮奇-邪仙技法"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -543,7 +543,7 @@ Configs: {
 		}
 
 		Junko: {
-			Label: 纯狐-纯化加成
+			Label: "[i:TouhouPets/JunkoMooncake] 纯狐-纯化加成"
 			Tooltip:
 				'''
 				应该无兼容性问题
@@ -552,7 +552,7 @@ Configs: {
 		}
 
 		Hecatia: {
-			Label: 赫卡提亚-增加饰品栏上限
+			Label: "[i:TouhouPets/HecatiaPlanet] 赫卡提亚-增加饰品栏上限"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -561,7 +561,7 @@ Configs: {
 		}
 
 		Piece: {
-			Label: 皮丝-狂气之神
+			Label: "[i:TouhouPets/HecatiaPlanet] 皮丝-狂气之神"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -609,22 +609,22 @@ Configs: {
 		}
 
 		Rumia: {
-			Label: 露米娅-黑暗特效
+			Label: "[i:TouhouPets/RumiaRibbon] 露米娅-黑暗特效"
 			Tooltip: 禁用后将不再显示所有人的黑暗特效
 		}
 
 		Sakuya: {
-			Label: 咲夜-时缓效果
+			Label: "[i:TouhouPets/SakuyaWatch] 咲夜-时缓效果"
 			Tooltip: 禁用后就算启用咲夜能力，时间也会正常流逝
 		}
 
 		Aya: {
-			Label: 文-无双风神特效
+			Label: "[i:TouhouPets/AyaCamera] 文-无双风神特效"
 			Tooltip: 禁用后将不再在高速飞行时显示速度线
 		}
 
 		Yuyuko: {
-			Label: 幽幽子-即死特效
+			Label: "[i:TouhouPets/YuyukoFan] 幽幽子-即死特效"
 			Tooltip:
 				'''
 				可以修改自身触发即死时所释放的特效
@@ -646,7 +646,7 @@ Configs: {
 		}
 
 		Yuka: {
-			Label: 幽香-向阳特效
+			Label: "[i:TouhouPets/YukaSunflower] 幽香-向阳特效"
 			Tooltip:
 				'''
 				可以修改自身接触向日葵时所释放的特效
@@ -668,7 +668,7 @@ Configs: {
 		}
 
 		Sekibanki: {
-			Label: 赤蛮奇-飞头特效
+			Label: "[i:TouhouPets/SekibankiBow] 赤蛮奇-飞头特效"
 			Tooltip:
 				'''
 				可以修改飞头时特效
@@ -684,7 +684,7 @@ Configs: {
 		}
 
 		Raiko: {
-			Label: 雷鼓-震屏特效
+			Label: "[i:TouhouPets/RaikoDrum] 雷鼓-震屏特效"
 			Tooltip: 禁用后将不再显示闪电劈下时的震屏特效
 		}
 	}
@@ -762,7 +762,7 @@ Items: {
 			   启用后，您还需要保证身上带有伙伴增益，否则不会生效。
 			3. 能力的上限：能力默认上限为1，如果在达到上限时继续启用能力将会关闭最早启用的能力
 			   部分能力为被动能力，会带有特殊描述告知，被动能力不占用能力上限，可通过右键主动禁用被动。
-			   可以通过：携带赫卡提亚并击败肉山或月总、开启萝莉丝并使用100本书
+			   可以通过：携带[i:TouhouPets/HecatiaPlanet]赫卡提亚并击败肉山或月总、开启[i:TouhouPets/AliceOldDoll]萝莉丝并使用100本书
 			   使用新造的偶（生命水晶 + ？？？）、使用被烧焦的偶（新造的偶 + ？？？）来增加能力上限
 			4. 能力的查看：每个带有能力的物品其物品描述都有标识大致的能力，增益描述上则显示着当前开启的能力。
 			   （可在视觉特效内关闭增益描述，其中主动能力和被动能力描述可以分别关闭）
