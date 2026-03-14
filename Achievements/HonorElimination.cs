@@ -3,23 +3,16 @@ using Terraria.GameContent.Achievements;
 using Terraria.ModLoader;
 
 namespace TouhouPetsEx.Achievements;
-public class Start : ModAchievement
+public class HonorElimination : ModAchievement
 {
 
     public CustomFlagCondition Condition { get; private set; }
 
     public override bool Hidden => false;
-    public override Position GetDefaultPosition()
-    {
-        return new Before("BENCHED");
-    }
-    public override Position GetAdvisorPosition()
-    {
-        return new Before("BENCHED");
-    }
+
     public override void SetStaticDefaults()
     {
-        Achievement.SetCategory(AchievementCategory.Explorer);
+        Achievement.SetCategory(AchievementCategory.Challenger);
 
         Condition = AddCondition();
     }

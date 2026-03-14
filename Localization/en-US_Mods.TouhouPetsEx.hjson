@@ -1114,4 +1114,9 @@ Achievements: {
 		FriendlyName: 孢子舞台
 		Description: 在狂风与雷雨中，与最高难度的蘑菇们一起跳舞吧？
 	}
+
+	HonorElimination: {
+		FriendlyName: 荣誉消灭
+		Description: 启用西行寺幽幽子能力，通过该能力斩杀一只当前血量刚好为5000的敌怪
+	}
 }

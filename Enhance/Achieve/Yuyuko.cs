@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 
@@ -16,8 +17,11 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if (target.boss || target.life >= 5000 || Main.rand.Next(1000) >= 44 || player != Main.LocalPlayer)
+            if (target.boss || target.life > 5000 || Main.rand.Next(1000) >= 44 || player != Main.LocalPlayer)
                 return;
+
+            if (target.life == 5000)
+                ModContent.GetInstance<HonorElimination>().Condition.Complete();
 
             target.StrikeInstantKill();
             int rand = -1;
