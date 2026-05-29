@@ -19,10 +19,10 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             AddEnhance(ModContent.ItemType<AliceOldDoll>());
         }
-        public override void PlayerResetEffects(Player player)
+        public override void PlayerResetEffectsAlways(Player player)
         {
             if (player.MP().EatBook >= 100)
-                player.MP().ActiveEnhanceCount += 2;
+                player.MP().ActiveEnhanceCount++;
         }
         public override void PlayerPostUpdateEquips(Player player)
         {
@@ -48,9 +48,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (likesToRead.Condition.Value >= LikesToRead.Max)
                     likesToRead.Condition.Complete();
             }
-        }
-        public override void PlayerPostUpdate(Player player)
-        {
+
             if (Config.AliceOld)
                 player.GetDamage(DamageClass.Magic) += player.statManaMax2 / 1000f;
         }

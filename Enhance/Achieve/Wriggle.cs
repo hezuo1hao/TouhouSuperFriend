@@ -1,9 +1,13 @@
 using Microsoft.Xna.Framework;
-using System.Diagnostics;
 using Terraria;
+using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
+using TouhouPets;
+using TouhouPets.Content.Dusts;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPets.Content.Projectiles;
 using TouhouPetsEx.Enhance.Core;
+using WrigglePet = TouhouPets.Content.Projectiles.Pets.Wriggle;
 
 namespace TouhouPetsEx.Enhance.Achieve
 {
@@ -21,6 +25,15 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (player.MP().WriggleCD > 0)
                 player.MP().WriggleCD--;
         }
+        public override void PlayerPostUpdate(Player player)
+        {
+            if (player != Main.LocalPlayer || player.RollGoodLuck(100) > 5)
+                return;
+
+            Vector2 point = player.Center + new Vector2(Main.rand.Next(-100, 100), Main.rand.Next(-100, 100));
+            if (WrigglePet.CheckEmptyPlace(point))
+                SpawnFirefly(point, player);
+        }
         public override void SystemPostUpdateNPCs()
         {
             NPC.goldCritterChance = 400;
@@ -30,11 +43,11 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (!player.EnableEnhance<WriggleInAJar>())
                     continue;
 
-                NPC.goldCritterChance /= 2;
+                NPC.goldCritterChance /= 8;
                 if (NPC.goldCritterChance <= 0)
                     NPC.goldCritterChance = 1;
 
-                if (player.MP().WriggleCD > 0 || !Main.rand.NextBool(60))
+                if (player.MP().WriggleCD > 0 || player.RollGoodLuck(60) != 0)
                     continue;
 
                 bool flag = false;
@@ -145,10 +158,18 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     int spawnPositionX = num10 * 16 + 8;
                     int spawnPositionY = num11 * 16;
-                    NPC.NewNPC(player.GetSource_FromThis(), spawnPositionX, spawnPositionY, Main.rand.Next(player.RollLuck(NPC.goldCritterChance) == 0 ? TouhouPetsEx.VanillaGoldBug : TouhouPetsEx.VanillaBug));
+                    NPC.NewNPC(player.GetSource_FromThis(), spawnPositionX, spawnPositionY, Main.rand.Next(player.RollGoodLuck(NPC.goldCritterChance) == 0 ? TouhouPetsEx.VanillaGoldBug : TouhouPetsEx.VanillaBug));
                     player.MP().WriggleCD = 300;
                 }
             }
+        }
+        private static void SpawnFirefly(Vector2 position, Player player)
+        {
+            Dust fly = Dust.NewDustPerfect(position, ModContent.DustType<WriggleFirefly>(), Vector2.Zero);
+            fly.velocity = new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
+            fly.customData = WrigglePet.FireflyType(player);
+            if (!ModUtils.CompatibilityMode)
+                fly.shader = GameShaders.Armor.GetSecondaryShader(player.cLight, player);
         }
     }
 }

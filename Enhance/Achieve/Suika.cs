@@ -42,12 +42,14 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void BuffUpdate(int type, Player player, ref int buffIndex)
         {
+            player.whipRangeMultiplier += 0.3f;
+
             if (type == BuffID.Tipsy)
             {
-                player.statDefense += 4;
+                player.statDefense += 8;
                 player.GetDamage(DamageClass.Melee) += 0.02f;
                 player.GetAttackSpeed(DamageClass.Melee) += 0.02f;
-                player.GetCritChance(DamageClass.Melee) += 3;
+                player.GetCritChance(DamageClass.Melee) += 4;
             }
         }
     }

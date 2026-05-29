@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 
@@ -18,8 +19,10 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if (hit.Crit && Main.rand.NextBool(5))
+            if (hit.Crit && player.RollGoodLuck(100) < 19)
             {
+                target.AddBuff(ModContent.BuffType<LeiZhe>(), 60);
+
                 float maxDistance = 304;
                 NPC target2 = null;
                 foreach (NPC npc in Main.ActiveNPCs)

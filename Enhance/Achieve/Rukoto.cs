@@ -30,6 +30,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (Main.GameUpdateCount % 60 == 0)
             {
                 bool rukotoSweeping = false;
+                EnhancePlayers mp = player.MP();
 
                 if (player.ownedProjectileCounts[ModContent.ProjectileType<Pets.Rukoto>()] > 0)
                 {
@@ -46,16 +47,16 @@ namespace TouhouPetsEx.Enhance.Achieve
 
                 DelegateMethods.tileCutIgnore = TileID.Sets.TileCutIgnore.None;
 
-                float range = 240;
+                mp.RukotoRange = 240;
                 if (rukotoSweeping)
                 {
-                    range *= 2;
+                    mp.RukotoRange *= 2;
 
                     if (player == Main.LocalPlayer)
                         ModContent.GetInstance<GreatPurge>().Condition.Complete();
                 }
 
-                Utils.PlotTileLine(player.Center + Vector2.UnitX * range, player.Center - Vector2.UnitX * range, range * 2, CutTiles);
+                Utils.PlotTileLine(player.Center + Vector2.UnitX * mp.RukotoRange, player.Center - Vector2.UnitX * mp.RukotoRange, mp.RukotoRange * 2, CutTiles);
 
                 DelegateMethods.tileCutIgnore = null;
             }

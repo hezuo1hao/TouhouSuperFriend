@@ -4,6 +4,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Achievements;
+using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -36,7 +37,7 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (mp?.OldBuff == null || (uint)buffIndex >= (uint)mp.OldBuff.Length)
                 return;
 
-            if (mp.OldBuff[buffIndex] == player.buffTime[buffIndex] || BuffID.Sets.TimeLeftDoesNotDecrease[type] || BuffID.Sets.NurseCannotRemoveDebuff[type])
+            if (mp.OldBuff[buffIndex] == player.buffTime[buffIndex] || BuffID.Sets.TimeLeftDoesNotDecrease[type] || (BuffID.Sets.NurseCannotRemoveDebuff[type] && BuffLoader.GetBuff(type) is not CDBuff))
                 return;
 
             if (Main.debuff[type])
@@ -54,7 +55,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 
                 if (tt2.Condition.Value > TT2.Max)
                     tt2.Condition.Complete();
-            }    
+            }
         }
     }
 }

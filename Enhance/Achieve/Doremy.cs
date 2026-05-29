@@ -40,7 +40,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (!player.sleeping.isSleeping || !player.EnableEnhance<DoremyPillow>())
                     return;
 
-                if (Main.rand.NextDouble() < Main.dayRate / (27000.0 * 4))
+                if (player.RollGoodLuck(108000) < Main.dayRate)
                 {
                     int num8 = 0;
                     for (int i = 0; i < 200; i++)

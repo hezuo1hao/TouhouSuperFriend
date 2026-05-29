@@ -8,11 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using TouhouPetsEx.Enhance.Core;
-using Terraria.ID;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Achievements;
+using TouhouPetsEx.Enhance.Core;
 
 namespace TouhouPetsEx
 {
@@ -57,14 +58,52 @@ namespace TouhouPetsEx
 
             return EnhanceCount.TryGetValue(enhanceId, out int value) && value > 0;
         }
+        public static bool WorldAllEnableEnhance<T>(out int number) where T : ModItem
+        {
+            number = 0;
+
+            if (EnhanceCount == null ||
+                !EnhanceRegistry.TryGetEnhanceId(ModContent.ItemType<T>(), out EnhancementId enhanceId) ||
+                !EnhanceCount.TryGetValue(enhanceId, out number) ||
+                number <= 0)
+                return false;
+
+            return true;
+        }
         public static void AddActivePassiveEnhance(this Player player, Item item)
         {
             if (item.ModItem?.Mod.Name == "TouhouPets"
                 && TouhouPetsEx.GEnhanceInstances.TryGetValue(item.type, out var enhance)
                 && enhance.Passive
-                && !player.EnableEnhance(item.type)
-                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
-                    player.MP().ActivePassiveEnhance.Add(enhanceId);
+                && EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId)
+                && !player.MP().NowActivePassiveEnhance.Contains(enhanceId))
+                    player.MP().NowActivePassiveEnhance.Add(enhanceId);
+        }
+        public static int RollGoodLuck(this Player player, int range)
+        {
+            float luck = player.luck;
+            if (player.luck <= 0)
+                player.luck = 0;
+
+            int rand = player.RollLuck(range);
+            player.luck = luck;
+            return rand;
+        }
+        /// <summary>
+        /// 获取世界上最幸运的玩家
+        /// </summary>
+        /// <returns>返回出来的玩家可能是不存在的玩家</returns>
+        public static Player LuckiestPlayer()
+        {
+            Player player = null;
+            foreach (Player player2 in Main.ActivePlayers)
+            {
+                if (player == null || player.luck < player2.luck)
+                    player = player2;
+            }
+
+            player ??= new Player();
+            return player;
         }
         public static int ReflectionDamage(this Player.HurtInfo info)
         {
@@ -81,6 +120,27 @@ namespace TouhouPetsEx
                 damage = proj.damage;
 
             return damage;
+        }
+        public static int DetermineCD(this Player player, Player.HurtInfo info, int time)
+        {
+            return (int)MathHelper.Lerp(time / 10, time, Math.Min(1f, info.Damage / (player.statLifeMax2 / 2f)));
+        }
+        public static void Kaguya(this Player player, int buffIndex)
+        {
+            player.buffTime[buffIndex]--;
+            if (player.EnableEnhance<KaguyaBranch>())
+            {
+                player.buffTime[buffIndex]--;
+
+                if (player == Main.LocalPlayer)
+                {
+                    var tt2 = ModContent.GetInstance<TT2>();
+                    tt2.Condition.Value += 2;
+
+                    if (tt2.Condition.Value > TT2.Max)
+                        tt2.Condition.Complete();
+                }
+            }
         }
         public static int GetTooltipsLastIndex(this List<TooltipLine> tooltips)
         {

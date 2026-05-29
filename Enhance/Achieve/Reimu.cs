@@ -4,6 +4,7 @@ using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Enhance.Core;
+using TouhouPetsEx.Items;
 using TouhouPetsEx.Projectiles;
 
 namespace TouhouPetsEx.Enhance.Achieve
@@ -28,6 +29,13 @@ namespace TouhouPetsEx.Enhance.Achieve
 
                 if (player == Main.LocalPlayer && player.wingsLogic > 0 && player.velocity.Y < 0)
                     ModContent.GetInstance<FlyMyWings>().Condition.Complete();
+            }
+
+            if (player.equippedWings == null)
+            {
+                Item currentItem = new(ModContent.ItemType<AirWings>());
+                player.wingsLogic = currentItem.wingSlot;
+                player.equippedWings = currentItem;
             }
         }
         public override void PlayerPostUpdate(Player player)

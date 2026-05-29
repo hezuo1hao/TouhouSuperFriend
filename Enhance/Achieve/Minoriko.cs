@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
@@ -9,43 +11,27 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Minoriko : BaseEnhance
     {
         public override string Text => GetText("Minoriko");
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<MinorikoSweetPotato>());
         }
-        public override void BuffUpdate(int type, Player player, ref int buffIndex)
+        public override void ItemHoldItem(Item item, Player player)
         {
-            if (type == BuffID.WellFed)
+            if (item.type == ModContent.ItemType<MinorikoSweetPotato>() && !player.HasBuff(BuffID.WellFed) && !player.HasBuff(BuffID.WellFed2) && !player.HasBuff(BuffID.WellFed3))
             {
-                player.statDefense += 2;
-                player.GetCritChance(DamageClass.Generic) += 2;
-                player.GetDamage(DamageClass.Generic) += 0.05f;
-                player.GetAttackSpeed(DamageClass.Melee) += 0.05f;
-                player.minionKB += 0.5f;
-                player.moveSpeed += 0.2f;
-                player.pickSpeed -= 0.05f;
+                EnhanceOn.NoUpdate = true;
+                player.AddBuff(BuffID.WellFed, 36000);
+                EnhanceOn.NoUpdate = false;
+                SoundEngine.PlaySound(SoundID.Item2, player.Center);
             }
-
-            if (type == BuffID.WellFed2)
+        }
+        public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)
+        {
+            if (item.type == ModContent.ItemType<MinorikoSweetPotato>())
             {
-                player.statDefense += 3;
-                player.GetCritChance(DamageClass.Generic) += 3;
-                player.GetDamage(DamageClass.Generic) += 0.075f;
-                player.GetAttackSpeed(DamageClass.Melee) += 0.075f;
-                player.minionKB += 0.75f;
-                player.moveSpeed += 0.3f;
-                player.pickSpeed -= 0.1f;
-            }
-
-            if (type == BuffID.WellFed3)
-            {
-                player.statDefense += 4;
-                player.GetCritChance(DamageClass.Generic) += 4;
-                player.GetDamage(DamageClass.Generic) += 0.1f;
-                player.GetAttackSpeed(DamageClass.Melee) += 0.1f;
-                player.minionKB += 1f;
-                player.moveSpeed += 0.4f;
-                player.pickSpeed -= 0.15f;
+                tooltips.Insert(tooltips.FindIndex(tip => tip.Mod == "TouhouPetsEx" && tip.Name == "EnhanceTooltip") + 1, new("ExTooltip", GetText("Minoriko_0")));
             }
         }
     }

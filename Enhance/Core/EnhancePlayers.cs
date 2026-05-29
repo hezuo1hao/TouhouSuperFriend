@@ -13,6 +13,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Drawing;
 using Terraria.GameInput;
+using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -20,6 +21,7 @@ using Terraria.WorldBuilding;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Buffs;
+using TouhouPetsEx.Enhance.Achieve;
 using TouhouPetsEx.Items;
 using TouhouPetsEx.Projectiles;
 
@@ -41,17 +43,23 @@ namespace TouhouPetsEx.Enhance.Core
         public List<EnhancementId> ActiveEnhance = [];
         /// <summary>
         /// 被动启用的增强（例如被动能力、宠物栏/照明栏等自动生效能力）。
+        /// 需要注意的是，为了防止执行顺序导致的空窗期，这里存储的实际上是上一帧的情况
         /// </summary>
         public List<EnhancementId> ActivePassiveEnhance = [];
+        /// <summary>
+        /// 用于记录本帧的被动能力，在ResetEffect时写入到<see cref="ActivePassiveEnhance"/>
+        /// </summary>
+        public List<EnhancementId> NowActivePassiveEnhance = [];
         public int ActiveEnhanceCount = 11037;
+        public float DefMult = 1;
+        /// <summary>
+        /// 留琴用，用于达成范围内摇树和打罐子不出炸弹
+        /// </summary>
+        public int RukotoRange;
         /// <summary>
         /// 萝莉丝用
         /// </summary>
         public int EatBook = 0;
-        /// <summary>
-        /// 大妖精用
-        /// </summary>
-        public int DaiyouseiCD = 0;
         /// <summary>
         /// 红美铃用，用于检测是否在落地时造成地震
         /// </summary>
@@ -61,17 +69,9 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public Terraria.Enums.FrameSkipMode? frameSkipMode = null;
         /// <summary>
-        /// 咲夜用
+        /// 蕾米莉亚用
         /// </summary>
-        public int SakuyaCD;
-        /// <summary>
-        /// 莉莉白用
-        /// </summary>
-        public int LilyCD = 0;
-        /// <summary>
-        /// 幽香四溢Buff用（风见幽香能力相关）
-        /// </summary>
-        public bool FragrantAromaFillsTheAir = false;
+        public int RemiliaCD;
         /// <summary>
         /// 风见幽香-向阳花田用
         /// </summary>
@@ -84,6 +84,18 @@ namespace TouhouPetsEx.Enhance.Core
         /// 蕾蒂用
         /// </summary>
         public int LettyCD = 0;
+        /// <summary>
+        /// 橙用，记录闪避
+        /// </summary>
+        public bool ChenDodge = false;
+        /// <summary>
+        /// 橙用，闪避特效
+        /// </summary>
+        public List<NewEntityShadowInfo> OldPlayer = [];
+        /// <summary>
+        /// 橙用，闪避特效
+        /// </summary>
+        public List<Color> SandevistanColor = [];
         /// <summary>
         /// 莉莉卡用
         /// </summary>
@@ -117,6 +129,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         public int[] OldBuff;
         /// <summary>
+        /// 妹红用
+        /// </summary>
+        public int respawnFullHPTimer;
+        /// <summary>
         /// 河城荷取用，记录原版合成站
         /// </summary>
         public bool[] adjTileVanilla;
@@ -132,10 +148,6 @@ namespace TouhouPetsEx.Enhance.Core
         /// 河城荷取用，记录水、蜂蜜、岩浆、微光、炼药桌
         /// </summary>
         public bool[] adjOther;
-        /// <summary>
-        /// 东风谷早苗用
-        /// </summary>
-        public int SanaeCD;
         /// <summary>
         /// 火焰猫燐用
         /// </summary>
@@ -164,6 +176,7 @@ namespace TouhouPetsEx.Enhance.Core
         float DrawEffects_b;
         float DrawEffects_a;
         bool DrawEffects_fullBright;
+        PlayerDrawSet ModifyDrawInfo_drawInfo;
         Player.HurtModifiers ModifyHurt_modifiers;
         NPC.HitModifiers ModifyHitNPCWithItem_modifiers;
         NPC.HitModifiers ModifyHitNPCWithProj_modifiers;
@@ -273,9 +286,8 @@ namespace TouhouPetsEx.Enhance.Core
             }
 
             // 每 tick 重建被动启用列表，确保状态与背包/宠物栏一致。
-            ActivePassiveEnhance = [];
-
-            FragrantAromaFillsTheAir = false;
+            ActivePassiveEnhance = [.. NowActivePassiveEnhance];
+            NowActivePassiveEnhance = [];
 
             if (Config.PetInv)
             {
@@ -414,9 +426,15 @@ namespace TouhouPetsEx.Enhance.Core
         {
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostUpdateBuffs(Player));
         }
+        public override void UpdateEquips()
+        {
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerUpdateEquips(Player));
+        }
         public override void PostUpdateEquips()
         {
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostUpdateEquips(Player));
+            Player.statDefense *= DefMult;
+            DefMult = 1;
         }
         public override void PostUpdateRunSpeeds()
         {
@@ -424,13 +442,11 @@ namespace TouhouPetsEx.Enhance.Core
         }
         public override void PostUpdate()
         {
-            if (FragrantAromaFillsTheAir && TouhouPetsExModSystem.SynchronousTime % 60 == 37)
-                Player.statLife += Math.Clamp(Player.statLifeMax2 / 100, 0, Player.statLifeMax2 - Player.statLife);
-
             if (Main.GameUpdateCount % 18000 == 12000 && Player == Main.LocalPlayer)
                 AwardPlayerSync(Mod, -1, Main.myPlayer);
 
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerPostUpdate(Player));
+            ProcessDemonismAction((enhance) => enhance.PlayerPostUpdateAlways(Player));
         }
         public override void ModifyItemScale(Item item, ref float scale)
         {
@@ -442,8 +458,24 @@ namespace TouhouPetsEx.Enhance.Core
         {
             return ProcessDemonismAction(Player, (enhance) => enhance.PlayerUseTimeMultiplier(Player, item));
         }
+        public override void DrawPlayer(Camera camera)
+        {
+            if (Player != Main.LocalPlayer && Player.ownedProjectileCounts[ModContent.ProjectileType<Sandevistan>()] > 0)
+                YukariAndRanAndChen.DrawPlayer(camera, Player);
+
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerDrawPlayer(Player, camera));
+        }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
+            if (drawInfo.shadow > 0 && drawInfo.drawPlayer.ownedProjectileCounts[ModContent.ProjectileType<Sandevistan>()] > 0)
+            {
+                Color color = drawInfo.drawPlayer.MP().SandevistanColor[YukariAndRanAndChen.count];
+                r = color.R / 255f;
+                g = color.G / 255f;
+                b = color.B / 255f;
+                a = 0.2f;
+            }
+
             DrawEffects_r = r;
             DrawEffects_g = g;
             DrawEffects_b = b;
@@ -456,6 +488,12 @@ namespace TouhouPetsEx.Enhance.Core
             a = DrawEffects_a;
             fullBright = DrawEffects_fullBright;
         }
+        public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
+        {
+            ModifyDrawInfo_drawInfo = drawInfo;
+            ProcessDemonismAction(Player, (enhance) => enhance.PlayerModifyDrawInfo(ref ModifyDrawInfo_drawInfo));
+            drawInfo = ModifyDrawInfo_drawInfo;
+        }
         public override bool FreeDodge(Player.HurtInfo info)
         {
             bool? reesult = ProcessDemonismAction(Player, true, (enhance) => enhance.PlayerFreeDodge(Player, info));
@@ -467,7 +505,7 @@ namespace TouhouPetsEx.Enhance.Core
             if (modifiers.DamageSource.SourceNPCIndex > -1)
             {
                 NPC npc = Main.npc[modifiers.DamageSource.SourceNPCIndex];
-                if (npc.GetGlobalNPC<GEnhanceNPCs>().MoonMist && Main.rand.NextBool(10))
+                if (npc.GetGlobalNPC<GEnhanceNPCs>().MoonMist && Player.RollGoodLuck(10) == 0)
                 {
                     modifiers.Cancel();
 
@@ -534,6 +572,10 @@ namespace TouhouPetsEx.Enhance.Core
             }
 
             ProcessDemonismAction(Player, (enhance) => enhance.PlayerKill(Player, damage, hitDirection, pvp, damageSource));
+        }
+        public override void OnRespawn()
+        {
+            ProcessDemonismAction((enhance) => enhance.PlayerOnRespawn(Player));
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {

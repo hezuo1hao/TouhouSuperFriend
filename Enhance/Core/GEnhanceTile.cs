@@ -35,5 +35,9 @@ namespace TouhouPetsEx.Enhance.Core
             foreach (BaseEnhance enhance in EnhanceHookRegistry.TileRandomUpdate)
                 enhance.TileRandomUpdate(i, j, type);
         }
+        public override void NearbyEffects(int i, int j, int type, bool closer)
+        {
+            base.NearbyEffects(i, j, type, closer);
+        }
     }
 }

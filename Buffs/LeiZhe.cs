@@ -7,7 +7,7 @@ namespace TouhouPetsEx.Buffs
 {
     public class LeiZhe : ModBuff
     {
-        public override string Texture => "TouhouPetsEx/Buffs/NPCDebuff";
+        public override string Texture => "Terraria/Images/Buff";
         public override void Update(Player player, ref int buffIndex)
         {
         }
@@ -17,7 +17,7 @@ namespace TouhouPetsEx.Buffs
 
             if (Main.rand.NextBool(5))
             {
-                Dust dust = Dust.NewDustDirect(npc.position, npc.width, npc.height, DustID.Firework_Yellow, 10, 10);
+                Dust dust = Dust.NewDustDirect(npc.position, npc.width, npc.height, DustID.Electric, 10, 10);
                 dust.velocity = Main.rand.NextVector2Circular(3f, 3f);
                 dust.scale = Main.rand.NextFloat(1.00f, 1.50f);
                 dust.noGravity = true;

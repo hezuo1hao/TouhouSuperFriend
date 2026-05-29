@@ -40,6 +40,10 @@ namespace TouhouPetsEx.Enhance.Core
         /// 米斯蒂娅用
         /// </summary>
         public float? OldLifeRegenTime = null;
+        /// <summary>
+        /// 幽香四溢Buff用（风见幽香能力相关）
+        /// </summary>
+        public bool FragrantAromaFillsTheAir = false;
         public override void ResetEffects()
         {
             // Patience 未激活时不需要保留旧的 lifeRegenTime 参考值。
@@ -50,6 +54,7 @@ namespace TouhouPetsEx.Enhance.Core
             Glutton = false;
             Patience = false;
             Throw = false;
+            FragrantAromaFillsTheAir = false;
         }
         public override void PreUpdate()
         {
@@ -63,6 +68,11 @@ namespace TouhouPetsEx.Enhance.Core
                 OldLifeRegenTime = Player.lifeRegenTime;
             }
         }
+        public override void PostUpdate()
+        {
+            if (FragrantAromaFillsTheAir && TouhouPetsExModSystem.SynchronousTime % 60 == 37)
+                Player.statLife += Math.Clamp(Player.statLifeMax2 / 100, 0, Player.statLifeMax2 - Player.statLife);
+        }
         public override void UpdateLifeRegen()
         {
             if (Patience && OldLifeRegenTime != null && OldLifeRegenTime > Player.lifeRegenTime)
@@ -71,6 +81,14 @@ namespace TouhouPetsEx.Enhance.Core
                 Player.lifeRegenTime = OldLifeRegenTime.Value;
                 // 取消流血（流血会阻止生命回复）。
                 Player.bleed = false;
+            }
+        }
+        public override void NaturalLifeRegen(ref float regen)
+        {
+            if (Patience && (Player.velocity.X == 0f || Player.grappling[0] > 0) && !Player.sitting.isSitting && !Player.sleeping.isSleeping)
+            {
+                Player.lifeRegenTime += 3f;
+                regen *= 1.3f;
             }
         }
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -84,7 +102,7 @@ namespace TouhouPetsEx.Enhance.Core
         /// </summary>
         private void SuperCrit(ref NPC.HitInfo info, NPC npc)
         {
-            if (info.Crit && Player.MBP().Glutton && Main.rand.NextBool(25))
+            if (info.Crit && Player.MBP().Glutton && Player.RollGoodLuck(100) < 5 + Player.GetTotalCritChance(DamageClass.Generic) / 4f)
             {
                 // 伤害翻倍（在暴击结算后再次加成）。
                 info.Damage *= 2;

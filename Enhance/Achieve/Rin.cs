@@ -48,8 +48,8 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
                 {
-                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                    if (!player.MP().NowActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().NowActivePassiveEnhance.Add(enhanceId);
                 }
             }
         }
@@ -59,8 +59,8 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
                 {
-                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                    if (!player.MP().NowActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().NowActivePassiveEnhance.Add(enhanceId);
                 }
             }
         }
@@ -75,8 +75,8 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
                     {
-                        if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                            player.MP().ActivePassiveEnhance.Add(enhanceId);
+                        if (!player.MP().NowActivePassiveEnhance.Contains(enhanceId))
+                            player.MP().NowActivePassiveEnhance.Add(enhanceId);
                     }
                     break;
                 }

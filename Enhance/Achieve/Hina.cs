@@ -12,6 +12,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Hina : BaseEnhance
     {
         public override string Text => GetText("Hina");
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<HinaDoll>());
@@ -25,22 +27,12 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void ItemUpdateInventory(Item item, Player player)
         {
-            if (!player.EnableEnhance<HinaDoll>())
-                return;
-
-            int i = 0;
-            while (PrefixID.Sets.ReducedNaturalChance[item.prefix])
-            {
-                if (i >= 100)
-                {
-                    item.prefix = 0;
-                    return;
-                }
-
-                item.ResetPrefix();
-                item.Prefix(-2);
-                i++;
-            }
+            Reforge(item, player);
+        }
+        public override bool? ItemReforgePrice(Item item, ref int reforgePrice, ref bool canApplyDiscount)
+        {
+            Reforge(item, Main.LocalPlayer);
+            return null;
         }
         float[] rots = new float[200];
         public override void PlayerPostUpdate(Player player)
@@ -60,6 +52,25 @@ namespace TouhouPetsEx.Enhance.Achieve
                     if (npc.boss && player == Main.LocalPlayer)
                         ModContent.GetInstance<SpinSpinSpin>().Condition.Complete();
                 }
+            }
+        }
+        private void Reforge(Item item, Player player)
+        {
+            if (!player.EnableEnhance<HinaDoll>())
+                return;
+
+            int i = 0;
+            while (PrefixID.Sets.ReducedNaturalChance[item.prefix])
+            {
+                if (i >= 100)
+                {
+                    item.prefix = 0;
+                    return;
+                }
+
+                item.ResetPrefix();
+                item.Prefix(-2);
+                i++;
             }
         }
     }

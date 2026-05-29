@@ -25,7 +25,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             player.MP().ReisenDodge = false;
 
-            if (Main.rand.Next(100) < 17)
+            if (modifiers.DamageSource.SourceProjectileType != -1 && player.RollGoodLuck(100) < 25)
             {
                 player.MP().ReisenDodge = true;
                 modifiers.ModifyHurtInfo += Modifiers_ModifyHurtInfo;

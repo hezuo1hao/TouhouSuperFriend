@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -30,6 +31,12 @@ namespace TouhouPetsEx.Projectiles
         List<Vector4> imitate2 = [];
         public override void AI()
         {
+            if (Projectile.soundDelay >= 0)
+            {
+                Projectile.soundDelay--;
+                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/arc") with { MaxInstances = 114514, PitchVariance = 0.25f }, Projectile.Center);
+            }
+
             NPC npc = Main.npc[(int)Projectile.ai[0]];
 
             for (int i = 0; i < 100; i++)
@@ -64,7 +71,7 @@ namespace TouhouPetsEx.Projectiles
             {
                 for (int i = 0; i < 30; i++)
                 {
-                    Dust dust = Dust.NewDustDirect(Vector2.Lerp(vector4.XY(), vector4.ZW(), i / 30f), 1, 1, DustID.GoldFlame, Scale: 1.5f);
+                    Dust dust = Dust.NewDustDirect(Vector2.Lerp(vector4.XY(), vector4.ZW(), i / 30f), 1, 1, DustID.BlueFlare, Scale: 1.5f);
                     dust.noGravity = true;
                     dust.velocity *= 0.25f;
                 }
@@ -74,7 +81,7 @@ namespace TouhouPetsEx.Projectiles
             {
                 for (int i = 0; i < 30; i++)
                 {
-                    Dust dust = Dust.NewDustDirect(Vector2.Lerp(vector4.XY(), vector4.ZW(), i / 30f), 1, 1, DustID.GoldFlame, Scale: 1.5f);
+                    Dust dust = Dust.NewDustDirect(Vector2.Lerp(vector4.XY(), vector4.ZW(), i / 30f), 1, 1, DustID.BlueFlare, Scale: 1.5f);
                     dust.noGravity = true;
                     dust.velocity *= 0.25f;
                 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.Graphics;
 using Terraria.ModLoader;
 
 namespace TouhouPetsEx.Enhance.Core
@@ -113,6 +114,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
             return null;
         }
+        public virtual bool? ItemReforgePrice(Item item, ref int reforgePrice, ref bool canApplyDiscount)
+        {
+            return null;
+        }
         public virtual void ItemOnCreated(Item item, ItemCreationContext context)
         {
 
@@ -161,6 +166,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void PlayerUpdateEquips(Player player)
+        {
+
+        }
         public virtual void PlayerPostUpdateEquips(Player player)
         {
 
@@ -173,6 +182,10 @@ namespace TouhouPetsEx.Enhance.Core
         {
 
         }
+        public virtual void PlayerPostUpdateAlways(Player player)
+        {
+
+        }
         public virtual void PlayerModifyItemScale(Player player, Item item, ref float scale)
         {
 
@@ -181,7 +194,15 @@ namespace TouhouPetsEx.Enhance.Core
         {
             return null;
         }
+        public virtual void PlayerDrawPlayer(Player player, Camera camera)
+        {
+
+        }
         public virtual void PlayerDrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
+        {
+
+        }
+        public virtual void PlayerModifyDrawInfo(ref PlayerDrawSet drawInfo)
         {
 
         }
@@ -234,6 +255,10 @@ namespace TouhouPetsEx.Enhance.Core
             return null;
         }
         public virtual void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+        {
+
+        }
+        public virtual void PlayerOnRespawn(Player player)
         {
 
         }
@@ -294,6 +319,10 @@ namespace TouhouPetsEx.Enhance.Core
 
         }
         public virtual void SystemPostUpdateEverything()
+        {
+
+        }
+        public virtual void SystemPostDrawTiles()
         {
 
         }

@@ -22,6 +22,9 @@ namespace TouhouPetsEx.Enhance.Achieve
                 return;
 
             List<int> buffs = [BuffID.Midas, BuffID.Wet, BuffID.Poisoned, BuffID.OnFire, ModContent.BuffType<Earth>()];
+            if (Main.hardMode)
+                buffs = [BuffID.Midas, BuffID.Wet, BuffID.Venom, BuffID.OnFire3, ModContent.BuffType<Earth>()];
+
             if (NPC.downedPlantBoss)
             {
                 if (!target.HasBuff(BuffID.Daybreak))

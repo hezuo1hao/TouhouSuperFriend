@@ -24,11 +24,13 @@ namespace TouhouPetsEx.Enhance.Core
 	/// </summary>
 	public class GEnhanceItems : GlobalItem
     {
+        // TODO: 把能力详细信息写出来，使用shift显示
         #region 防止闭包的私有字段们
         int GrabRange_grabRange;
         float HorizontalWingSpeeds_speed;
         float HorizontalWingSpeeds_acceleration;
-
+        int ReforgePrice_reforgePrice;
+        bool ReforgePrice_canApplyDiscount;
         #endregion
         private static void ProcessDemonismAction(Action<BaseEnhance> action)
         {
@@ -179,6 +181,16 @@ namespace TouhouPetsEx.Enhance.Core
         {
             // UseItem：聚合多个增强的可选 bool? 结果，优先返回 false（阻止默认行为）。
             return ProcessDemonismAction(player, false, (enhance) => enhance.ItemUseItem(item, player));
+        }
+        public override bool ReforgePrice(Item item, ref int reforgePrice, ref bool canApplyDiscount)
+        {
+            ReforgePrice_reforgePrice = reforgePrice;
+            ReforgePrice_canApplyDiscount = canApplyDiscount;
+            bool? reesult = ProcessDemonismAction(Main.LocalPlayer, false, (enhance) => enhance.ItemReforgePrice(item, ref ReforgePrice_reforgePrice, ref ReforgePrice_canApplyDiscount));
+            reforgePrice = ReforgePrice_reforgePrice;
+            canApplyDiscount = ReforgePrice_canApplyDiscount;
+
+            return reesult ?? base.ReforgePrice(item, ref reforgePrice, ref canApplyDiscount);
         }
         public override void OnCreated(Item item, ItemCreationContext context)
         {

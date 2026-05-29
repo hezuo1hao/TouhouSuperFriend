@@ -29,7 +29,10 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     Tile tile = Framing.GetTileSafely(player.Center);
                     if (TileID.Sets.IsShakeable[tile.TileType])
+                    {
+                        EnhanceOn.Sizuha = true;
                         WorldGen.ShakeTree((int)player.Center.X / 16, (int)player.Center.Y / 16);
+                    }
                 }
             }
         }

@@ -105,5 +105,9 @@ namespace TouhouPetsEx.Enhance.Core
             // 一帧内所有 Update 完成后的总收尾钩子。
             ProcessDemonismAction((enhance) => enhance.SystemPostUpdateEverything());
         }
+        public override void PostDrawTiles()
+        {
+            ProcessDemonismAction((enhance) => enhance.SystemPostDrawTiles());
+        }
     }
 }

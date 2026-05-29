@@ -7,7 +7,7 @@ namespace TouhouPetsEx.Buffs
 {
     public class Earth : ModBuff
     {
-        public override string Texture => "TouhouPetsEx/Buffs/NPCDebuff";
+        public override string Texture => "Terraria/Images/Buff";
         public override void Update(Player player, ref int buffIndex)
         {
         }

@@ -23,5 +23,20 @@ namespace TouhouPetsEx.Enhance.Achieve
             if (player.respawnTimer > 180)
                 player.respawnTimer = 180;
         }
+        public override void PlayerOnRespawn(Player player)
+        {
+            player.MP().respawnFullHPTimer = 1;
+        }
+        public override void PlayerPostUpdate(Player player)
+        {
+            EnhancePlayers mp = player.MP();
+            if (mp.respawnFullHPTimer == 0)
+            {
+                mp.respawnFullHPTimer = -1;
+                player.statLife = player.statLifeMax2;
+                player.statMana = player.statManaMax2;
+            }
+            mp.respawnFullHPTimer--;
+        }
     }
 }

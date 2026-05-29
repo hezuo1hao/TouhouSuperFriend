@@ -22,5 +22,9 @@ namespace TouhouPetsEx.Enhance.Achieve
 
             return null;
         }
+        public override void PlayerPostUpdateBuffs(Player player)
+        {
+            Main.NewText("b");
+        }
     }
 }

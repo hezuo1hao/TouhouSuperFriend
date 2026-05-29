@@ -1,6 +1,7 @@
 using System;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Achievements;
@@ -11,6 +12,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Wakasagihime : BaseEnhance
     {
         public override string Text => GetText("Wakasagihime");
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override string[] ExperimentalText => [GetText("Wakasagihime_1"), GetText("Wakasagihime_2")];
         public override bool[] Experimental => [Config.Wakasagihime, Config.Wakasagihime_2];
         public override void ItemSSD()
@@ -29,13 +32,16 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (player.dripping && !player.wet)
                     multiplier *= 0.5f;
 
-                player.statDefense += (int)Math.Ceiling(4 * multiplier);
-                player.GetCritChance(DamageClass.Generic) += 4 * multiplier;
-                player.GetAttackSpeed(DamageClass.Generic) += 0.06f * multiplier;
-                player.pickSpeed -= 0.12f * multiplier;
-                player.GetDamage(DamageClass.Generic) += 0.08f * multiplier;
-                player.GetKnockback(DamageClass.Summon) += 0.5f * multiplier;
                 player.moveSpeed += 0.28f * multiplier;
+                if (Config.Wakasagihime_3)
+                {
+                    player.statDefense += (int)Math.Ceiling(4 * multiplier);
+                    player.GetCritChance(DamageClass.Generic) += 4 * multiplier;
+                    player.GetAttackSpeed(DamageClass.Generic) += 0.06f * multiplier;
+                    player.pickSpeed -= 0.12f * multiplier;
+                    player.GetDamage(DamageClass.Generic) += 0.08f * multiplier;
+                    player.GetKnockback(DamageClass.Summon) += 0.5f * multiplier;
+                }
             }
 
             player.accMerman = true;
@@ -58,10 +64,18 @@ namespace TouhouPetsEx.Enhance.Achieve
                 foreach (int type in TouhouPetsEx.OceanEnemy)
                     player.npcTypeNoAggro[type] = true;
             }
+
+            if (!LocalConfig.Wakasagihime)
+                player.hideMerman = true;
         }
-        public override void PlayerModifyHitNPCWithItem(Player player, Item item, NPC target, ref NPC.HitModifiers modifiers)
+        public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            modifiers.SourceDamage *= 1.15f;
+            int time = 360;
+            if (player.HasBuff(BuffID.Wet))
+                time = Math.Max(time, player.buffTime[player.FindBuffIndex(BuffID.Wet)]);
+
+            if (player.wet || (player.dripping && player.RollGoodLuck(100) < 15))
+                target.AddBuff(BuffID.Wet, time);
         }
         public override void ItemOnCreated(Item item, ItemCreationContext context)
         {

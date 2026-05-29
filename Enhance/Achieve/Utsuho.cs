@@ -15,6 +15,12 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override string Text => GetText("Utsuho");
         public override string[] ExperimentalText => [GetText("Utsuho_1"), GetText("Utsuho_2"), GetText("Utsuho_3")];
         public override bool[] Experimental => [Config.Utsuho, Config.Utsuho_2, Config.Utsuho_3];
+        int vaporizing = -1;
+        public override void SystemPostSetupContent()
+        {
+            if (ModLoader.TryGetMod("Gensokyo", out var mod))
+                vaporizing = mod.Find<ModBuff>("Debuff_Vaporizing").Type;
+        }
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<UtsuhoEye>());
@@ -32,8 +38,8 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
                 {
-                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                    if (!player.MP().NowActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().NowActivePassiveEnhance.Add(enhanceId);
                 }
             }
         }
@@ -43,9 +49,17 @@ namespace TouhouPetsEx.Enhance.Achieve
             {
                 if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
                 {
-                    if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                        player.MP().ActivePassiveEnhance.Add(enhanceId);
+                    if (!player.MP().NowActivePassiveEnhance.Contains(enhanceId))
+                        player.MP().NowActivePassiveEnhance.Add(enhanceId);
                 }
+            }
+        }
+        public override void PlayerPostUpdateBuffs(Player player)
+        {
+            if (vaporizing != -1)
+            {
+                player.buffImmune[vaporizing] = true;
+                player.buffImmune[BuffID.OnFire] = true;
             }
         }
         public override void PlayerPostResetEffects(Player player)
@@ -59,8 +73,8 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     if (EnhanceRegistry.TryGetEnhanceId(item.type, out EnhancementId enhanceId))
                     {
-                        if (!player.MP().ActivePassiveEnhance.Contains(enhanceId))
-                            player.MP().ActivePassiveEnhance.Add(enhanceId);
+                        if (!player.MP().NowActivePassiveEnhance.Contains(enhanceId))
+                            player.MP().NowActivePassiveEnhance.Add(enhanceId);
                     }
                     break;
                 }
@@ -73,7 +87,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (npc.dontTakeDamage || npc.friendly || (npc.aiStyle == 112 && !(npc.ai[2] <= 1f)) || !player.CanNPCBeHitByPlayerOrPlayerProjectile(npc))
                     continue;
 
-                if (Config.Utsuho_3 && player == Main.LocalPlayer && TouhouPetsExModSystem.SynchronousTime % 120 == 67 && Main.rand.NextBool(6))
+                if (Config.Utsuho_3 && player == Main.LocalPlayer && TouhouPetsExModSystem.SynchronousTime % 120 == 67 && player.RollGoodLuck(6) == 0)
                     npc.AddBuff(Main.rand.Next([.. GEnhanceBuffs.FireDebuff]), 300);
 
                 int disMax = 1000;

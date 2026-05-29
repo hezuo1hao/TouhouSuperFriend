@@ -38,7 +38,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerModifyHitNPCWithItem(Player player, Item item, NPC target, ref NPC.HitModifiers modifiers)
         {
-            modifiers.CritDamage += Math.Max(0, player.GetWeaponCrit(item) - 100);
+            modifiers.CritDamage += Math.Max(0, player.GetWeaponCrit(item) - 100) / 100f;
         }
         public override void PlayerModifyHitNPCWithProjectile(Player player, Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
         {

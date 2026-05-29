@@ -45,7 +45,7 @@ namespace TouhouPetsEx.Projectiles
                 Projectile.Kill();
 
             Projectile.velocity.X *= (Projectile.ai[0] == 1) ? 0.995f : 0.99f;
-            Projectile.velocity.Y += (!Projectile.wet) ? 0.12f : -0.2f;
+            //Projectile.velocity.Y += (!Projectile.wet) ? 0.12f : -0.2f;
 
             if (Projectile.ai[0] == 0)
                 Projectile.rotation += Projectile.velocity.X * 0.2f;

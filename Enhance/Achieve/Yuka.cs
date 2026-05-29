@@ -7,6 +7,7 @@ using TouhouPetsEx.Achievements;
 using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TouhouPetsEx.Enhance.Achieve
 {
@@ -52,7 +53,10 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPostUpdate(Player player)
         {
-            if (Main.netMode != NetmodeID.Server && Config.Yuka_2 && player.ZoneOverworldHeight && player.ZoneGlowshroom && player.sporeSac && Main.ActiveWorldFileData.GameMode == 3 && Main.getGoodWorld && Main.IsItStorming)
+            if (Main.netMode == NetmodeID.Server || player != Main.LocalPlayer)
+                return;
+
+            if (Config.Yuka_2 && player.ZoneOverworldHeight && player.ZoneGlowshroom && player.sporeSac && Main.ActiveWorldFileData.GameMode == 3 && Main.getGoodWorld && Main.IsItStorming)
                 ModContent.GetInstance<SporeStage>().Condition.Complete();
 
             if (!Config.Yuka || player.MP().YukaCD > 0)
@@ -67,8 +71,10 @@ namespace TouhouPetsEx.Enhance.Achieve
                     Tile tile = Framing.GetTileSafely(posX, posY);
                     if (tile.type == TileID.Sunflower && tile.TileFrameX % 36 == 0 && tile.TileFrameY == 0)
                     {
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                            Item.NewItem(player.GetSource_FromThis(), new Rectangle(posX * 16, posY * 16, 32, 32), ItemID.CopperCoin, 6);
+                        int index = Item.NewItem(player.GetSource_FromThis(), new Rectangle(posX * 16, posY * 16, 32, 32), ItemID.CopperCoin, 6);
+
+                        if (Main.netMode == NetmodeID.MultiplayerClient)
+                            NetMessage.SendData(MessageID.SyncItem, -1, -1, null, index, 1f);
 
                         player.MP().YukaCD = 60;
                         i++;

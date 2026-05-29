@@ -15,7 +15,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             AddEnhance(ModContent.ItemType<MarisaHakkero>());
         }
-        public override void PlayerPostUpdateEquips(Player player)
+        public override void PlayerUpdateEquips(Player player)
         {
             player.GetDamage(DamageClass.Magic) *= 1.25f;
 

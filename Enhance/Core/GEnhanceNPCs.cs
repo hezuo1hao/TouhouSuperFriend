@@ -29,7 +29,7 @@ namespace TouhouPetsEx.Enhance.Core
         /// <summary>
         /// 赫卡提亚+皮丝用
         /// </summary>
-        public int TorchDamage;
+        public int Torch;
         /// <summary>
         /// 土debuff，帕秋莉用
         /// </summary>
@@ -108,10 +108,10 @@ namespace TouhouPetsEx.Enhance.Core
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
             // 小五：混乱目标额外掉血（世界存在该增强才生效）。
-            if (npc.HasBuff(BuffID.Confused) && WorldEnableEnhance<SatoriSlippers>())
+            if (npc.HasBuff(BuffID.Confused) && WorldAllEnableEnhance<SatoriSlippers>(out int number))
             {
-                npc.lifeRegen -= 12;
-                if (damage < 5) damage = 5;
+                npc.lifeRegen -= number * 12;
+                if (damage < number * 5) damage = number * 5;
             }
 
             // 熔化：最低 DoT 伤害底线。
@@ -139,14 +139,19 @@ namespace TouhouPetsEx.Enhance.Core
             if (Earth)
                 modifiers.Defense /= 2f;
 
-            if (npc.HasBuff(BuffID.Confused) && WorldEnableEnhance<SatoriSlippers>())
-                modifiers.Defense /= 2f;
+            if (Config.Satori_3 && npc.HasBuff(BuffID.Confused) && WorldAllEnableEnhance<SatoriSlippers>(out int number))
+                modifiers.Defense /= (float)Math.Pow(2f, number);
 
             if (Restless)
                 modifiers.FinalDamage *= 1.05f;
 
             if (npc.HasBuff(ModContent.BuffType<LeiZhe>()))
-                modifiers.FinalDamage *= 1 + (float)Math.Ceiling(npc.buffTime[npc.FindBuffIndex(ModContent.BuffType<LeiZhe>())] / 60f) * 0.02f;
+            {
+                WorldAllEnableEnhance<IkuOarfish>(out number);
+                if (number <= 0)
+                    number = 1;
+                modifiers.FinalDamage *= 1 + (float)Math.Ceiling(npc.buffTime[npc.FindBuffIndex(ModContent.BuffType<LeiZhe>())] / 60f) * number * 0.19f;
+            }
         }
         public override void ModifyHitNPC(NPC npc, NPC target, ref NPC.HitModifiers modifiers)
         {

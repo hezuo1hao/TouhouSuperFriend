@@ -23,6 +23,12 @@ namespace TouhouPetsEx
         private static bool LookStar => ((!Main.dayTime && Main.LocalPlayer.ZoneOverworldHeight && Main.cloudAlpha <= 0) || Main.LocalPlayer.ZoneSkyHeight) && !Main.bloodMoon;
         public override void PostSetupContent()
         {
+            #region 更好的体验
+            if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("ImproveGame", out Mod qot))
+            {
+                qot.Call("AddModernConfigTitle", Mod, Language.GetText("Mods.TouhouPetsEx.Configs.ModernConfigTitle"));
+            }
+            #endregion
             #region 东方小伙伴
             if (ModLoader.TryGetMod("TouhouPets", out Mod TouhouPets))
             {
@@ -1488,5 +1494,15 @@ namespace TouhouPetsEx
             return true;
         }
         #endregion
+    }
+    [JITWhenModsEnabled("ImproveGame")]
+    public class QOTCallSystem : ModSystem
+    {
+        [JITWhenModsEnabled("ImproveGame")]
+        public override void PostSetupContent()
+        {
+            if (Main.netMode != NetmodeID.Server)
+                ImproveGame.UI.ModernConfig.CategorySidePanel.SetAboutPage(Mod, new UI.MeAboutPage());
+        }
     }
 }

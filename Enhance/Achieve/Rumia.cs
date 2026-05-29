@@ -28,7 +28,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 if (npc.Center.Distance(player.Center) < 120)
                     npc.AddBuff(BuffID.Confused, 60);
 
-                if (Config.Rumia && !Main.dayTime && Main.rand.NextBool(60))
+                if (Config.Rumia && !Main.dayTime && player.RollGoodLuck(60) == 0)
                     npc.AddBuff(BuffID.Confused, Main.rand.Next(15, 90));
             }
         }

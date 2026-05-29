@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
@@ -19,6 +20,7 @@ namespace TouhouPetsEx
 {
 	public class TouhouPetsEx : Mod
 	{
+        // TODO: 使用局长的ui前置写一个能力控制面板
         public static int[] WhitelistBlock = [2, 3, 3086, 3081, 169, 3271, 3272, 133, 176, 172, 593, 664, 9, 620, 619, 911, 2503, 2504, 1727, 4564, 586, 591, 1872];
         public static int[] ColdProjVanilla = [118, 119, 120, 166, 172, 253, 309, 337, 344, 359, 520, 979];
         public static List<int> ColdProjAll = [];
@@ -32,6 +34,7 @@ namespace TouhouPetsEx
         public static Effect TransformShader;
         public static Effect GrayishWhiteShader;
         public static BlendState InverseColor;
+        public static BlendState Green;
         public static int TransparentHead = -1;
         public override void Load()
         {
@@ -49,6 +52,16 @@ namespace TouhouPetsEx
                 AlphaDestinationBlend = Blend.One,
                 AlphaSourceBlend = Blend.Zero
             };
+            Green = new BlendState()
+            {
+                Name = "BlendState.Green",
+                BlendFactor = new Color(100, 255, 100, 50),
+                ColorSourceBlend = Blend.Zero,
+                AlphaSourceBlend = Blend.Zero,
+                ColorDestinationBlend = Blend.BlendFactor,
+                AlphaDestinationBlend = Blend.One
+            };
+            PrefixID.Sets.ReducedNaturalChance[PrefixID.Annoying] = true;
         }
         public override void PostSetupContent()
         {
@@ -87,6 +100,7 @@ namespace TouhouPetsEx
             TransformShader = null;
             GrayishWhiteShader = null;
             InverseColor?.Dispose();
+            Green?.Dispose();
         }
         internal enum MessageType : byte
         {

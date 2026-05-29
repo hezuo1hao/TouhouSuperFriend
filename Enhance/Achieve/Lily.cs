@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Achievements;
+using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 
@@ -20,27 +21,33 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             AddEnhance(ModContent.ItemType<LilyOneUp>());
         }
-        public override void PlayerPostUpdateEquips(Player player)
+        public override void PlayerPreUpdateBuffsAlways(Player player)
         {
-            if (player.MP().LilyCD > 0)
-                player.MP().LilyCD--;
+            if (!player.HasBuff<LilyCD>())
+                return;
 
-            if (player.MP().LilyCD == 1)
-                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_extend"), player.Center);
-
+            if (player.buffTime[player.FindBuffIndex(ModContent.BuffType<LilyCD>())] <= 5)
+                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_extend") with { SoundLimitBehavior = SoundLimitBehavior.IgnoreNew}, player.Center);
+        }
+        public override void PlayerUpdateEquips(Player player)
+        {
             if (Config.Lily)
                 player.statLifeMax2 += 80;
         }
         public override bool? PlayerPreKill(Player player, double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
         {
-            if (player.MP().LilyCD == 0)
+            if (!player.HasBuff<LilyCD>())
             {
                 int time = player.longInvince ? 600 : 360;
 
-                player.statLife = 1;
+                if (player.EnableEnhance<MokuMatch>())
+                    player.statLife = 100;
+                else
+                    player.statLife = 1;
+
                 foreach (int buffType in player.buffType)
                 {
-                    if (Main.debuff[buffType] && !BuffID.Sets.NurseCannotRemoveDebuff[buffType])
+                    if ((Main.debuff[buffType] && !BuffID.Sets.NurseCannotRemoveDebuff[buffType]) || buffType == ModContent.BuffType<DaiyouseiCD>())
                         player.ClearBuff(buffType);
                 }
                 player.breath = player.breathMax;
@@ -51,7 +58,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     player.hurtCooldowns[i] += time;
                 }
-                player.MP().LilyCD = 14400;
+                player.AddBuff(ModContent.BuffType<LilyCD>(), 10800);
                 Projectile.NewProjectile(player.GetSource_Death(), player.Center, Vector2.Zero, ModContent.ProjectileType<LilyDodgeEffects>(), 0, 0, player.whoAmI);
 
                 if (player.EnableAllYousei() && player == Main.LocalPlayer)
@@ -67,10 +74,6 @@ namespace TouhouPetsEx.Enhance.Achieve
             }
 
             return null;
-        }
-        public override void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
-        {
-            player.MP().LilyCD = 0;
         }
     }
 }

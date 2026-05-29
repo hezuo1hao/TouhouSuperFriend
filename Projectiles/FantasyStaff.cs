@@ -54,7 +54,7 @@ namespace TouhouPetsEx.Projectiles
 
             if (i > 1.9f)
                 Projectile.alpha += 14;
-            else if (i > 0.65f && player == Main.LocalPlayer && !Collision.SolidCollision(Projectile.position, Projectile.width, Projectile.height) && Main.rand.NextBool(30))
+            else if (i > 0.65f && player == Main.LocalPlayer && !Collision.SolidCollision(Projectile.position, Projectile.width, Projectile.height) && player.RollGoodLuck(30) == 0)
             {
                 Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center - Vector2.UnitY * 8, new(Main.rand.NextFloat(-1.00f, 1.00f), 0.01f), ModContent.ProjectileType<FantasyNote>(), Projectile.damage, Projectile.knockBack, Projectile.owner, Main.rand.Next(3), ai2: Main.rand.NextFloat(6.00f, 12.00f));
             }

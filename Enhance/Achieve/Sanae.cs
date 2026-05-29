@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -7,6 +8,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Achievements;
+using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 using static TouhouPetsEx.TouhouPetsEx;
@@ -17,38 +19,35 @@ namespace TouhouPetsEx.Enhance.Achieve
     {
         public override string Text => GetText("Sanae");
         public override bool Passive => true;
-        public override bool[] Experimental => [Config.Sanae];
-        public override string[] ExperimentalText => [GetText("Sanae_1")];
+        public override bool[] Experimental => [Config.Sanae, Config.Sanae_2];
+        public override string[] ExperimentalText => [GetText("Sanae_1"), GetText("Sanae_2")];
         public override bool EnableBuffText => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SanaeCoin>());
         }
-        public override void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+        public override void PlayerPreUpdateBuffsAlways(Player player)
         {
-            if (Config.Sanae)
-                player.MP().SanaeCD = 0;
+            if (!player.HasBuff<SanaeCD>())
+                return;
+
+            if (player.buffTime[player.FindBuffIndex(ModContent.BuffType<SanaeCD>())] <= 5)
+                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/Power") with { SoundLimitBehavior = SoundLimitBehavior.IgnoreNew}, player.Center);
         }
         public override void PlayerPostUpdate(Player player)
         {
             if (!Config.Sanae)
                 return;
 
-            if (player.MP().SanaeCD > 0 && player.statLife == player.statLifeMax2)
-                player.MP().SanaeCD--;
-
-            if (player.MP().SanaeCD == 1)
-                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/Power"), player.Center);
-
-            if (!player.dead && player.statLife < player.statLifeMax2 / 2 && player.MP().SanaeCD == 0)
+            if (!player.dead && player.statLife < player.statLifeMax2 / 2 && !player.HasBuff<SanaeCD>())
             {
-                player.MP().SanaeCD = 21600;
                 player.Heal(player.statLifeMax2 / 2);
                 foreach (int buffType in player.buffType)
                 {
                     if (Main.debuff[buffType] && !BuffID.Sets.NurseCannotRemoveDebuff[buffType])
                         player.ClearBuff(buffType);
                 }
+                player.AddBuff(ModContent.BuffType<SanaeCD>(), 21600);
                 Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<SanaeRegen>(), 0, 0, player.whoAmI);
 
                 if (player == Main.LocalPlayer)
@@ -61,13 +60,31 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
             }
         }
+        public override void PlayerPreUpdate(Player player)
+        {
+            if (!Config.Sanae_2 || Main.dayTime || player.RollGoodLuck(250) > 0)
+                return;
+
+            Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter.X + Main.rand.Next(-1000, 1000), Math.Max(player.MountedCenter.Y - 1750, 100), Main.rand.NextFloat(-5.000f, 5.000f), 15, ProjectileID.FallingStar, 1000, 0, player.whoAmI);
+        }
+        public override void PlayerPostUpdateAlways(Player player)
+        {
+            if (player.statLife < player.statLifeMax2 || !player.HasBuff<SanaeCD>())
+                return;
+
+            int buffIndex = player.FindBuffIndex(ModContent.BuffType<SanaeCD>());
+            if (player.townNPCs > 2 && !NPC.AnyDanger())
+                player.buffTime[buffIndex] -= 3;
+
+            player.Kaguya(buffIndex);
+        }
         public override bool? ItemCanUseItem(Item item, Player player, ref bool def)
         {
             if (player.altFunctionUse == 2 && item.type == ModContent.ItemType<SanaeCoin>())
             {
                 def = false;
 
-                if (Main.MouseWorld.Y < Main.screenPosition.Y + Main.screenHeight / 3f)
+                if (Main.MouseWorld.Y < Main.screenPosition.Y + Main.screenHeight / 2f)
                 {
                     if (!Main.raining)
                     {

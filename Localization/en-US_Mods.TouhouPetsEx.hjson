@@ -1,4 +1,4 @@
-Rukoto: 会清理周边的各种植物。
+Rukoto: 会清除周围的植物和罐子等（请注意：可能会清扫不想被清扫之物）。
 Shinki:
 	'''
 	解锁/give指令的使用权限，输入 /help give 查询指令用法
@@ -10,7 +10,7 @@ AliceOld_2: 魔力会给予你力量
 Rumia: 让被黑暗所笼罩的敌人无法找寻正确的道路
 Rumia_1: 夜晚也算作黑暗
 Daiyousei: 每隔一段时间，可以触发一次决死效果
-Cirno: 制造冰，并可以作为武器使用
+Cirno: 成为冰之勇者！拥有空手造冰的能力，
 Cirno_1: 冰块不再遵守现实规则
 Meirin: 给予额外跳跃
 Meirin_1: 成为耐摔王
@@ -20,9 +20,9 @@ Koakuma:
 	寻找书籍
 	'''
 Patchouli: 使用七曜魔法对敌人造成额外效果
-Sakuya: 减缓时间的流逝
+Sakuya: 减缓时间的流逝（可以在模组配置-{$Mods.TouhouPetsEx.Configs.TouhouPetsExLocalConfigs.DisplayName}内关闭）
 Sakuya_1: 学会碰瓷
-Remilia: 近战增加吸血能力，削弱吸血限制
+Remilia: 增加血液储备，增加吸血能力，削弱吸血限制
 Flandre: 可以更加轻松地破坏各种物块
 Letty: 会使用原生寒冷系攻击对付敌人
 Letty_1: 寒冷将会变得更加寒冷
@@ -54,31 +54,27 @@ Keine_1: 不存在的也会
 Reimu:
 	'''
 	飞行时间翻倍
-	当你成功证明自身的强大时，天空将无极限
+	当你成功证明自身的强大时，天空将无极限，大地将无法束缚你
 	'''
 Reimu_1: 「梦想天生」
 Marisa: 给予魔法就是火力程度的增强
 Marisa_0: "[c/3BDA55:东方小祖宗：][c/FFF014:抑制无意识的活动]"
 Marisa_1: 魔力充盈 【极】
 Tewi: 增加运气，同时你能承受更多的运气
-Reisen: 有概率让敌人无法琢磨透你真身所在
+Reisen: 有概率闪避弹幕
 Reisen_1: 可以随时发动能力来开挂
 Eirin: 加强制作药水的能力
 Eirin_1: 加强恢复系药水的效果
 Kaguya: 让部分状态走的更快，而有的则更慢
-Moku: 加快伤痕痊愈速度，并加快复活，携带贤者之石将更有助于恢复
-Aya:
-	'''
-	加快移速
-	无视狂风
-	乘风而行
-	'''
+Moku: 加快伤痕痊愈速度，并加快复活、复活后崭新出厂，携带贤者之石将更有助于恢复
+Aya: 加快移速、无视狂风、乘风而动、逆风巩固
 Aya_1: 无！双！风！神！
 Yuka: 接触向日葵会为你带来增益
 Yuka_1: 周围的向日葵会从事生产
 Yuka_2: 会有孢子在你身上爆发四散
 Sizuha: 你摇起树来更加得心应手
 Minoriko: 食物更好吃
+Minoriko_0: 手持时会闻到番薯的香味
 Hina: 减小伤害浮动的负面效果，并净化负面前缀
 Nitori: 可以随身制作各种物品
 Sanae:
@@ -92,6 +88,7 @@ Sanae_0_2: 雨停！
 Sanae_0_3: 起风！
 Sanae_0_4: 风止！
 Sanae_1: 危机情况时，立刻治愈自身的创伤
+Sanae_2: AAA星星批发
 Iku: 暴击有概率产生闪电链，对其它敌人造成连锁打击，并施加雷蛰
 Tenshi: 增加耐打能力，可以洞悉敌人弱点
 Tenshi_1: 可通过洞悉弱点来对敌人造成更致命的打击
@@ -144,7 +141,7 @@ Junko_1: 加成不再有职业之分（即便看上去好像有）
 HecatiaAndPiece:
 	'''
 	{$Mods.TouhouPetsEx.Hecatia}
-	火把会使敌人疯狂自残
+	火把会使敌人疯狂自残，更多的能力会加深疯狂
 	'''
 Hecatia: 当你成功证明自身的强大时，增加能力携带上限
 HecatiaAndPiece_1:
@@ -199,8 +196,19 @@ Give: {
 }
 
 Configs: {
+	ModernConfigTitle:
+		'''
+		配置控制中心真的是太好用啦！
+		本模组已适配快来用嘿嘿嘿
+		'''
+
 	TouhouPetsExConfigs: {
 		DisplayName: 模组玩法
+		Description:
+			'''
+			这些选项会补充和拓展伙伴的能力
+			注意：这里的能力可能不会很好的适配所有内容模组，其具体风险已在每一个选项中标注
+			'''
 
 		Headers: {
 			Vanilla: 原版玩法调整
@@ -244,15 +252,6 @@ Configs: {
 				'''
 		}
 
-		Lily: {
-			Label: "[i:TouhouPets/LilyOneUp] 莉莉白-增加最大血量"
-			Tooltip:
-				'''
-				无兼容性问题
-				额外增加最大生命值+80效果
-				'''
-		}
-
 		Cirno: {
 			Label: "[i:TouhouPets/CirnoIceShard] 琪露诺-反牛顿冰块"
 			Tooltip:
@@ -272,7 +271,7 @@ Configs: {
 		}
 
 		Letty: {
-			Label: "[i:TouhouPets/LettyGlobe] 蕾蒂-增强寒冷系弹幕"
+			Label: "[i:TouhouPets/LettyGlobe] 蕾蒂-凛冬将至"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -300,8 +299,17 @@ Configs: {
 				'''
 		}
 
+		Lily: {
+			Label: "[i:TouhouPets/LilyOneUp] 莉莉白-增加最大血量"
+			Tooltip:
+				'''
+				无兼容性问题
+				额外增加最大生命值+80效果
+				'''
+		}
+
 		Yukari: {
-			Label: "[i:TouhouPets/YukarisItem] 八云紫-隙间传送无限制"
+			Label: "[i:TouhouPets/YukarisItem] 八云紫-隙间黑金VIP"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -351,7 +359,7 @@ Configs: {
 		}
 
 		Eirin: {
-			Label: "[i:TouhouPets/EirinBow] 永琳-增强恢复系药水效果"
+			Label: "[i:TouhouPets/EirinBow] 永琳-PHD"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -396,6 +404,15 @@ Configs: {
 				'''
 		}
 
+		Sanae_2: {
+			Label: "[i:TouhouPets/SanaeCoin] 早苗-祈星雨了"
+			Tooltip:
+				'''
+				无兼容性问题
+				玩家周围坠星数量增加
+				'''
+		}
+
 		Tenshi: {
 			Label: "[i:TouhouPets/TenshiKeyStone] 天子-破甲伤害也是伤害"
 			Tooltip:
@@ -424,7 +441,7 @@ Configs: {
 		}
 
 		Satori_3: {
-			Label: "[i:TouhouPets/SatoriSlippers] 古明地觉-游戏般的心理咨询"
+			Label: "[i:TouhouPets/SatoriSlippers] 小五-游戏般的心理咨询"
 			Tooltip:
 				'''
 				可能有兼容性问题
@@ -469,7 +486,7 @@ Configs: {
 		}
 
 		Utsuho_2: {
-			Label: "[i:TouhouPets/UtsuhoEye] 阿空-温度叠加"
+			Label: "[i:TouhouPets/UtsuhoEye] 阿空-热力学"
 			Tooltip:
 				'''
 				无兼容性问题
@@ -533,6 +550,15 @@ Configs: {
 				'''
 		}
 
+		Wakasagihime_3: {
+			Label: "[i:TouhouPets/WakasagihimeFishingRod] 若鹭姬-魂兮归来"
+			Tooltip:
+				'''
+				无兼容性问题
+				把平衡性调整时删除的加成复活
+				'''
+		}
+
 		Sekibanki: {
 			Label: "[i:TouhouPets/SekibankiBow] 赤蛮奇-邪仙技法"
 			Tooltip:
@@ -572,6 +598,7 @@ Configs: {
 
 	TouhouPetsExLocalConfigs: {
 		DisplayName: 特效/其它修改
+		Description: 用于调节本地内容，包括但不限于特效、对话等
 
 		MarisaKoishi: {
 			Label: 纯粹享乐的两人
@@ -667,6 +694,11 @@ Configs: {
 				'''
 		}
 
+		Wakasagihime: {
+			Label: "[i:TouhouPets/WakasagihimeFishingRod] 若鹭姬-人鱼特效"
+			Tooltip: 禁用后将不再在水里显示为人鱼
+		}
+
 		Sekibanki: {
 			Label: "[i:TouhouPets/SekibankiBow] 赤蛮奇-飞头特效"
 			Tooltip:
@@ -686,6 +718,25 @@ Configs: {
 		Raiko: {
 			Label: "[i:TouhouPets/RaikoDrum] 雷鼓-震屏特效"
 			Tooltip: 禁用后将不再显示闪电劈下时的震屏特效
+		}
+
+		Piece: {
+			Label: "[i:TouhouPets/HecatiaPlanet] 皮丝-敌怪受击特效"
+			Tooltip:
+				'''
+				可以修改敌怪因火把陷入疯狂时，自残受击的特效
+				也会同时修改因别人导致的敌怪自残特效
+
+				有四种可选的范围：
+				1. {$Mods.TouhouPetsEx.Configs.PieceEffect.Disabled.Label}
+				  - 不会显示任何敌怪自残受击音效和对应的跳字
+				2. {$Mods.TouhouPetsEx.Configs.PieceEffect.NoSound.Label}
+				  - 不会听到敌怪自残受击音效
+				3. {$Mods.TouhouPetsEx.Configs.PieceEffect.NoVisual.Label}
+				  - 不会显示敌怪自残受击跳字
+				4. {$Mods.TouhouPetsEx.Configs.PieceEffect.All.Label}
+				  - 完整显示敌怪自残受击特效
+				'''
 		}
 	}
 
@@ -750,6 +801,44 @@ Configs: {
 
 		Tooltip: ""
 	}
+
+	PieceEffect: {
+		Disabled: {
+			Label: 陷入昏迷
+			Tooltip: ""
+		}
+
+		NoSound: {
+			Label: 魔音入耳什么的绝对不要
+			Tooltip: ""
+		}
+
+		NoVisual: {
+			Label: 呱，我不要看呀
+			Tooltip: ""
+		}
+
+		All: {
+			Label: 就好这口
+			Tooltip: ""
+		}
+
+		Tooltip: ""
+	}
+}
+
+ModernConfig: {
+	MeAboutPage: {
+		About:
+			'''
+			哈喽！这里是已经适配好更好的体验配置控制中心的东方小祖宗哦！
+			欢迎并推荐大家在这里品鉴本模组的众多配置哟！
+			'''
+		Label: 关于
+		Tooltip: 是东方小祖宗哦~
+		LinkGitHub: GitHub:  https://github.com/hezuo1hao/TouhouSuperFriend（可点击！）
+		LinkQQ: QQ群：https://qm.qq.com/q/DfMN49cJHO（群号753836414）
+	}
 }
 
 Items: {
@@ -761,13 +850,13 @@ Items: {
 			2. 能力启用方法：手持单体伙伴物品，右键。对于被动能力则是携带在身上或宠物栏即可生效。
 			   启用后，您还需要保证身上带有伙伴增益，否则不会生效。
 			3. 能力的上限：能力默认上限为1，如果在达到上限时继续启用能力将会关闭最早启用的能力
-			   部分能力为被动能力，会带有特殊描述告知，被动能力不占用能力上限，可通过右键主动禁用被动。
-			   可以通过：携带[i:TouhouPets/HecatiaPlanet]赫卡提亚并击败肉山或月总、开启[i:TouhouPets/AliceOldDoll]萝莉丝并使用100本书
-			   使用新造的偶（生命水晶 + ？？？）、使用被烧焦的偶（新造的偶 + ？？？）来增加能力上限
+			   部分能力为被动能力，会带有特殊描述告知，被动能力不占用能力上限。
+			   查看能力上限的获取条件和获取情况可以通过创梦仪获取，该物品会与 [i:TouhouPets/YukarisItem]贤者车票一起赠送
 			4. 能力的查看：每个带有能力的物品其物品描述都有标识大致的能力，增益描述上则显示着当前开启的能力。
 			   （可在视觉特效内关闭增益描述，其中主动能力和被动能力描述可以分别关闭）
 			   如想看具体数值可自行拆包查看txt文件。
-			5. 实验性玩法与个人设置：同时具有补强和“这个角色应该有这个效果，但是加上太强了，扔实验性玩法吧”两种作用。
+			5. 模组配置-{$Mods.TouhouPetsEx.Configs.TouhouPetsExConfigs.DisplayName}：其中{$Mods.TouhouPetsEx.Configs.TouhouPetsExConfigs.Headers.Vanilla}用于调整模组标准能力或功能
+			   而{$Mods.TouhouPetsEx.Configs.TouhouPetsExConfigs.Headers.Experimental}同时具有补强和“这个角色应该有这个效果，但是加上太强了，扔实验性玩法吧”两种作用。
 			   如果您觉得哪个角色应该有某种能力那么欢迎投稿，我会视情况加入到实验性玩法。
 			6. 其它：部分特效可以通过 模组配置-{$Mods.TouhouPetsEx.Configs.TouhouPetsExLocalConfigs.DisplayName} 进行手动调整
 			7. BUG反馈：如果遇到任何BUG欢迎反馈，反馈渠道优先级：qq群、github、创意工坊评论
@@ -790,6 +879,11 @@ Items: {
 			永久提高能力上限
 			“由某人亲手缝制，携带着独有的丝线”
 			'''
+	}
+
+	AirWings: {
+		DisplayName: 哦，你不该看到这个的
+		Tooltip: 如果你能在正常流程里获取这东西就代表我代码有点问题
 	}
 }
 
@@ -814,6 +908,8 @@ Projectiles: {
 	FlyingKnife.DisplayName: 飞刀
 	DreamsAreBorn.DisplayName: 梦想天生
 	YukaSpore.DisplayName: 孢子
+	Sandevistan.DisplayName: Sandevistan
+	CriticalHit.DisplayName: Critical Hit
 }
 
 Buffs: {
@@ -904,6 +1000,11 @@ Buffs: {
 	PopularityExplosion: {
 		DisplayName: 人气爆发
 		Description: 引人注目，全属性提升
+	}
+
+	CD: {
+		DisplayName: 能力冷却中
+		Description: 请耐心等待能力冷却完毕
 	}
 }
 

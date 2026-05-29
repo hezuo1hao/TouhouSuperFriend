@@ -33,15 +33,15 @@ namespace TouhouPetsEx
         public bool Sakuya;
 
         [DefaultValue(false)]
-        public bool Lily;
-
-        [DefaultValue(false)]
         public bool Letty;
 
         [DefaultValue(false)]
         public bool Letty_2;
 
-        public List<string> Letty_2_1;
+        public List<string> Letty_2_1 = [];
+
+        [DefaultValue(false)]
+        public bool Lily;
 
         [DefaultValue(false)]
         public bool Yukari;
@@ -55,7 +55,7 @@ namespace TouhouPetsEx
         [DefaultValue(false)]
         public bool Reisen;
 
-        public List<string> Reisen_1;
+        public List<string> Reisen_1 = [];
 
         [DefaultValue(false)]
         public bool Eirin;
@@ -71,6 +71,9 @@ namespace TouhouPetsEx
 
         [DefaultValue(false)]
         public bool Sanae;
+
+        [DefaultValue(false)]
+        public bool Sanae_2;
 
         [DefaultValue(false)]
         public bool Tenshi;
@@ -116,6 +119,9 @@ namespace TouhouPetsEx
 
         [DefaultValue(false)]
         public bool Wakasagihime_2;
+
+        [DefaultValue(false)]
+        public bool Wakasagihime_3;
 
         [DefaultValue(false)]
         public bool Sekibanki;
@@ -166,12 +172,19 @@ namespace TouhouPetsEx
         [DrawTicks]
         public YukaEffect Yuka;
 
+        [DefaultValue(false)]
+        public bool Wakasagihime;
+
         [DefaultValue(SekibankiEffect.Normal)]
         [DrawTicks]
         public SekibankiEffect Sekibanki;
 
         [DefaultValue(true)]
         public bool Raiko;
+
+        [DefaultValue(PieceEffect.NoSound)]
+        [DrawTicks]
+        public PieceEffect Piece;
     }
     public enum YuyukoEffect
     {
@@ -192,5 +205,12 @@ namespace TouhouPetsEx
     {
         Normal,
         QOT
+    }
+    public enum PieceEffect
+    {
+        Disabled,
+        NoSound,
+        NoVisual,
+        All
     }
 }

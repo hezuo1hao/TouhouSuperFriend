@@ -34,7 +34,8 @@ namespace TouhouPetsEx.Enhance.Achieve
 
         public override void NPCAI(NPC npc)
         {
-            if (Config.Piece_V)
+            if (!Config.Piece_V)
+                return;
 
             if (Main.netMode == NetmodeID.MultiplayerClient || npc.dontTakeDamage || npc.friendly ||
                 NPCID.Sets.CountsAsCritter[npc.type])
@@ -48,31 +49,62 @@ namespace TouhouPetsEx.Enhance.Achieve
                 magnification <= 0)
                 return;
 
-            _touchDmg(npc, gNpc, magnification);
+            _touchDmg(npc, gNpc);
 
-            if (Main.GameUpdateCount % 30 != 17 || gNpc.TorchDamage <= 0)
+            if (Main.GameUpdateCount % 25 != 17 || gNpc.Torch <= 0)
                 return;
 
-            npc.SimpleStrikeNPC(gNpc.TorchDamage, 0, CrazyGod());
-            gNpc.TorchDamage = 0;
+            int dmg = 0;
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (!player.EnableEnhance<HecatiaPlanet>())
+                    return;
+
+                dmg += gNpc.Torch = (int)Math.Ceiling(Math.Sqrt(gNpc.Torch) * (2 + player.MP().ActiveEnhanceCount));
+            }
+
+            var sound = npc.HitSound;
+            if (LocalConfig.Piece is PieceEffect.Disabled or PieceEffect.NoSound)
+                npc.HitSound = null;
+
+            bool canCrit = CrazyGod(out float crit);
+            var modifiers = npc.GetIncomingStrikeModifiers(null, 0);
+            modifiers.CritDamage += Math.Max(0, crit - 100) / 100f;
+
+            var hit = modifiers.ToHitInfo(dmg, canCrit, 0, false, LuckiestPlayer().luck);
+            if (LocalConfig.Piece is PieceEffect.Disabled or PieceEffect.NoVisual)
+                hit.HideCombatText = true;
+
+            npc.StrikeNPC(hit, fromNet: false, false);
+            if (Main.netMode != NetmodeID.SinglePlayer)
+                NetMessage.SendStrikeNPC(npc, hit);
+
+            gNpc.Torch = 0;
+            npc.HitSound = sound;
         }
 
-        private static bool CrazyGod()
+        private static bool CrazyGod(out float crit)
         {
+            crit = 0;
             if (!Config.Piece)
                 return false;
 
-            int numerator = 0;
+            float numerator = 0;
 
             foreach (Player player in Main.ActivePlayers)
             {
                 if (player.unlockedBiomeTorches)
-                    numerator += 4;
+                {
+                    numerator += 4 * player.MP().ActiveEnhanceCount + player.GetTotalCritChance(DamageClass.Generic);
+
+                    if (player.EnableEnhance<JunkoMooncake>())
+                        crit += 4 * player.MP().ActiveEnhanceCount + player.GetTotalCritChance(DamageClass.Generic);
+                }
             }
 
-            return Main.rand.Next(100) < numerator;
+            return LuckiestPlayer().RollGoodLuck(100) < numerator;
         }
-        private static void _touchDmg(NPC npc, GEnhanceNPCs gNpc, int magnification)
+        private static void _touchDmg(NPC npc, GEnhanceNPCs gNpc)
         {
             // 每隔 15 tick 进行一次“完整扫描”，并用 whoAmI 分桶，把不同 NPC 的扫描摊到不同 tick 上，允许部分 NPC 的扫描延后。
             if ((Main.GameUpdateCount % (ulong)TorchScanIntervalTicks) !=
@@ -98,9 +130,8 @@ namespace TouhouPetsEx.Enhance.Achieve
                 }
             }
 
-            int torchBuckets = (torchTiles + 9) / 10;
-            if (torchBuckets > 0)
-                gNpc.TorchDamage += torchBuckets * magnification;
+            if (torchTiles > 0)
+                gNpc.Torch += torchTiles;
         }
     }
 }

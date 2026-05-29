@@ -52,7 +52,10 @@ namespace TouhouPetsEx.Projectiles
                 if (index < 600)
                 {
                     if (ChildSafety.Disabled)
-                        EnhanceSystem.GoreDamage[index] = Main.hardMode ? 100 : 25;
+                    {
+                        int damage = (Main.masterMode ? 75 : Main.expertMode ? 50 : 25);
+                        EnhanceSystem.GoreDamage[index] = Main.hardMode ? damage * 2 : damage;
+                    }
                     else
                         Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center, Vector2.Zero, ProjectileID.SpiritHeal, 0, 0, Projectile.owner, Projectile.owner, 1);
                 }

@@ -22,22 +22,32 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             player.buffImmune[BuffID.WindPushed] = true;
             player.moveSpeed += 0.35f;
-            player.accRunSpeed += 0.35f;
             player.runSlowdown += 0.35f;
+            player.maxRunSpeed += 1.5f * Math.Abs(Main.windSpeedCurrent);
+            player.accRunSpeed += 1.5f * Math.Abs(Main.windSpeedCurrent);
 
             if ((player.direction == 1 && Main.windSpeedCurrent > 0) || (player.direction == -1 && Main.windSpeedCurrent < 0))
             {
-                player.maxRunSpeed += 2.5f * Math.Abs(Main.windSpeedCurrent);
-                player.accRunSpeed += 2.5f * Math.Abs(Main.windSpeedCurrent);
+                player.GetAttackSpeed(DamageClass.Generic) += 0.15f;
             }
+            else
+                player.MP().DefMult += 0.15f;
         }
         public override void ItemHorizontalWingSpeeds(Item item, Player player, ref float speed, ref float acceleration)
         {
+            player.moveSpeed *= 1.2f;
+            player.maxRunSpeed *= 1.2f;
+            player.accRunSpeed *= 1.2f;
+            player.runAcceleration *= 1.45f;
             if (Config.Aya && player.velocity.Y != 0)
                 player.maxRunSpeed *= 2;
         }
         public override void PlayerPostUpdateRunSpeeds(Player player)
         {
+            player.moveSpeed *= 1.2f;
+            player.maxRunSpeed *= 1.2f;
+            player.accRunSpeed *= 1.2f;
+            player.runAcceleration *= 1.45f;
             if (Config.Aya && player.velocity.Y != 0)
                 player.maxRunSpeed *= 2;
         }

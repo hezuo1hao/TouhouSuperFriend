@@ -23,7 +23,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 
             foreach (NPC npc in Main.ActiveNPCs)
             {
-                if (npc.dontTakeDamage || npc.friendly || (npc.aiStyle == 112 && !(npc.ai[2] <= 1f)) || !Main.LocalPlayer.CanNPCBeHitByPlayerOrPlayerProjectile(npc) || !Main.rand.NextBool(2400))
+                if (npc.dontTakeDamage || npc.friendly || (npc.aiStyle == 112 && !(npc.ai[2] <= 1f)) || !Main.LocalPlayer.CanNPCBeHitByPlayerOrPlayerProjectile(npc) || player.RollGoodLuck(2400) != 0)
                     continue;
 
                 int damage = 100;

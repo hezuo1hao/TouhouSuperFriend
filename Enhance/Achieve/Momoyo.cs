@@ -19,7 +19,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             AddEnhance(ModContent.ItemType<MomoyoPickaxe>());
         }
-        public override void PlayerPostUpdateEquips(Player player)
+        public override void PlayerUpdateEquips(Player player)
         {
             EnhancePlayers plr = player.MP();
 

@@ -23,7 +23,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerOnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if (hit.Crit && player.MP().MystiaCD == 0 && !player.HasBuff(ModContent.BuffType<MystiasSong>()) && Main.rand.NextBool(4))
+            if (hit.Crit && player.MP().MystiaCD == 0 && !player.HasBuff(ModContent.BuffType<MystiasSong>()) && player.RollGoodLuck(4) == 0)
             {
                 player.MP().MystiaCD = 60;
 

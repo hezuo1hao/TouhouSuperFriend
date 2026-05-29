@@ -18,6 +18,7 @@ using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.GameContent.Events;
 using Terraria.GameContent.UI.Chat;
+using Terraria.Graphics;
 using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.Localization;
@@ -63,6 +64,7 @@ namespace TouhouPetsEx.Enhance.Core
                     Main.OnResolutionChanged += Main_OnResolutionChanged;
                 });
             On_FilterManager.EndCapture += On_FilterManager_EndCapture;
+            On_ScreenObstruction.Draw += On_ScreenObstruction_Draw;
             // 玩家属性相关（伤害/攻速/暴击/穿甲等）。
             On_Player.GetDamage += On_Player_GetDamage;
             On_Player.GetCritChance += On_Player_GetCritChance;
@@ -71,6 +73,7 @@ namespace TouhouPetsEx.Enhance.Core
             On_Player.GetArmorPenetration += On_Player_GetArmorPenetration;
             On_Player.VanillaBaseDefenseEffectiveness += On_Player_VanillaBaseDefenseEffectiveness;
             On_Player.GetPickaxeDamage += On_Player_GetPickaxeDamage;
+            On_Player.AddBuff += On_Player_AddBuff;
             // 运气相关：多个来源会用到同一套加成逻辑。
             On_Player.RollLuck += LuckUp;
             On_NPC.HitModifiers.GetDamage += ExCrit;
@@ -87,6 +90,9 @@ namespace TouhouPetsEx.Enhance.Core
             On_ShopHelper.LimitAndRoundMultiplier += On_ShopHelper_LimitAndRoundMultiplier;
             On_ShopHelper.ProcessMood += On_ShopHelper_ProcessMood;
             On_Gore.NewGore_IEntitySource_Vector2_Vector2_int_float += On_Gore_NewGore_IEntitySource_Vector2_Vector2_int_float;
+            On_WorldGen.SpawnThingsFromPot += On_WorldGen_SpawnThingsFromPot;
+            On_WorldGen.TreeGrowFX += On_WorldGen_TreeGrowFX;
+            On_NetMessage.SendData += On_NetMessage_SendData;
             // 叠叠叠叠叠叠到厌倦~
             if (Main.netMode != NetmodeID.Server && ModLoader.TryGetMod("TouhouPetsExOptimization", out Mod m))
             {
@@ -115,19 +121,75 @@ namespace TouhouPetsEx.Enhance.Core
                     player.itemTime = (int)Math.Max(1, item.useTime / 4f);
             };
         }
-        (Vector2, float)[] speedLine = new(Vector2, float)[30];
-        private void On_FilterManager_EndCapture(On_FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
+
+        public static bool NoUpdate;
+        private void On_Player_AddBuff(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
         {
-            var spriteBatch = Main.spriteBatch;
+            if (!NoUpdate && self.EnableEnhance<MinorikoSweetPotato>())
+            {
+                if (type == BuffID.WellFed)
+                    type = BuffID.WellFed2;
+                else if (type == BuffID.WellFed2)
+                    type = BuffID.WellFed3;
+            }
+
+            orig(self, type, timeToAdd, quiet, foodHack);
+        }
+
+        private void On_NetMessage_SendData(On_NetMessage.orig_SendData orig, int msgType, int remoteClient, int ignoreClient, NetworkText text, int number, float number2, float number3, float number4, int number5, int number6, int number7)
+        {
+            if (noLeaf && msgType == 112)
+                return;
+
+            orig(msgType, remoteClient, ignoreClient, text, number, number2, number3, number4, number5, number6, number7);
+        }
+
+        private void On_WorldGen_TreeGrowFX(On_WorldGen.orig_TreeGrowFX orig, int x, int y, int height, int treeGore, bool hitTree)
+        {
+            if (noLeaf)
+                return;
+
+            orig(x, y, height, treeGore, hitTree);
+        }
+
+        private void On_WorldGen_SpawnThingsFromPot(On_WorldGen.orig_SpawnThingsFromPot orig, int i, int j, int x2, int y2, int style)
+        {
+            bool a = Main.getGoodWorld;
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (player.EnableEnhance<RukotoRemote>() && player.Center.Distance(new(i * 16, j * 16)) < player.MP().RukotoRange)
+                {
+                    Main.getGoodWorld = false;
+                    break;
+                }
+            }
+            orig(i, j, x2, y2, style);
+            Main.getGoodWorld = a;
+
+        }
+
+        (Vector2, float)[] speedLine = new(Vector2, float)[30];
+        private void On_ScreenObstruction_Draw(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
+        {
             var player = Main.LocalPlayer;
+            if (player.ownedProjectileCounts[ModContent.ProjectileType<Sandevistan>()] > 0)
+            {
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Deferred, TouhouPetsEx.Green, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+                spriteBatch.Draw(TextureAssets.MagicPixel.Value, Vector2.Zero, null, Color.White, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight / 1000f), SpriteEffects.None, 0);
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+                Main.instance.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+
+                Achieve.YukariAndRanAndChen.DrawPlayer(Main.Camera, player);
+                Main.PlayerRenderer.DrawPlayer(Main.Camera, player, player.position, player.fullRotation, player.fullRotationOrigin, 0);
+            }
 
             if (LocalConfig.Aya)
             {
                 var tex = TextureAssets.MagicPixel.Value;
                 bool left = player.velocity.X < 0;
                 bool newLine = !Main.gamePaused && Math.Abs(player.velocity.X) > 6 && Config.Aya && player.EnableEnhance<AyaCamera>() && player.velocity.Y != 0 && Main.GameUpdateCount % 3 == 0 && Main.rand.NextBool(2);
-
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
 
                 for (int i = 0; i < speedLine.Length; i++)
                 {
@@ -154,10 +216,13 @@ namespace TouhouPetsEx.Enhance.Core
                     if (line.Item1 != Vector2.Zero)
                         spriteBatch.Draw(tex, pos, null, Color.White, 1.57f, tex.Size() / 2f, new Vector2(4, line.Item2 / 200f), SpriteEffects.None, 0);
                 }
-
-                spriteBatch.End();
             }
 
+            orig(spriteBatch);
+        }
+        private void On_FilterManager_EndCapture(On_FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
+        {
+            var spriteBatch = Main.spriteBatch;
             bool perfectMaid = false;
             bool reisenEffect = false;
             int perfectMaidType = ModContent.ProjectileType<PerfectMaid>();
@@ -696,7 +761,7 @@ namespace TouhouPetsEx.Enhance.Core
 
             foreach (Player player in Main.ActivePlayers)
             {
-                if (player.sleeping.isSleeping && player.EnableEnhance<DoremyPillow>() && Main.rand.NextBool(50))
+                if (player.sleeping.isSleeping && player.EnableEnhance<DoremyPillow>() && player.RollGoodLuck(50) == 0)
                     WorldGen.spawnMeteor = true;
             }
         }
@@ -784,12 +849,12 @@ namespace TouhouPetsEx.Enhance.Core
 
                     // 成就的触发
                     int count = mp.adjTile.Concat(mp.adjOther).Where(a => a).Count();
-                    var improveGame = ModContent.GetInstance<ImproveGame>();
+                    var improveGame = ModContent.GetInstance<Achievements.ImproveGame>();
 
                     if (improveGame.Condition.Value < count)
                         improveGame.Condition.Value = count;
 
-                    if (improveGame.Condition.Value >= ImproveGame.Max)
+                    if (improveGame.Condition.Value >= Achievements.ImproveGame.Max)
                         improveGame.Condition.Complete();
 
                     player.adjWater = mp.adjOther[0];
@@ -801,15 +866,27 @@ namespace TouhouPetsEx.Enhance.Core
                 }
             });
         }
-
+        public static bool Sizuha = false;
+        bool noLeaf;
         private void On_WorldGen_ShakeTree(On_WorldGen.orig_ShakeTree orig, int i, int j)
         {
-            if (!WorldEnableEnhance<SizuhaBrush>())
+            if (!Sizuha)
             {
+                bool a = Main.getGoodWorld;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    if (player.EnableEnhance<RukotoRemote>() && player.Center.Distance(new(i * 16, j * 16)) < player.MP().RukotoRange)
+                    {
+                        Main.getGoodWorld = false;
+                        break;
+                    }
+                }
                 orig(i, j);
+                Main.getGoodWorld = a;
                 return;
             }
 
+            Sizuha = false;
             for (int l = 0; ;l++)
             {
                 // 在orig前获取树是否被摇过，因为orig会修改WorldGen.treeShakeX,Y的值，标记为被摇过
@@ -825,6 +902,9 @@ namespace TouhouPetsEx.Enhance.Core
                     }
                 }
 
+                if (l >= 1)
+                    noLeaf = true;
+
                 bool a = Main.getGoodWorld;
                 Main.getGoodWorld = false;
 
@@ -833,7 +913,10 @@ namespace TouhouPetsEx.Enhance.Core
                 Main.getGoodWorld = a;
 
                 if (WorldGen.numTreeShakes == WorldGen.maxTreeShakes || treeShaken || l >= 20)
+                {
+                    noLeaf = false;
                     return;
+                }
                 else
                 {
                     for (int k = 0; k < WorldGen.numTreeShakes; k++)
@@ -876,10 +959,10 @@ namespace TouhouPetsEx.Enhance.Core
             }
 
             if (luck > 0f && damage < dmg && Main.LocalPlayer.EnableEnhance<HinaDoll>())
-                damage = (int)Math.Round(dmg * (1f + Main.rand.Next(percent + 1) * 0.01f));
+                damage = (int)Math.Round(dmg * (1f + Main.rand.Next((int)MathHelper.Lerp(-percent, 0, Math.Min(luck, 1)), percent + 1) * 0.01f));
 
             if (luck < 0f && damage > dmg && Main.LocalPlayer.EnableEnhance<HinaDoll>())
-                damage = (int)Math.Round(dmg * (1f + Main.rand.Next(-percent, 1) * 0.01f));
+                damage = (int)Math.Round(dmg * (1f + Main.rand.Next(-percent, (int)MathHelper.Lerp(percent + 1, 0, Math.Min(Math.Abs(luck), 1))) * 0.01f));
 
             return damage;
         }
@@ -899,7 +982,7 @@ namespace TouhouPetsEx.Enhance.Core
         private int LuckUp(On_Player.orig_RollLuck orig, Player self, int range)
         {
             if (self.luck > 1f && self.EnableEnhance<TewiCarrot>() && Main.rand.NextFloat() < self.luck - 1)
-                return Main.rand.Next(Main.rand.Next(range / 4, range));
+                return Main.rand.Next(Main.rand.Next(range / 4, range / 2));
 
             return orig(self, range);
         }
@@ -971,9 +1054,24 @@ namespace TouhouPetsEx.Enhance.Core
 
         private int ExCrit(On_NPC.HitModifiers.orig_GetDamage orig, ref NPC.HitModifiers self, float baseDamage, bool crit, bool damageVariation, float luck)
         {
-            if (!crit && self.DamageType?.CountsAsClass(DamageClass.Summon) == true && Main.LocalPlayer.EnableEnhance<YukarisItem>() && Main.rand.NextBool(100))
+            if (self.DamageType?.CountsAsClass(DamageClass.Summon) == true && Main.LocalPlayer.EnableEnhance<YukarisItem>())
             {
-                self.SetCrit();
+                if (!crit && Main.LocalPlayer.RollGoodLuck(100) == 0)
+                    self.SetCrit();
+                else if (crit && Main.LocalPlayer.EnableEnhance<JunkoMooncake>())
+                    self.CritDamage += 0.01f;
+            }
+
+            if (WorldAllEnableEnhance<SatoriSlippers>(out int number))
+            {
+                int probability = number * 20;
+                if (self.DamageType?.CountsAsClass(DamageClass.Summon) == true)
+                    probability /= 2;
+
+                if (!crit && Main.LocalPlayer.RollGoodLuck(100) < probability)
+                    self.SetCrit();
+                else if (crit && Main.LocalPlayer.EnableEnhance<JunkoMooncake>())
+                    self.CritDamage += probability / 100f;
             }
 
             if (Main.LocalPlayer.EnableEnhance<TenshiKeyStone>())
@@ -997,7 +1095,12 @@ namespace TouhouPetsEx.Enhance.Core
                 NoDamageReduction(ref self.NonCritDamage);
                 NoDamageReduction(ref self.SourceDamage);
             }
-            return orig(ref self, baseDamage, crit, damageVariation, luck);
+            int damage = orig(ref self, baseDamage, crit, damageVariation, luck);
+
+            if (damage <= self.CritDamage.ApplyTo(1) && crit && Main.LocalPlayer.EnableEnhance<YukarisItem>())
+                damage = (int)(baseDamage * 2);
+
+            return damage;
         }
         void NoDamageReduction(ref StatModifier modifier)
         {
@@ -1029,11 +1132,12 @@ namespace TouhouPetsEx.Enhance.Core
         {
             float effectiveness = orig();
             EnhancePlayers mp = Main.LocalPlayer.MP();
+            EnhanceBuffPlayers mbp = Main.LocalPlayer.MBP();
 
             if (mp == null)
                 return effectiveness;
 
-            if (mp.FragrantAromaFillsTheAir == true)
+            if (mbp.FragrantAromaFillsTheAir == true)
                 effectiveness += 0.25f;
 
             if (Main.LocalPlayer.EnableEnhance<MomoyoPickaxe>())

@@ -10,6 +10,8 @@ namespace TouhouPetsEx.Enhance.Achieve
     public class Flandre : BaseEnhance
     {
         public override string Text => GetText("Flandre");
+        public override bool EnableRightClick => false;
+        public override bool Passive => true;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<FlandrePudding>());

@@ -26,7 +26,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 
                 for (int i = amount; i > 0; i--)
                 {
-                    if (Main.rand.Next(100) < 81)
+                    if (Main.LocalPlayer.RollGoodLuck(100) < 81)
                         amount--;
                 }
             });

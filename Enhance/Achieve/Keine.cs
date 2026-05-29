@@ -21,13 +21,17 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerPostUpdateBuffs(Player player)
         {
-            if (player.MP().KeineCD[0] == 0)
+            if (player != Main.LocalPlayer)
+                return;
+
+            EnhancePlayers mp = player.MP();
+            if (mp.KeineCD[0] == 0)
             {
                 List<int> buffs = [ModContent.BuffType<Sword>(), ModContent.BuffType<Jade>(), ModContent.BuffType<Mirror>(), ModContent.BuffType<Township>()];
-                buffs.Remove(player.MP().KeineCD[1]);
-                player.MP().KeineCD[1] = Main.rand.Next(buffs);
-                player.AddBuff(player.MP().KeineCD[1], 1800);
-                player.MP().KeineCD[0] = 1800;
+                buffs.Remove(mp.KeineCD[1]);
+                mp.KeineCD[1] = Main.rand.Next(buffs);
+                player.AddBuff(mp.KeineCD[1], 1800, false);
+                mp.KeineCD[0] = 1800;
             }
         }
         public override void ItemModifyTooltips(Item item, List<TooltipLine> tooltips)

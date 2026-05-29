@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
+using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 
@@ -15,6 +16,8 @@ namespace TouhouPetsEx.Enhance.Achieve
         public override string Text => GetText("Sakuya");
         public override string[] ExperimentalText => [GetText("Sakuya_1")];
         public override bool[] Experimental => [Config.Sakuya];
+        public override bool Passive => true;
+        public override bool EnableRightClick => false;
         public override void ItemSSD()
         {
             AddEnhance(ModContent.ItemType<SakuyaWatch>());
@@ -40,7 +43,7 @@ namespace TouhouPetsEx.Enhance.Achieve
         }
         public override void PlayerModifyHurt(Player player, ref Player.HurtModifiers modifiers)
         {
-            if (Config.Sakuya && modifiers.DamageSource.TryGetCausingEntity(out var entity) && player.MP().SakuyaCD == 0)
+            if (Config.Sakuya && modifiers.DamageSource.TryGetCausingEntity(out var entity) && !player.HasBuff<SakuyaCD>())
                 modifiers.ModifyHurtInfo += Modifiers_ModifyHurtInfo;
         }
 
@@ -51,12 +54,12 @@ namespace TouhouPetsEx.Enhance.Achieve
 
         public override bool? PlayerFreeDodge(Player player, Player.HurtInfo info)
         {
-            if (Config.Sakuya && info.DamageSource.TryGetCausingEntity(out var entity) && player.MP().SakuyaCD == 0)
+            if (Config.Sakuya && info.DamageSource.TryGetCausingEntity(out var entity) && !player.HasBuff<SakuyaCD>())
             {
                 if (entity is NPC)
-                    player.MP().SakuyaCD = 9600;
+                    player.AddBuff(ModContent.BuffType<SakuyaCD>(), player.DetermineCD(info, 9600));
                 else
-                    player.MP().SakuyaCD = 4800;
+                    player.AddBuff(ModContent.BuffType<SakuyaCD>(), player.DetermineCD(info, 4800));
 
                 Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<PerfectMaid>(), 0, 0, player.whoAmI, ai1: info.DamageSource.SourceNPCIndex, ai2: (int)Math.Ceiling(info.ReflectionDamage() / 5f));
 
@@ -80,21 +83,13 @@ namespace TouhouPetsEx.Enhance.Achieve
 
             return null;
         }
-        public override void PlayerPostUpdate(Player player)
+        public override void PlayerPreUpdateBuffsAlways(Player player)
         {
-            if (Config.Sakuya)
-            {
-                if (player.MP().SakuyaCD > 0)
-                    player.MP().SakuyaCD--;
+            if (!player.HasBuff<SakuyaCD>())
+                return;
 
-                if (player.MP().SakuyaCD == 1)
-                    SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_cardget"), player.Center);
-            }
-        }
-        public override void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
-        {
-            if (Config.Sakuya)
-                player.MP().SakuyaCD = 0;
+            if (player.buffTime[player.FindBuffIndex(ModContent.BuffType<SakuyaCD>())] <= 2)
+                SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_cardget"), player.Center);
         }
         public override bool? NPCPreAI(NPC npc)
         {

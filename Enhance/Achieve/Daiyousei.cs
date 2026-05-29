@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TouhouPets.Content.Items.PetItems;
 using TouhouPetsEx.Achievements;
+using TouhouPetsEx.Buffs;
 using TouhouPetsEx.Enhance.Core;
 using TouhouPetsEx.Projectiles;
 
@@ -18,17 +19,17 @@ namespace TouhouPetsEx.Enhance.Achieve
         {
             AddEnhance(ModContent.ItemType<DaiyouseiBomb>());
         }
-        public override void PlayerResetEffects(Player player)
+        public override void PlayerPreUpdateBuffsAlways(Player player)
         {
-            if (player.MP().DaiyouseiCD > 0)
-                player.MP().DaiyouseiCD--;
+            if (!player.HasBuff<DaiyouseiCD>())
+                return;
 
-            if (player.MP().DaiyouseiCD == 1)
+            if (player.buffTime[player.FindBuffIndex(ModContent.BuffType<DaiyouseiCD>())] <= 2)
                 SoundEngine.PlaySound(new SoundStyle("TouhouPetsEx/Sound/se_cardget"), player.Center);
         }
         public override void PlayerModifyHurt(Player player, ref Player.HurtModifiers modifiers)
         {
-            if (player.MP().DaiyouseiCD == 0)
+            if (!player.HasBuff<DaiyouseiCD>())
                 modifiers.ModifyHurtInfo += Modifiers_ModifyHurtInfo;
         }
 
@@ -39,7 +40,7 @@ namespace TouhouPetsEx.Enhance.Achieve
 
         public override bool? PlayerFreeDodge(Player player, Player.HurtInfo info)
         {
-            if (player.MP().DaiyouseiCD == 0)
+            if (!player.HasBuff<DaiyouseiCD>())
             {
                 int time = player.longInvince ? 240 : 180;
 
@@ -49,7 +50,7 @@ namespace TouhouPetsEx.Enhance.Achieve
                 {
                     player.hurtCooldowns[i] += time;
                 }
-                player.MP().DaiyouseiCD = 5400;
+                player.AddBuff(ModContent.BuffType<DaiyouseiCD>(), player.DetermineCD(info, 5400));
                 Projectile.NewProjectile(player.GetSource_OnHurt(info.DamageSource), player.Center, Vector2.Zero, ModContent.ProjectileType<DaiyouseiBoom>(), (info.ReflectionDamage() + 10) * 10, 5, player.whoAmI);
 
                 if (player.EnableAllYousei())
@@ -66,10 +67,6 @@ namespace TouhouPetsEx.Enhance.Achieve
             }
 
             return null;
-        }
-        public override void PlayerKill(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
-        {
-            player.MP().DaiyouseiCD = 0;
         }
     }
 }

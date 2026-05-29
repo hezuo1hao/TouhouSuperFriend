@@ -3,4 +3,5 @@ author = hezuo1hao
 version = 1.1.5.901
 includeSource = true
 modReferences = TouhouPets@1.1.5.9
+weakReferences = ImproveGame@1.8.1.22
 homepage = https://github.com/hezuo1hao/TouhouSuperFriend
