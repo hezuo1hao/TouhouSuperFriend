@@ -206,17 +206,26 @@ namespace TouhouPetsEx.Enhance.Core
         public override void SetStaticDefaults()
         {
             List<Type> subclasses = [];
-
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Type[] allTypes = assembly.GetTypes();
+            Type[] allTypes;
+
+            try
+            {
+                allTypes = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                allTypes = [.. ex.Types.Where(t => t != null)];
+            }
 
             foreach (Type type in allTypes)
             {
-                if (type.IsClass && !type.IsAbstract && typeof(BaseEnhance).IsAssignableFrom(type))
+                if (type != null && type.IsClass && !type.IsAbstract && typeof(BaseEnhance).IsAssignableFrom(type))
                 {
                     subclasses.Add(type);
                 }
             }
+
 
             foreach (Type types in subclasses)
             {

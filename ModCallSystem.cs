@@ -14,6 +14,9 @@ using Terraria.Utilities;
 using TouhouPets.Content.Projectiles.Pets;
 using TouhouPets;
 using Terraria.ID;
+using ImproveGame.UI.ModernConfig;
+using ImproveGame.UI.ModernConfig.FakeCategories;
+using TouhouPetsEx.UI;
 
 namespace TouhouPetsEx
 {
@@ -1495,14 +1498,14 @@ namespace TouhouPetsEx
         }
         #endregion
     }
-    [JITWhenModsEnabled("ImproveGame")]
+    [JITWhenModsEnabled(nameof(ImproveGame))]
+    [ExtendsFromMod(nameof(ImproveGame))]
     public class QOTCallSystem : ModSystem
     {
-        [JITWhenModsEnabled("ImproveGame")]
         public override void PostSetupContent()
         {
             if (Main.netMode != NetmodeID.Server)
-                ImproveGame.UI.ModernConfig.CategorySidePanel.SetAboutPage(Mod, new UI.MeAboutPage());
+                CategorySidePanel.SetAboutPage(Mod, new MeAboutPage());
         }
     }
 }

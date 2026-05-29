@@ -1,3 +1,7 @@
+using ImproveGame.UI.ModernConfig;
+using ImproveGame.UI.ModernConfig.FakeCategories;
+using ImproveGame.UIFramework.BaseViews;
+using ImproveGame.UIFramework.SUIElements;
 using Microsoft.Xna.Framework;
 using Terraria.ID;
 using Terraria.Localization;
@@ -6,21 +10,18 @@ using Terraria.UI;
 
 namespace TouhouPetsEx.UI;
 
-[JITWhenModsEnabled("ImproveGame")]
-public sealed class MeAboutPage : ImproveGame.UI.ModernConfig.Category
+[JITWhenModsEnabled(nameof(ImproveGame))]
+[ExtendsFromMod(nameof(ImproveGame))]
+public sealed class MeAboutPage : Category
 {
-    [JITWhenModsEnabled("ImproveGame")]
     public override int ItemIconId => ItemID.GPS;
-    [JITWhenModsEnabled("ImproveGame")]
     public override string Label => GetText($"ModernConfig.{LocalizationKey}.Label");
-    [JITWhenModsEnabled("ImproveGame")]
     public override string Tooltip => GetText($"ModernConfig.{LocalizationKey}.Tooltip");
-    [JITWhenModsEnabled("ImproveGame")]
-    public override void AddOptions(ImproveGame.UI.ModernConfig.ConfigOptionsPanel panel)
+    public override void AddOptions(ConfigOptionsPanel panel)
     {
         panel.ShouldHideSearchBar = true;
 
-        var text = new ImproveGame.UIFramework.SUIElements.SUIText
+        var text = new SUIText
         {
             TextOrKey = "Mods.TouhouPetsEx.ModernConfig.MeAboutPage.About",
             UseKey = true,
@@ -28,7 +29,7 @@ public sealed class MeAboutPage : ImproveGame.UI.ModernConfig.Category
             IsWrapped = true,
             Width = { Precent = 1f },
             TextScale = 1.1f,
-            RelativeMode = ImproveGame.UIFramework.BaseViews.RelativeMode.Vertical
+            RelativeMode = RelativeMode.Vertical
         };
         panel.AddToOptionsDirect(text);
         text.RecalculateText();
@@ -38,22 +39,22 @@ public sealed class MeAboutPage : ImproveGame.UI.ModernConfig.Category
 
         panel.Recalculate();
     }
-    [JITWhenModsEnabled("ImproveGame")]
-    public static void AddLinksToPanel(ImproveGame.UI.ModernConfig.ConfigOptionsPanel panel)
+
+    public static void AddLinksToPanel(ConfigOptionsPanel panel)
     {
-        var gapProvider = new ImproveGame.UIFramework.BaseViews.View
+        var gapProvider = new View
         {
             Width = StyleDimension.Fill,
             Height = new(30, 0f),
-            RelativeMode = ImproveGame.UIFramework.BaseViews.RelativeMode.Vertical
+            RelativeMode = RelativeMode.Vertical
         };
         panel.AddToOptionsDirect(gapProvider);
 
-        ImproveGame.UI.ModernConfig.FakeCategories.AboutPage.GenerateLinkElement(panel, "Mods.TouhouPetsEx.ModernConfig.MeAboutPage.LinkGitHub", "https://github.com/hezuo1hao/TouhouSuperFriend");
+        AboutPage.GenerateLinkElement(panel, "Mods.TouhouPetsEx.ModernConfig.MeAboutPage.LinkGitHub", "https://github.com/hezuo1hao/TouhouSuperFriend");
 
         if (Language.ActiveCulture.Name is not "zh-Hans")
             return;
 
-        ImproveGame.UI.ModernConfig.FakeCategories.AboutPage.GenerateLinkElement(panel, "Mods.TouhouPetsEx.ModernConfig.MeAboutPage.LinkQQ", "https://qm.qq.com/q/DfMN49cJHO");
+        AboutPage.GenerateLinkElement(panel, "Mods.TouhouPetsEx.ModernConfig.MeAboutPage.LinkQQ", "https://qm.qq.com/q/DfMN49cJHO");
     }
 }
